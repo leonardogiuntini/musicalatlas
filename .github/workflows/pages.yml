@@ -1,4 +1,4 @@
-name: Build index and deploy to GitHub Pages
+name: Build indexes and deploy to GitHub Pages
 
 on:
   push:
@@ -21,34 +21,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate content-index.json
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Build index (node)
+      - name: Generate content-index.json and search-index.json from /menu
         run: |
           node - <<'NODE'
           const fs = require("fs");
           const path = require("path");
 
-          const ROOT = "content";
+          const ROOT = "menu";
           const exts = new Set([".rtf"]);
 
           function titleize(name) {
             const base = name.replace(/\.rtf$/i, "").replace(/[_\-]+/g, " ").trim();
             return base.replace(/\b\w/g, c => c.toUpperCase());
           }
-          function slugify(s) {
-            return String(s||"")
-              .trim()
-              .toLowerCase()
-              .replace(/\.rtf$/i, "")
-              .replace(/\s+/g, "-")
-              .replace(/[^\w\-]+/g, "");
+
+          // Very simple RTF -> text extraction (good enough for search)
+          function rtfToPlainText(rtf) {
+            let s = String(rtf || "");
+
+            // Remove groups like {\*\...}
+            s = s.replace(/\{\\\*[^{}]*\}/g, " ");
+
+            // Replace escaped hex \'hh
+            s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
+
+            // Remove control words like \par, \fs24, \b0 etc.
+            s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
+
+            // Remove braces
+            s = s.replace(/[{}]/g, " ");
+
+            // Collapse whitespace
+            s = s.replace(/\s+/g, " ").trim();
+            return s;
           }
 
-          function scanDir(absDir, relParts) {
+          function scanDir(absDir, relParts, searchItems) {
             const node = {
               type: "folder",
               name: relParts[relParts.length - 1],
@@ -59,44 +72,65 @@ jobs:
 
             const entries = fs.readdirSync(absDir, { withFileTypes: true });
             for (const ent of entries) {
+              const abs = path.join(absDir, ent.name);
+
               if (ent.isDirectory()) {
-                node.children.push(scanDir(path.join(absDir, ent.name), [...relParts, ent.name]));
+                node.children.push(scanDir(abs, [...relParts, ent.name], searchItems));
               } else if (ent.isFile()) {
                 const ext = path.extname(ent.name).toLowerCase();
                 if (!exts.has(ext)) continue;
+
+                const pagePath = [ROOT, ...relParts, ent.name].join("/");
+                const title = titleize(ent.name);
+
                 node.children.push({
                   type: "page",
                   name: ent.name,
-                  title: titleize(ent.name),
-                  path: [ROOT, ...relParts, ent.name].join("/")
+                  title,
+                  path: pagePath
                 });
+
+                // Build search entry
+                try {
+                  const raw = fs.readFileSync(abs, "utf8");
+                  const text = rtfToPlainText(raw);
+                  searchItems.push({ path: pagePath, title, text });
+                } catch {
+                  // ignore
+                }
               }
             }
 
-            node.children.sort((a,b) => (a.type === b.type ? a.title.localeCompare(b.title) : (a.type === "folder" ? -1 : 1)));
+            node.children.sort((a,b) => (
+              a.type === b.type ? a.title.localeCompare(b.title) : (a.type === "folder" ? -1 : 1)
+            ));
             return node;
           }
 
-          // countries = subfolders of /content
+          // Countries = subfolders of /menu
           const items = [];
+          const searchItems = [];
+
           if (fs.existsSync(ROOT) && fs.statSync(ROOT).isDirectory()) {
             const top = fs.readdirSync(ROOT, { withFileTypes: true });
             for (const ent of top) {
               if (!ent.isDirectory()) continue;
-              items.push(scanDir(path.join(ROOT, ent.name), [ent.name]));
+              items.push(scanDir(path.join(ROOT, ent.name), [ent.name], searchItems));
             }
           }
           items.sort((a,b) => a.title.localeCompare(b.title));
 
+          // flat map for quick linking by name (kept for compatibility)
           const flatPagesByKey = {};
+          function normalizeName(s) {
+            return String(s||"").trim().replace(/\.rtf$/i,"").toLowerCase();
+          }
           function flatten(node) {
             for (const ch of (node.children || [])) {
               if (ch.type === "page") {
-                const key = slugify(ch.title);
-                flatPagesByKey[key] = { title: ch.title, path: ch.path };
-              } else if (ch.type === "folder") {
-                flatten(ch);
-              }
+                const key = normalizeName(ch.title);
+                if (!flatPagesByKey[key]) flatPagesByKey[key] = { title: ch.title, path: ch.path };
+              } else if (ch.type === "folder") flatten(ch);
             }
           }
           for (const it of items) flatten(it);
@@ -109,7 +143,9 @@ jobs:
           };
 
           fs.writeFileSync("content-index.json", JSON.stringify(index, null, 2), "utf8");
-          console.log("Wrote content-index.json with", items.length, "top folders.");
+          fs.writeFileSync("search-index.json", JSON.stringify({ generatedAt: index.generatedAt, root: ROOT, items: searchItems }, null, 2), "utf8");
+
+          console.log("Wrote content-index.json and search-index.json");
           NODE
 
       - name: Upload artifact
