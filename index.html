@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RTF Site</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    header { padding: 14px 16px; border-bottom: 1px solid #ddd; display:flex; gap:12px; align-items:center; }
+    header .pill { font-size:12px; border:1px solid #ddd; padding:4px 8px; border-radius:999px; }
+    main { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 52px); }
+    nav { border-right: 1px solid #ddd; overflow:auto; padding: 12px; }
+    .content { padding: 16px; overflow:auto; }
+    .hidden { display:none !important; }
+
+    .screen { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+    .card { border: 1px solid #ddd; border-radius: 14px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .row { display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
+    button {
+      border: 1px solid #222; background: #222; color:#fff;
+      padding: 10px 12px; border-radius: 12px; cursor: pointer;
+    }
+    button.secondary { background: transparent; color:#222; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .muted { color:#555; }
+    .small { font-size: 13px; }
+    .list { display:flex; flex-direction:column; gap: 6px; }
+    .item {
+      border: 1px solid #e5e5e5; background:#fff; border-radius: 12px;
+      padding: 10px 10px; cursor:pointer;
+    }
+    .item:hover { border-color:#bbb; }
+    .item.active { border-color:#222; }
+    .crumbs { display:flex; gap: 6px; flex-wrap:wrap; margin: 10px 0 12px; }
+    .crumb { font-size: 12px; border:1px solid #ddd; padding:4px 8px; border-radius: 999px; cursor:pointer; }
+    .crumb:hover { border-color:#aaa; }
+    .notice { border-left: 4px solid #222; padding: 10px 12px; background:#f7f7f7; border-radius: 10px; }
+    .rtf-host {
+      /* Your “personalized font” step: change this font-family later */
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+    .rtf-host a { color: inherit; text-decoration: underline; }
+  </style>
+
+  <!-- rtf.js bundles (RTF -> HTML rendering) -->
+  <script src="https://unpkg.com/rtf.js@3.0.9/dist/WMFJS.bundle.js"></script>
+  <script src="https://unpkg.com/rtf.js@3.0.9/dist/EMFJS.bundle.js"></script>
+  <script src="https://unpkg.com/rtf.js@3.0.9/dist/RTFJS.bundle.js"></script>
+</head>
+
+<body>
+<header>
+  <strong>RTF Site</strong>
+  <span id="modePill" class="pill">…</span>
+  <span id="status" class="muted small"></span>
+</header>
+
+<!-- WELCOME / BUILD SCREEN -->
+<section id="welcomeScreen" class="screen">
+  <div class="card">
+    <h2 style="margin:0 0 8px;">Welcome!</h2>
+    <p class="muted" style="margin:0 0 14px;">
+      This site builds menus from your <code>/content</code> folder and renders <code>.rtf</code> files as HTML.
+    </p>
+
+    <div class="notice small" style="margin: 12px 0;">
+      <div><strong>GitHub mode:</strong> if <code>content-index.json</code> exists, the site enters automatically.</div>
+      <div><strong>Offline mode:</strong> click “Enter the Website” and choose your local <code>content</code> folder.</div>
+    </div>
+
+    <div class="row" style="margin-top: 10px;">
+      <button id="enterBtn">Enter the Website</button>
+      <button id="downloadIndexBtn" class="secondary" disabled>Download content-index.json</button>
+      <button id="resetLocalBtn" class="secondary">Reset local cache</button>
+    </div>
+
+    <p class="small muted" style="margin-top: 14px;">
+      Tip: If you plan to publish on GitHub Pages, you can either:
+      (a) download <code>content-index.json</code> and commit it, or
+      (b) let GitHub Actions generate it automatically (workflow below).
+    </p>
+
+    <div class="small muted" id="welcomeDebug" style="margin-top:10px;"></div>
+  </div>
+</section>
+
+<!-- APP SCREEN -->
+<main id="appScreen" class="hidden">
+  <nav>
+    <div class="small muted" style="margin-bottom:8px;">Menu</div>
+    <div id="menuList" class="list"></div>
+  </nav>
+
+  <div class="content">
+    <div id="crumbs" class="crumbs"></div>
+
+    <div id="pagesListWrap" class="card" style="margin-bottom:14px;">
+      <div class="small muted">Pages</div>
+      <div id="pagesList" class="list" style="margin-top:8px;"></div>
+    </div>
+
+    <div id="docWrap" class="card">
+      <div class="small muted" style="margin-bottom:8px;">Document</div>
+      <div id="docTitle" style="font-weight:600; margin: 0 0 10px;"></div>
+      <div id="doc" class="rtf-host"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+/** ---------------------------
+ *  Utilities
+ *  ------------------------- */
+const $ = (sel) => document.querySelector(sel);
+
+function setStatus(msg) { $("#status").textContent = msg || ""; }
+
+function slugify(s) {
+  return String(s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\.rtf$/i, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "");
+}
+
+function titleize(name) {
+  // "south_africa" -> "South Africa"
+  const base = String(name).replace(/\.rtf$/i, "").replace(/[_\-]+/g, " ").trim();
+  return base.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function downloadJson(filename, obj) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function arrayBufferFromString(str) {
+  const buffer = new ArrayBuffer(str.length);
+  const view = new Uint8Array(buffer);
+  for (let i = 0; i < str.length; i++) view[i] = str.charCodeAt(i) & 0xff;
+  return buffer;
+}
+
+/** ---------------------------
+ *  Global state
+ *  ------------------------- */
+const STATE = {
+  index: null,            // { generatedAt, root, items, flatPagesByKey }
+  mode: "unknown",        // "github" | "offline" | "unknown"
+  currentFolder: null,    // selected top folder key
+  currentPath: [],        // crumbs inside folder tree
+};
+
+const LS_KEY = "rtfSite.indexCache.v1";
+
+/** ---------------------------
+ *  Index format we use
+ *  -------------------------
+ *  index = {
+ *    generatedAt: ISOString,
+ *    root: "content",
+ *    items: [
+ *      { type:"folder", name:"ghana", title:"Ghana", path:"content/ghana", children:[ ... ] }
+ *    ],
+ *    flatPagesByKey: {
+ *      "ewe": { title:"Ewe", path:"content/ghana/ewe.rtf" },
+ *      ...
+ *    }
+ *  }
+ */
+
+/** ---------------------------
+ *  RTF -> HTML rendering using rtf.js
+ *  ------------------------- */
+async function renderRtfArrayBuffer(ab) {
+  // silence logs
+  try { RTFJS.loggingEnabled(false); WMFJS.loggingEnabled(false); EMFJS.loggingEnabled(false); } catch {}
+
+  const doc = new RTFJS.Document(ab);
+  const htmlElements = await doc.render(); // array of HTMLElements
+  const div = document.createElement("div");
+  div.append(...htmlElements);
+  return div;
+}
+
+/** ---------------------------
+ *  Auto-link: bold + ALL CAPS words -> internal page
+ *  ------------------------- */
+function autoLinkBoldCaps(container, flatPagesByKey) {
+  const bolds = container.querySelectorAll("b, strong");
+
+  for (const node of bolds) {
+    if (node.closest("a")) continue;
+
+    const raw = (node.textContent || "").trim();
+    // rule: single token, all caps letters (allow diacritics? keep simple for now)
+    if (!/^[A-Z]{2,}$/.test(raw)) continue;
+
+    const key = slugify(raw);
+    const page = flatPagesByKey?.[key];
+    if (!page) continue;
+
+    const a = document.createElement("a");
+    a.href = `#page=${encodeURIComponent(page.path)}`;
+    a.title = `Open: ${page.title}`;
+    node.parentNode.insertBefore(a, node);
+    a.appendChild(node);
+  }
+}
+
+/** ---------------------------
+ *  UI: Screen switching
+ *  ------------------------- */
+function showWelcome() {
+  $("#welcomeScreen").classList.remove("hidden");
+  $("#appScreen").classList.add("hidden");
+}
+function showApp() {
+  $("#welcomeScreen").classList.add("hidden");
+  $("#appScreen").classList.remove("hidden");
+}
+
+/** ---------------------------
+ *  Build menus from index
+ *  ------------------------- */
+function buildLeftMenu() {
+  const list = $("#menuList");
+  list.innerHTML = "";
+
+  const folders = (STATE.index?.items || []).filter(x => x.type === "folder");
+  for (const folder of folders) {
+    const el = document.createElement("div");
+    el.className = "item" + (STATE.currentFolder === folder.name ? " active" : "");
+    el.textContent = folder.title;
+    el.onclick = () => {
+      STATE.currentFolder = folder.name;
+      STATE.currentPath = [];
+      updateAppUI();
+    };
+    list.appendChild(el);
+  }
+}
+
+function getSelectedFolderNode() {
+  const folders = (STATE.index?.items || []).filter(x => x.type === "folder");
+  return folders.find(f => f.name === STATE.currentFolder) || folders[0] || null;
+}
+
+function getNodeAtPath(folderNode, pathArr) {
+  let node = folderNode;
+  for (const p of pathArr) {
+    const next = (node.children || []).find(ch => ch.type === "folder" && ch.name === p);
+    if (!next) return node;
+    node = next;
+  }
+  return node;
+}
+
+function buildCrumbs(folderNode) {
+  const crumbs = $("#crumbs");
+  crumbs.innerHTML = "";
+  const base = document.createElement("div");
+  base.className = "crumb";
+  base.textContent = folderNode.title;
+  base.onclick = () => { STATE.currentPath = []; updateAppUI(); };
+  crumbs.appendChild(base);
+
+  let accum = [];
+  for (const p of STATE.currentPath) {
+    accum.push(p);
+    const node = getNodeAtPath(folderNode, accum);
+    const c = document.createElement("div");
+    c.className = "crumb";
+    c.textContent = node.title;
+    c.onclick = () => { STATE.currentPath = accum.slice(); updateAppUI(); };
+    crumbs.appendChild(c);
+  }
+}
+
+function buildPagesList(currentNode) {
+  const wrap = $("#pagesList");
+  wrap.innerHTML = "";
+
+  // show subfolders first
+  for (const ch of (currentNode.children || [])) {
+    if (ch.type !== "folder") continue;
+    const el = document.createElement("div");
+    el.className = "item";
+    el.textContent = "📁 " + ch.title;
+    el.onclick = () => {
+      STATE.currentPath.push(ch.name);
+      updateAppUI();
+    };
+    wrap.appendChild(el);
+  }
+
+  // then pages
+  for (const ch of (currentNode.children || [])) {
+    if (ch.type !== "page") continue;
+    const el = document.createElement("div");
+    el.className = "item";
+    el.textContent = "📄 " + ch.title;
+    el.onclick = () => openPageByPath(ch.path, ch.title);
+    wrap.appendChild(el);
+  }
+
+  if (!wrap.childElementCount) {
+    const empty = document.createElement("div");
+    empty.className = "muted small";
+    empty.textContent = "No subfolders or .rtf files here.";
+    wrap.appendChild(empty);
+  }
+}
+
+async function openPageByPath(path, title) {
+  $("#docTitle").textContent = title || path;
+  $("#doc").innerHTML = "";
+  setStatus("Loading RTF…");
+
+  try {
+    let ab;
+
+    // If offline builder loaded files via handles, we may have stored a handle map
+    const handleMap = STATE.index?._handleMap;
+    if (handleMap && handleMap[path]) {
+      ab = await handleMap[path].getFile().then(f => f.arrayBuffer());
+    } else {
+      // GitHub/static mode: fetch from server
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+      ab = await res.arrayBuffer();
+    }
+
+    const htmlDiv = await renderRtfArrayBuffer(ab);
+    autoLinkBoldCaps(htmlDiv, STATE.index.flatPagesByKey);
+
+    const doc = $("#doc");
+    doc.innerHTML = "";
+    doc.appendChild(htmlDiv);
+
+    setStatus("");
+    // update hash for deep-linking
+    location.hash = `page=${encodeURIComponent(path)}`;
+  } catch (err) {
+    console.error(err);
+    $("#doc").innerHTML = `<div class="muted">Failed to render RTF: ${String(err.message || err)}</div>`;
+    setStatus("");
+  }
+}
+
+function updateAppUI() {
+  buildLeftMenu();
+
+  const folderNode = getSelectedFolderNode();
+  if (!folderNode) return;
+
+  if (!STATE.currentFolder) STATE.currentFolder = folderNode.name;
+
+  buildCrumbs(folderNode);
+
+  const currentNode = getNodeAtPath(folderNode, STATE.currentPath);
+  buildPagesList(currentNode);
+}
+
+/** ---------------------------
+ *  Offline builder: choose a folder, scan it, build index (+ map of handles)
+ *  ------------------------- */
+async function buildIndexFromPickedFolder() {
+  if (!("showDirectoryPicker" in window)) {
+    throw new Error("Your browser doesn't support folder picking. Use Chrome or Edge for the offline builder step.");
+  }
+
+  // Ask user to select the /content folder
+  const dirHandle = await window.showDirectoryPicker({ mode: "read" });
+
+  // Recursive scan
+  const handleMap = {}; // path -> FileSystemFileHandle
+  async function scanDir(handle, relPathParts) {
+    const node = {
+      type: "folder",
+      name: relPathParts[relPathParts.length - 1] || handle.name,
+      title: titleize(relPathParts[relPathParts.length - 1] || handle.name),
+      path: ["content", ...relPathParts].join("/"),
+      children: []
+    };
+
+    for await (const [name, child] of handle.entries()) {
+      if (child.kind === "directory") {
+        const childNode = await scanDir(child, [...relPathParts, name]);
+        node.children.push(childNode);
+      } else if (child.kind === "file" && name.toLowerCase().endsWith(".rtf")) {
+        const pagePath = ["content", ...relPathParts, name].join("/");
+        node.children.push({
+          type: "page",
+          name,
+          title: titleize(name),
+          path: pagePath
+        });
+        handleMap[pagePath] = child;
+      }
+    }
+
+    // sort: folders then pages
+    node.children.sort((a,b) => (a.type === b.type ? a.title.localeCompare(b.title) : (a.type === "folder" ? -1 : 1)));
+    return node;
+  }
+
+  // top-level: countries = subfolders of chosen folder
+  const items = [];
+  for await (const [name, child] of dirHandle.entries()) {
+    if (child.kind !== "directory") continue;
+    items.push(await scanDir(child, [name]));
+  }
+  items.sort((a,b) => a.title.localeCompare(b.title));
+
+  // flat page map for autolinking
+  const flatPagesByKey = {};
+  function flatten(node) {
+    for (const ch of (node.children || [])) {
+      if (ch.type === "page") {
+        const key = slugify(ch.title);
+        flatPagesByKey[key] = { title: ch.title, path: ch.path };
+      } else if (ch.type === "folder") {
+        flatten(ch);
+      }
+    }
+  }
+  for (const it of items) flatten(it);
+
+  const index = {
+    generatedAt: new Date().toISOString(),
+    root: "content",
+    items,
+    flatPagesByKey,
+    _handleMap: handleMap // not serialized; used only for offline reading
+  };
+
+  // cache (without handles)
+  const cacheCopy = structuredClone(index);
+  delete cacheCopy._handleMap;
+  localStorage.setItem(LS_KEY, JSON.stringify(cacheCopy));
+
+  return index;
+}
+
+/** ---------------------------
+ *  Startup: try GitHub index, else local cache, else welcome
+ *  ------------------------- */
+async function tryLoadIndexFromGithub() {
+  const res = await fetch("./content-index.json", { cache: "no-store" });
+  if (!res.ok) return null;
+  return await res.json();
+}
+
+function tryLoadIndexFromCache() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function applyLoadedIndex(index, mode) {
+  STATE.index = index;
+  STATE.mode = mode;
+  $("#modePill").textContent = mode === "github" ? "GitHub index" : (mode === "offline" ? "Offline builder" : "Index");
+  showApp();
+
+  // pick first folder by default
+  const firstFolder = (STATE.index.items || []).find(x => x.type === "folder");
+  STATE.currentFolder = firstFolder?.name || null;
+  STATE.currentPath = [];
+  updateAppUI();
+
+  // deep link support
+  handleHash();
+}
+
+/** ---------------------------
+ *  Hash navigation
+ *  ------------------------- */
+function handleHash() {
+  const h = (location.hash || "").replace(/^#/, "");
+  const m = new URLSearchParams(h);
+  const page = m.get("page");
+  if (page) {
+    // find title from map if possible
+    const key = slugify(page.split("/").pop() || "");
+    const title = STATE.index?.flatPagesByKey?.[key]?.title || page;
+    openPageByPath(page, title);
+  }
+}
+window.addEventListener("hashchange", handleHash);
+
+/** ---------------------------
+ *  Wire up buttons
+ *  ------------------------- */
+$("#enterBtn").addEventListener("click", async () => {
+  try {
+    setStatus("Building menu from folder…");
+    const idx = await buildIndexFromPickedFolder();
+    STATE.index = idx;
+    STATE.mode = "offline";
+    $("#downloadIndexBtn").disabled = false;
+    $("#modePill").textContent = "Offline builder";
+    setStatus("");
+
+    showApp();
+    const firstFolder = (STATE.index.items || []).find(x => x.type === "folder");
+    STATE.currentFolder = firstFolder?.name || null;
+    STATE.currentPath = [];
+    updateAppUI();
+  } catch (e) {
+    console.error(e);
+    setStatus("");
+    $("#welcomeDebug").textContent = String(e.message || e);
+  }
+});
+
+$("#downloadIndexBtn").addEventListener("click", () => {
+  if (!STATE.index) return;
+  const copy = structuredClone(STATE.index);
+  delete copy._handleMap;
+  downloadJson("content-index.json", copy);
+});
+
+$("#resetLocalBtn").addEventListener("click", () => {
+  localStorage.removeItem(LS_KEY);
+  $("#downloadIndexBtn").disabled = true;
+  $("#welcomeDebug").textContent = "Local cache cleared.";
+});
+
+/** ---------------------------
+ *  Boot
+ *  ------------------------- */
+(async function boot() {
+  showWelcome();
+  setStatus("Loading…");
+
+  // 1) GitHub / hosted mode
+  try {
+    const idx = await tryLoadIndexFromGithub();
+    if (idx) {
+      setStatus("");
+      applyLoadedIndex(idx, "github");
+      return;
+    }
+  } catch {}
+
+  // 2) Offline cache
+  const cached = tryLoadIndexFromCache();
+  if (cached) {
+    setStatus("");
+    applyLoadedIndex(cached, "offline");
+    $("#downloadIndexBtn").disabled = false;
+    return;
+  }
+
+  // 3) Welcome screen (no index yet)
+  setStatus("");
+  $("#modePill").textContent = "No index yet";
+})();
+</script>
+</body>
+</html>
