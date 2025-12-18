@@ -1,0 +1,129 @@
+name: Build index and deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate content-index.json
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build index (node)
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const ROOT = "content";
+          const exts = new Set([".rtf"]);
+
+          function titleize(name) {
+            const base = name.replace(/\.rtf$/i, "").replace(/[_\-]+/g, " ").trim();
+            return base.replace(/\b\w/g, c => c.toUpperCase());
+          }
+          function slugify(s) {
+            return String(s||"")
+              .trim()
+              .toLowerCase()
+              .replace(/\.rtf$/i, "")
+              .replace(/\s+/g, "-")
+              .replace(/[^\w\-]+/g, "");
+          }
+
+          function scanDir(absDir, relParts) {
+            const node = {
+              type: "folder",
+              name: relParts[relParts.length - 1],
+              title: titleize(relParts[relParts.length - 1]),
+              path: [ROOT, ...relParts].join("/"),
+              children: []
+            };
+
+            const entries = fs.readdirSync(absDir, { withFileTypes: true });
+            for (const ent of entries) {
+              if (ent.isDirectory()) {
+                node.children.push(scanDir(path.join(absDir, ent.name), [...relParts, ent.name]));
+              } else if (ent.isFile()) {
+                const ext = path.extname(ent.name).toLowerCase();
+                if (!exts.has(ext)) continue;
+                node.children.push({
+                  type: "page",
+                  name: ent.name,
+                  title: titleize(ent.name),
+                  path: [ROOT, ...relParts, ent.name].join("/")
+                });
+              }
+            }
+
+            node.children.sort((a,b) => (a.type === b.type ? a.title.localeCompare(b.title) : (a.type === "folder" ? -1 : 1)));
+            return node;
+          }
+
+          // countries = subfolders of /content
+          const items = [];
+          if (fs.existsSync(ROOT) && fs.statSync(ROOT).isDirectory()) {
+            const top = fs.readdirSync(ROOT, { withFileTypes: true });
+            for (const ent of top) {
+              if (!ent.isDirectory()) continue;
+              items.push(scanDir(path.join(ROOT, ent.name), [ent.name]));
+            }
+          }
+          items.sort((a,b) => a.title.localeCompare(b.title));
+
+          const flatPagesByKey = {};
+          function flatten(node) {
+            for (const ch of (node.children || [])) {
+              if (ch.type === "page") {
+                const key = slugify(ch.title);
+                flatPagesByKey[key] = { title: ch.title, path: ch.path };
+              } else if (ch.type === "folder") {
+                flatten(ch);
+              }
+            }
+          }
+          for (const it of items) flatten(it);
+
+          const index = {
+            generatedAt: new Date().toISOString(),
+            root: ROOT,
+            items,
+            flatPagesByKey
+          };
+
+          fs.writeFileSync("content-index.json", JSON.stringify(index, null, 2), "utf8");
+          console.log("Wrote content-index.json with", items.length, "top folders.");
+          NODE
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
