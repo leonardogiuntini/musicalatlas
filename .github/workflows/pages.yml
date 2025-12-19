@@ -15,24 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Optional: Jekyll build sanity-check (runs only if a Jekyll site is detected).
-  # This job does NOT deploy anything. It only fails if Jekyll is present but broken.
-  jekyll_check:
+  build:
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('_config.yml') != '' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build Jekyll (optional check)
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
-
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    needs: [jekyll_check]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,16 +27,14 @@ jobs:
           node-version: "20"
 
       - name: Generate content-index.json and search-index.json
-        run: node - <<'NODE'
+        run: |
+          node - <<'NODE'
           const fs = require("fs");
           const path = require("path");
 
           const INDEX_OUT = "content-index.json";
           const SEARCH_OUT = "search-index.json";
 
-          // Optional config file (recommended):
-          // atlas-config.json: { "rootFolder": "MENU" }
-          // Lets you name the root folder anything you want.
           function readConfigRoot() {
             const cfgPath = "atlas-config.json";
             if (!fs.existsSync(cfgPath)) return null;
@@ -76,7 +58,6 @@ jobs:
 
           function rtfToPlainText(rtf) {
             let s = String(rtf || "");
-            // Rough but effective: remove common RTF control words and groups
             s = s.replace(/\{\\\*[^{}]*\}/g, " ");
             s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
             s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
@@ -85,12 +66,6 @@ jobs:
             return s;
           }
 
-          function isDir(p) {
-            return fs.existsSync(p) && fs.statSync(p).isDirectory();
-          }
-
-          // Find the first top-level directory (excluding .github/.git/etc.)
-          // that contains at least one .rtf somewhere inside.
           function containsRtfSomewhere(dirAbs) {
             const entries = fs.readdirSync(dirAbs, { withFileTypes: true });
             for (const ent of entries) {
@@ -119,7 +94,7 @@ jobs:
           }
 
           const ROOT = readConfigRoot() || autoDetectRoot();
-          if (!ROOT || !isDir(ROOT)) {
+          if (!ROOT || !fs.existsSync(ROOT) || !fs.statSync(ROOT).isDirectory()) {
             console.error("❌ No root content folder found.");
             console.error("Create a top-level folder containing .rtf files, OR add atlas-config.json like:");
             console.error('{ "rootFolder": "YOUR_FOLDER_NAME" }');
@@ -127,7 +102,6 @@ jobs:
           }
 
           function scanFolder(absDir, relParts, searchItems) {
-            // relParts are folders under ROOT. Root node uses ROOT as its name.
             const nodeName = relParts.length ? relParts[relParts.length - 1] : ROOT;
             const nodePath = relParts.length ? [ROOT, ...relParts].join("/") : ROOT;
 
@@ -140,7 +114,6 @@ jobs:
             };
 
             const entries = fs.readdirSync(absDir, { withFileTypes: true });
-
             for (const ent of entries) {
               const abs = path.join(absDir, ent.name);
 
@@ -158,17 +131,13 @@ jobs:
                 node.children.push({ type: "page", name: ent.name, title, path: pagePath });
 
                 try {
-                  // read as utf8 for text indexing
                   const raw = fs.readFileSync(abs, "utf8");
                   const text = rtfToPlainText(raw);
                   searchItems.push({ path: pagePath, title, text });
-                } catch {
-                  // ignore unreadable files
-                }
+                } catch {}
               }
             }
 
-            // folders first, then pages, both alphabetically
             node.children.sort((a,b) => {
               if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
               return a.title.localeCompare(b.title);
@@ -191,14 +160,18 @@ jobs:
 
           console.log("✅ Generated:", INDEX_OUT, "and", SEARCH_OUT);
           console.log("✅ Root folder:", ROOT);
-        NODE
+          NODE
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Deploy everything in the repo root (index.html, your content folder, and the generated JSON files)
           path: .
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        id: deployment
