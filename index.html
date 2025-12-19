@@ -21,19 +21,13 @@
     }
 
     *{ box-sizing: border-box; }
-
     body{
       margin:0;
       background: var(--ui-bg);
       color: var(--ui-fg);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-
-    .col{
-      width: var(--col);
-      margin: 0 auto;
-    }
-
+    .col{ width: var(--col); margin: 0 auto; }
     .wrap{ padding: 18px 0 74px; }
 
     #headerTitle{
@@ -60,7 +54,7 @@
     }
     #searchInput::placeholder{ color: rgba(255,255,255,0.65); }
 
-    /* Results now sit directly under search bar */
+    /* Search results row directly under the search bar */
     .resultsRow{
       display: flex;
       justify-content: center;
@@ -76,23 +70,9 @@
       gap: 10px;
       padding: 6px 0 6px;
     }
-    .navLeft{
-      display: flex;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-    .navMid{
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .navRight{
-      flex: 1 1 auto;
-      display: flex;
-      justify-content: flex-end;
-      min-width: 0;
-    }
+    .navLeft{ display:flex; gap: 8px; flex:0 0 auto; }
+    .navMid{ flex:0 0 auto; display:flex; align-items:center; gap:8px; }
+    .navRight{ flex:1 1 auto; display:flex; justify-content:flex-end; min-width:0; }
 
     #crumbs{
       display: flex;
@@ -104,7 +84,6 @@
       scrollbar-width: thin;
     }
 
-    /* Inverted UI buttons */
     .btn{
       border: 2px solid var(--ui-border);
       border-radius: 999px;
@@ -134,7 +113,6 @@
       min-height: 36px;
     }
 
-    /* Document stays "paper-like" */
     .docFrame{
       border: 2px solid var(--doc-border);
       border-radius: 18px;
@@ -162,7 +140,6 @@
       color: inherit !important;
     }
 
-    /* Hover balloon (inverted UI) */
     #hoverCard{
       position: fixed;
       z-index: 9999;
@@ -177,28 +154,6 @@
       pointer-events: none;
       box-shadow: 0 10px 26px rgba(0,0,0,0.35);
     }
-    #hoverCard::after{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:-7px;
-      transform:translateX(-50%);
-      width:0;height:0;
-      border-left:7px solid transparent;
-      border-right:7px solid transparent;
-      border-top:7px solid #000;
-    }
-    #hoverCard::before{
-      content:"";
-      position:absolute;
-      left:50%;
-      bottom:-8px;
-      transform:translateX(-50%);
-      width:0;height:0;
-      border-left:8px solid transparent;
-      border-right:8px solid transparent;
-      border-top:8px solid #fff;
-    }
 
     footer{
       position: fixed;
@@ -212,11 +167,6 @@
       text-align: center;
     }
   </style>
-
-  <!-- Local vendor bundles (autonomous) -->
-  <script src="./vendor/WMFJS.bundle.js"></script>
-  <script src="./vendor/EMFJS.bundle.js"></script>
-  <script src="./vendor/RTFJS.bundle.js"></script>
 </head>
 
 <body>
@@ -228,7 +178,6 @@
         <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
       </div>
 
-      <!-- Search results: directly under the search bar -->
       <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
 
       <div class="navRow" aria-label="Navigation">
@@ -286,58 +235,34 @@ or search from the bar above.`;
   const hoverCard    = $("#hoverCard");
 
   const APP = {
-    mode: "unknown",      // "online" | "offline" | "unknown"
+    mode: "unknown",
     index: null,
     searchIndex: [],
     rootNode: null,
 
-    // offline handles
     rootHandle: null,
-    fileHandleByPath: new Map(), // path -> FileSystemFileHandle
+    fileHandleByPath: new Map(),
 
-    // navigation (2-line)
-    menuOverlay: false,       // root menu view
-    folderPath: [],           // nodes root..current
-    currentDocPath: null,     // displayed doc path
+    menuOverlay: false,
+    folderPath: [],
+    currentDocPath: null,
 
-    // history snapshots
     navStack: [],
     navIdx: -1,
 
-    // link lookups
     pageByKey: new Map(),
     folderByKey: new Map(),
+
+    // vendor load tracking
+    vendorReady: false,
+    vendorLoadTried: false
   };
 
   function setMenuActive(active){ menuBtn.classList.toggle("sel", !!active); }
+  function hideHoverCard(){ hoverCard.style.display = "none"; hoverCard.textContent = ""; }
 
-  function hideHoverCard(){
-    hoverCard.style.display = "none";
-    hoverCard.textContent = "";
-  }
-
-  function showHoverCard(anchorEl, text){
-    const rect = anchorEl.getBoundingClientRect();
-    hoverCard.textContent = text;
-    hoverCard.style.display = "block";
-
-    const pad = 10;
-    const cardRect = hoverCard.getBoundingClientRect();
-    let x = rect.left + rect.width / 2 - cardRect.width / 2;
-    let y = rect.top - cardRect.height - 14;
-    x = Math.max(pad, Math.min(x, window.innerWidth - cardRect.width - pad));
-    y = Math.max(pad, y);
-    hoverCard.style.left = x + "px";
-    hoverCard.style.top = y + "px";
-  }
-
-  const normalizeKey = (s) =>
-    String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
-
-  const titleize = (name) => {
-    const base = String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim();
-    return base.replace(/\b\w/g, c => c.toUpperCase());
-  };
+  const normalizeKey = (s) => String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
+  const titleize = (name) => String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim().replace(/\b\w/g, c => c.toUpperCase());
 
   const escapeHtml = (s) =>
     String(s ?? "")
@@ -360,6 +285,74 @@ or search from the bar above.`;
 
     docContent.innerHTML = `<div class="welcomeMsg">${escapeHtml(WELCOME_TEXT)}</div>`;
     updateBackForwardButtons();
+  }
+
+  function rtfBundlesLoaded(){
+    return (typeof window.RTFJS !== "undefined") &&
+           (typeof window.WMFJS !== "undefined") &&
+           (typeof window.EMFJS !== "undefined");
+  }
+
+  function loadScript(src){
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.async = false;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load: " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureRtfVendorLoaded(){
+    if (rtfBundlesLoaded()){
+      APP.vendorReady = true;
+      return true;
+    }
+    if (APP.vendorLoadTried){
+      // already tried and failed
+      return false;
+    }
+    APP.vendorLoadTried = true;
+
+    const base = new URL(".", location.href).href;
+
+    const files = [
+      "vendor/WMFJS.bundle.js",
+      "vendor/EMFJS.bundle.js",
+      "vendor/RTFJS.bundle.js"
+    ];
+
+    try{
+      // Load in required order
+      await loadScript("./" + files[0]);
+      await loadScript("./" + files[1]);
+      await loadScript("./" + files[2]);
+
+      if (!rtfBundlesLoaded()){
+        throw new Error("Scripts loaded but globals not found (WMFJS/EMFJS/RTFJS).");
+      }
+
+      APP.vendorReady = true;
+      return true;
+    }catch(e){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">
+RTF renderer not loaded.
+
+Make sure this folder exists NEXT TO index.html:
+<b>vendor</b>
+
+And inside it you have EXACTLY these 3 files:
+<b>WMFJS.bundle.js</b>
+<b>EMFJS.bundle.js</b>
+<b>RTFJS.bundle.js</b>
+
+Quick check (open these in your browser):
+${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
+</div>`;
+      return false;
+    }
   }
 
   async function tryLoadOnlineIndexes(){
@@ -385,40 +378,6 @@ or search from the bar above.`;
     }catch{
       return false;
     }
-  }
-
-  /* IndexedDB (offline handle) */
-  const IDB_DB = "musical-atlas";
-  const IDB_STORE = "handles";
-  const IDB_KEY = "rootHandle";
-
-  function idbOpen(){
-    return new Promise((resolve, reject) => {
-      const req = indexedDB.open(IDB_DB, 1);
-      req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  }
-
-  async function idbSet(key, value){
-    const db = await idbOpen();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, "readwrite");
-      tx.objectStore(IDB_STORE).put(value, key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  async function idbGet(key){
-    const db = await idbOpen();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, "readonly");
-      const req = tx.objectStore(IDB_STORE).get(key);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
   }
 
   async function rtfToPlainTextFromFile(file){
@@ -553,7 +512,6 @@ or search from the bar above.`;
   function listSubfolders(folderNode){
     return (folderNode.children || []).filter(ch => ch.type === "folder");
   }
-
   function listExtraPages(folderNode){
     const pres = presentationDocPathForFolder(folderNode);
     return (folderNode.children || []).filter(ch => ch.type === "page" && ch.path !== pres);
@@ -569,10 +527,7 @@ or search from the bar above.`;
       const b = document.createElement("button");
       b.className = "btn sel";
       b.textContent = folderNode.name.toUpperCase();
-      b.addEventListener("click", () => {
-        hideHoverCard();
-        openFolderByPath(folderNode.path, true);
-      });
+      b.addEventListener("click", () => openFolderByPath(folderNode.path, true));
       crumbs.appendChild(b);
     }
     crumbs.scrollLeft = crumbs.scrollWidth;
@@ -591,7 +546,6 @@ or search from the bar above.`;
         b.className = "btn";
         b.textContent = f.name.toUpperCase();
         b.addEventListener("click", () => {
-          hideHoverCard();
           APP.menuOverlay = false;
           setMenuActive(false);
           openFolderByPath(f.path, true);
@@ -604,7 +558,6 @@ or search from the bar above.`;
         b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
         b.textContent = p.title.toUpperCase();
         b.addEventListener("click", () => {
-          hideHoverCard();
           APP.menuOverlay = false;
           setMenuActive(false);
           openDocByPath(p.path, true);
@@ -615,7 +568,6 @@ or search from the bar above.`;
     }
 
     const currentFolder = APP.folderPath[APP.folderPath.length - 1] || APP.rootNode;
-
     const subfolders = listSubfolders(currentFolder);
     const extras = listExtraPages(currentFolder);
 
@@ -623,10 +575,7 @@ or search from the bar above.`;
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = f.name.toUpperCase();
-      b.addEventListener("click", () => {
-        hideHoverCard();
-        openFolderByPath(f.path, true);
-      });
+      b.addEventListener("click", () => openFolderByPath(f.path, true));
       choicesRow.appendChild(b);
     }
 
@@ -634,27 +583,15 @@ or search from the bar above.`;
       const b = document.createElement("button");
       b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
       b.textContent = p.title.toUpperCase();
-      b.addEventListener("click", () => {
-        hideHoverCard();
-        openDocByPath(p.path, true);
-      });
+      b.addEventListener("click", () => openDocByPath(p.path, true));
       choicesRow.appendChild(b);
     }
-  }
-
-  /* RTF rendering fixes */
-
-  function rtfBundlesLoaded(){
-    return (typeof window.RTFJS !== "undefined") &&
-           (typeof window.WMFJS !== "undefined") &&
-           (typeof window.EMFJS !== "undefined");
   }
 
   function normalizeRtfArrayBuffer(ab){
     const u8 = new Uint8Array(ab);
     if (u8.length < 4) return ab;
 
-    // UTF-16 BOM
     const b0 = u8[0], b1 = u8[1];
     const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
     const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
@@ -664,15 +601,8 @@ or search from the bar above.`;
       return new TextEncoder().encode(s).buffer;
     }
 
-    // Heuristic: UTF-16LE WITHOUT BOM (common): "{\rtf" appears as 7B 00 5C 00 72 00...
-    const looksLE =
-      u8[0] === 0x7B && u8[1] === 0x00 &&
-      u8[2] === 0x5C && u8[3] === 0x00;
-
-    // Heuristic: UTF-16BE WITHOUT BOM: 00 7B 00 5C 00 72...
-    const looksBE =
-      u8[0] === 0x00 && u8[1] === 0x7B &&
-      u8[2] === 0x00 && u8[3] === 0x5C;
+    const looksLE = u8[0] === 0x7B && u8[1] === 0x00 && u8[2] === 0x5C && u8[3] === 0x00;
+    const looksBE = u8[0] === 0x00 && u8[1] === 0x7B && u8[2] === 0x00 && u8[3] === 0x5C;
 
     if (looksLE || looksBE){
       const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
@@ -683,127 +613,9 @@ or search from the bar above.`;
     return ab;
   }
 
-  function isAllCapsToken(token){
-    const t = String(token || "").trim();
-    if (t.length < 2) return false;
-    const letters = t.replace(/[^A-Za-z]/g,"");
-    if (letters.length < 2) return false;
-    return letters === letters.toUpperCase();
-  }
-
-  function elementIsBold(el){
-    if (!el || el.nodeType !== 1) return false;
-    const tag = el.tagName?.toLowerCase();
-    if (tag === "b" || tag === "strong") return true;
-    const w = getComputedStyle(el).fontWeight;
-    const n = Number(w);
-    if (!Number.isNaN(n)) return n >= 600;
-    return w === "bold";
-  }
-
-  function hasBoldAncestor(node){
-    let cur = node.parentElement;
-    while (cur){
-      if (elementIsBold(cur)) return true;
-      cur = cur.parentElement;
-    }
-    return false;
-  }
-
-  function autolinkBoldAllCaps(rootEl){
-    hideHoverCard();
-
-    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
-      acceptNode: (n) => {
-        if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-        if (!hasBoldAncestor(n) && !elementIsBold(n.parentElement)) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    });
-
-    const nodes = [];
-    while (walker.nextNode()) nodes.push(walker.currentNode);
-
-    for (const textNode of nodes){
-      const text = textNode.nodeValue;
-      if (!text) continue;
-
-      const parts = text.split(/(\s+)/);
-      let changed = false;
-
-      const frag = document.createDocumentFragment();
-      for (const part of parts){
-        if (/^\s+$/.test(part)){
-          frag.appendChild(document.createTextNode(part));
-          continue;
-        }
-
-        const m = part.match(/^([("'“”‘’\[\{<]*)(.*?)([)",'.!?;:’”\]\}>]*)$/);
-        const lead = m ? m[1] : "";
-        const core = m ? m[2] : part;
-        const tail = m ? m[3] : "";
-
-        if (core && isAllCapsToken(core)){
-          const key = normalizeKey(core);
-          const target = APP.pageByKey.get(key) || APP.folderByKey.get(key);
-          if (target){
-            changed = true;
-            if (lead) frag.appendChild(document.createTextNode(lead));
-
-            const span = document.createElement("span");
-            span.className = "atlasLink";
-            span.textContent = core;
-
-            span.addEventListener("mouseenter", () => showHoverCard(span, `go to ${target.title}`));
-            span.addEventListener("mouseleave", () => hideHoverCard());
-
-            let touchArmed = false;
-            span.addEventListener("pointerdown", (ev) => {
-              if (ev.pointerType === "touch"){
-                ev.preventDefault();
-                if (!touchArmed){
-                  touchArmed = true;
-                  showHoverCard(span, `go to ${target.title}`);
-                  setTimeout(() => { touchArmed = false; }, 1200);
-                } else {
-                  touchArmed = false;
-                  hideHoverCard();
-                  navigateToPath(target.path, true);
-                }
-              }
-            });
-
-            span.addEventListener("click", (ev) => {
-              ev.preventDefault();
-              hideHoverCard();
-              navigateToPath(target.path, true);
-            });
-
-            frag.appendChild(span);
-            if (tail) frag.appendChild(document.createTextNode(tail));
-            continue;
-          }
-        }
-
-        frag.appendChild(document.createTextNode(part));
-      }
-
-      if (changed){
-        textNode.parentNode.replaceChild(frag, textNode);
-      }
-    }
-  }
-
   async function renderRtfArrayBuffer(ab){
-    if (!rtfBundlesLoaded()){
-      docContent.innerHTML =
-        `<div class="welcomeMsg">RTF renderer not loaded.<br/>
-Make sure these files exist next to index.html:<br/>
-<b>vendor/WMFJS.bundle.js</b><br/>
-<b>vendor/EMFJS.bundle.js</b><br/>
-<b>vendor/RTFJS.bundle.js</b></div>`;
-      return;
-    }
+    const ok = await ensureRtfVendorLoaded();
+    if (!ok) return;
 
     try{
       window.RTFJS.loggingEnabled(false);
@@ -819,18 +631,46 @@ Make sure these files exist next to index.html:<br/>
     const container = document.createElement("div");
     for (const el of fragments) container.appendChild(el);
     docContent.appendChild(container);
+  }
 
-    autolinkBoldAllCaps(docContent);
+  async function fetchArrayBufferWithRootCaseFallback(docPath){
+    // tries original, then root LOWER/UPPER/Title variants
+    const original = String(docPath || "");
+    const parts = original.split("/").filter(Boolean);
+    if (parts.length === 0) throw new Error("Empty path");
+
+    const root = parts[0];
+    const variants = [];
+    const lower = root.toLowerCase();
+    const upper = root.toUpperCase();
+    const title = root.charAt(0).toUpperCase() + root.slice(1).toLowerCase();
+
+    const roots = Array.from(new Set([root, lower, upper, title]));
+
+    for (const r of roots){
+      const p = [r, ...parts.slice(1)].join("/");
+      variants.push(p);
+    }
+
+    let lastErr = null;
+    for (const p of variants){
+      const url = encodeURI("./" + p);
+      try{
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return await res.arrayBuffer();
+      }catch(e){
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error("Fetch failed");
   }
 
   async function loadDocArrayBuffer(docPath){
     if (!docPath) return null;
 
     if (APP.mode === "online"){
-      const url = encodeURI("./" + docPath);
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Fetch failed: " + docPath);
-      return await res.arrayBuffer();
+      return await fetchArrayBufferWithRootCaseFallback(docPath);
     }
 
     if (APP.mode === "offline"){
@@ -850,23 +690,21 @@ Make sure these files exist next to index.html:<br/>
     try{
       const ab = await loadDocArrayBuffer(docPath);
       await renderRtfArrayBuffer(ab);
-    }catch{
-      docContent.innerHTML = `<div class="welcomeMsg">Could not open document.</div>`;
+    }catch(e){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">Could not open document.<br/><br/>
+If this is ONLINE, it’s often a folder-name mismatch (example: <b>MENU</b> vs <b>menu</b>).<br/>
+If this is OFFLINE, make sure you opened the correct <b>index.html</b> (the one that has the <b>vendor</b> folder next to it).</div>`;
     }
   }
 
   function snapshotNow(){
-    return {
-      folderPath: APP.folderPath.map(n => n.path),
-      currentDocPath: APP.currentDocPath
-    };
+    return { folderPath: APP.folderPath.map(n => n.path), currentDocPath: APP.currentDocPath };
   }
 
   function pushSnapshot(){
     const snap = snapshotNow();
-    if (APP.navIdx < APP.navStack.length - 1){
-      APP.navStack = APP.navStack.slice(0, APP.navIdx + 1);
-    }
+    if (APP.navIdx < APP.navStack.length - 1) APP.navStack = APP.navStack.slice(0, APP.navIdx + 1);
     APP.navStack.push(snap);
     APP.navIdx = APP.navStack.length - 1;
     updateBackForwardButtons();
@@ -889,19 +727,15 @@ Make sure these files exist next to index.html:<br/>
     buildCrumbs();
     buildChoices();
     await openAndRenderDoc(APP.currentDocPath);
-
     updateBackForwardButtons();
   }
 
   function updateBackForwardButtons(){
-    const canBack = APP.navIdx > 0;
-    const canFwd  = APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1;
-    backBtn.classList.toggle("hidden", !canBack);
-    fwdBtn.classList.toggle("hidden", !canFwd);
+    backBtn.classList.toggle("hidden", !(APP.navIdx > 0));
+    fwdBtn.classList.toggle("hidden", !(APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1));
   }
 
   async function openFolderByPath(folderPath, pushHist){
-    hideHoverCard();
     const folderNode = findNodeByPath(folderPath);
     if (!folderNode || folderNode.type !== "folder") return;
 
@@ -921,7 +755,6 @@ Make sure these files exist next to index.html:<br/>
   }
 
   async function openDocByPath(docPath, pushHist){
-    hideHoverCard();
     const docNode = findNodeByPath(docPath);
     if (!docNode || docNode.type !== "page") return;
 
@@ -939,24 +772,13 @@ Make sure these files exist next to index.html:<br/>
     if (pushHist) pushSnapshot();
   }
 
-  async function navigateToPath(targetPath, pushHist){
-    const node = findNodeByPath(targetPath);
-    if (!node) return;
-    if (node.type === "folder") return openFolderByPath(node.path, pushHist);
-    if (node.type === "page")   return openDocByPath(node.path, pushHist);
-  }
-
   function renderSearchResults(items){
     resultsRow.innerHTML = "";
     for (const it of items){
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = (it.title || "").toUpperCase();
-      b.addEventListener("click", () => {
-        hideHoverCard();
-        openDocByPath(it.path, true);
-        searchInput.blur();
-      });
+      b.addEventListener("click", () => openDocByPath(it.path, true));
       resultsRow.appendChild(b);
     }
   }
@@ -975,40 +797,11 @@ Make sure these files exist next to index.html:<br/>
     renderSearchResults(hits);
   }
 
-  async function ensureIndexesAvailable(){
-    if (APP.index && APP.rootNode) return true;
-
-    const okOnline = await tryLoadOnlineIndexes();
-    if (okOnline) return true;
-
-    const isWeb = location.protocol === "https:" || location.protocol === "http:";
-    const canPick = !!window.showDirectoryPicker;
-
-    if (isWeb && !canPick) return false;
-
-    if (canPick){
-      try{
-        const saved = await idbGet(IDB_KEY);
-        if (saved){
-          const perm = await saved.queryPermission({ mode: "read" });
-          if (perm === "granted"){
-            APP.rootHandle = saved;
-            await scanOfflineRoot(saved);
-            return true;
-          }
-        }
-      }catch{}
-    }
-
-    return false;
-  }
-
   async function promptPickOfflineRoot(){
     if (!window.showDirectoryPicker) return false;
     try{
       const handle = await window.showDirectoryPicker();
       APP.rootHandle = handle;
-      await idbSet(IDB_KEY, handle);
       await scanOfflineRoot(handle);
       return true;
     }catch{
@@ -1016,16 +809,19 @@ Make sure these files exist next to index.html:<br/>
     }
   }
 
+  async function ensureIndexesAvailable(){
+    if (APP.index && APP.rootNode) return true;
+
+    const okOnline = await tryLoadOnlineIndexes();
+    if (okOnline) return true;
+
+    // offline fallback
+    if (!window.showDirectoryPicker) return false;
+    return false;
+  }
+
   async function onMenuClick(){
-    hideHoverCard();
-
     let ready = await ensureIndexesAvailable();
-
-    if (!ready && (location.protocol === "https:" || location.protocol === "http:")){
-      docContent.innerHTML =
-        `<div class="welcomeMsg">Online indexes not found.<br/>Make sure GitHub Actions deploys <b>${INDEX_FILENAME}</b> and <b>${SEARCH_INDEX_FILENAME}</b> next to <b>index.html</b>.</div>`;
-      return;
-    }
 
     if (!ready){
       const ok = await promptPickOfflineRoot();
@@ -1038,11 +834,9 @@ Make sure these files exist next to index.html:<br/>
 
     if (APP.menuOverlay){
       crumbs.innerHTML = "";
-
       const rootPres = presentationDocPathForFolder(APP.rootNode);
       APP.currentDocPath = rootPres;
       await openAndRenderDoc(APP.currentDocPath);
-
       buildChoices();
       updateBackForwardButtons();
       return;
@@ -1055,17 +849,11 @@ Make sure these files exist next to index.html:<br/>
 
   async function boot(){
     showWelcome();
-    await tryLoadOnlineIndexes();
 
-    headerTitle.addEventListener("click", () => {
-      hideHoverCard();
-      showWelcome();
-    });
-
+    headerTitle.addEventListener("click", () => showWelcome());
     menuBtn.addEventListener("click", onMenuClick);
 
     backBtn.addEventListener("click", async () => {
-      hideHoverCard();
       if (APP.navIdx > 0){
         APP.navIdx--;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
@@ -1073,7 +861,6 @@ Make sure these files exist next to index.html:<br/>
     });
 
     fwdBtn.addEventListener("click", async () => {
-      hideHoverCard();
       if (APP.navIdx < APP.navStack.length - 1){
         APP.navIdx++;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
@@ -1081,16 +868,6 @@ Make sure these files exist next to index.html:<br/>
     });
 
     searchInput.addEventListener("input", () => doSearch(searchInput.value));
-    searchInput.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape"){
-        searchInput.value = "";
-        resultsRow.innerHTML = "";
-        hideHoverCard();
-      }
-    });
-
-    document.addEventListener("click", () => hideHoverCard());
-    document.addEventListener("scroll", () => hideHoverCard(), { passive: true });
   }
 
   boot();
