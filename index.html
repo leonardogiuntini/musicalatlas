@@ -18,18 +18,29 @@
       --doc-bg: #fff;
       --doc-fg: #000;
       --doc-border: #000;
+
+      --gap: 12px; /* black spacing above/below content box */
     }
 
     *{ box-sizing: border-box; }
+
     body{
       margin:0;
       background: var(--ui-bg);
       color: var(--ui-fg);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-    .col{ width: var(--col); margin: 0 auto; }
-    .wrap{ padding: 18px 0 74px; }
 
+    .col{
+      width: var(--col);
+      margin: 0 auto;
+    }
+
+    .wrap{
+      padding: 18px 0 30px;
+    }
+
+    /* Header */
     #headerTitle{
       margin: 0;
       padding: 6px 0 2px;
@@ -37,10 +48,12 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       cursor: pointer;
+      -webkit-user-select: none;
       user-select: none;
       font-size: 28px;
     }
 
+    /* Search */
     .searchRow{ padding: 10px 0 6px; }
     #searchInput{
       width: 100%;
@@ -54,7 +67,7 @@
     }
     #searchInput::placeholder{ color: rgba(255,255,255,0.65); }
 
-    /* Search results row directly under the search bar */
+    /* Search results directly under search bar */
     .resultsRow{
       display: flex;
       justify-content: center;
@@ -64,15 +77,30 @@
       min-height: 36px;
     }
 
+    /* Nav row: < > left, Menu center, crumbs scroll right */
     .navRow{
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 6px 0 6px;
     }
-    .navLeft{ display:flex; gap: 8px; flex:0 0 auto; }
-    .navMid{ flex:0 0 auto; display:flex; align-items:center; gap:8px; }
-    .navRight{ flex:1 1 auto; display:flex; justify-content:flex-end; min-width:0; }
+    .navLeft{
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .navMid{
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .navRight{
+      flex: 1 1 auto;
+      display: flex;
+      justify-content: flex-end;
+      min-width: 0;
+    }
 
     #crumbs{
       display: flex;
@@ -81,9 +109,10 @@
       overflow-x: auto;
       padding-bottom: 2px;
       max-width: 100%;
-      scrollbar-width: thin;
+      /* scrollbar-width is not supported in Safari; harmless if present but removed to silence warnings */
     }
 
+    /* Buttons: inverted UI */
     .btn{
       border: 2px solid var(--ui-border);
       border-radius: 999px;
@@ -94,6 +123,7 @@
       cursor: pointer;
       background: #000;
       color: #fff;
+      -webkit-user-select: none;
       user-select: none;
       white-space: nowrap;
     }
@@ -104,6 +134,7 @@
     }
     .btn.hidden{ display:none; }
 
+    /* Choices row */
     .choicesRow{
       display: flex;
       justify-content: center;
@@ -113,6 +144,10 @@
       min-height: 36px;
     }
 
+    /* "Paper" content box */
+    .contentPad{
+      margin-top: var(--gap);
+    }
     .docFrame{
       border: 2px solid var(--doc-border);
       border-radius: 18px;
@@ -134,12 +169,14 @@
       color: var(--doc-fg);
     }
 
+    /* Link styling (no underline/color change) */
     .atlasLink{
       cursor: pointer;
       text-decoration: none !important;
       color: inherit !important;
     }
 
+    /* Hover balloon (inverted UI) */
     #hoverCard{
       position: fixed;
       z-index: 9999;
@@ -154,19 +191,45 @@
       pointer-events: none;
       box-shadow: 0 10px 26px rgba(0,0,0,0.35);
     }
+    #hoverCard::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-7px;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:7px solid transparent;
+      border-right:7px solid transparent;
+      border-top:7px solid #000;
+    }
+    #hoverCard::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-8px;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:8px solid transparent;
+      border-right:8px solid transparent;
+      border-top:8px solid #fff;
+    }
 
-    footer{
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      background: #000;
-      color: #fff;
+    /* Footer: NOT fixed; only visible when you scroll to bottom */
+    .footerPad{
+      margin-top: var(--gap);
+      padding: 8px 0 18px;
       border-top: 2px solid #fff;
-      padding: 8px 0;
       white-space: pre-line;
       font-size: 12px;
       text-align: center;
+      color: #fff;
     }
   </style>
+
+  <!-- Local vendor bundles (autonomous) -->
+  <script src="./vendor/WMFJS.bundle.js"></script>
+  <script src="./vendor/EMFJS.bundle.js"></script>
+  <script src="./vendor/RTFJS.bundle.js"></script>
 </head>
 
 <body>
@@ -178,7 +241,8 @@
         <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
       </div>
 
-      <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
+      <!-- ARIA fix: add role for aria-label -->
+      <div id="resultsRow" class="resultsRow" role="region" aria-label="Search results"></div>
 
       <div class="navRow" aria-label="Navigation">
         <div class="navLeft">
@@ -191,24 +255,28 @@
         </div>
 
         <div class="navRight">
-          <div id="crumbs" aria-label="Path"></div>
+          <!-- ARIA fix: role for aria-label -->
+          <div id="crumbs" role="navigation" aria-label="Path"></div>
         </div>
       </div>
 
-      <div id="choicesRow" class="choicesRow" aria-label="Choices"></div>
+      <!-- ARIA fix: add role for aria-label -->
+      <div id="choicesRow" class="choicesRow" role="region" aria-label="Choices"></div>
 
-      <div class="docFrame">
-        <div id="docContent"></div>
+      <div class="contentPad">
+        <div class="docFrame">
+          <div id="docContent"></div>
+        </div>
+      </div>
+
+      <div class="footerPad">
+        <div class="col">Music for the People.
+by Leo G.</div>
       </div>
     </div>
   </div>
 
   <div id="hoverCard"></div>
-
-  <footer>
-    <div class="col">Music for the People.
-by Leo G.</div>
-  </footer>
 
 <script>
 (() => {
@@ -235,34 +303,66 @@ or search from the bar above.`;
   const hoverCard    = $("#hoverCard");
 
   const APP = {
-    mode: "unknown",
+    mode: "unknown",      // "online" | "offline" | "unknown"
     index: null,
     searchIndex: [],
     rootNode: null,
 
+    // offline handles
     rootHandle: null,
-    fileHandleByPath: new Map(),
+    fileHandleByPath: new Map(), // path -> FileSystemFileHandle
 
-    menuOverlay: false,
-    folderPath: [],
-    currentDocPath: null,
+    // navigation (2-line)
+    menuOverlay: false,       // root menu view
+    folderPath: [],           // nodes root..current
+    currentDocPath: null,     // displayed doc path
 
+    // history snapshots
     navStack: [],
     navIdx: -1,
 
+    // link lookups
     pageByKey: new Map(),
     folderByKey: new Map(),
-
-    // vendor load tracking
-    vendorReady: false,
-    vendorLoadTried: false
   };
 
-  function setMenuActive(active){ menuBtn.classList.toggle("sel", !!active); }
-  function hideHoverCard(){ hoverCard.style.display = "none"; hoverCard.textContent = ""; }
+  /* =========================
+     UI helpers
+  ========================= */
+  function setMenuActive(active){
+    menuBtn.classList.toggle("sel", !!active);
+  }
 
-  const normalizeKey = (s) => String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
-  const titleize = (name) => String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim().replace(/\b\w/g, c => c.toUpperCase());
+  function hideHoverCard(){
+    hoverCard.style.display = "none";
+    hoverCard.textContent = "";
+  }
+
+  function showHoverCard(anchorEl, text){
+    const rect = anchorEl.getBoundingClientRect();
+    hoverCard.textContent = text;
+    hoverCard.style.display = "block";
+
+    const pad = 10;
+    const cardRect = hoverCard.getBoundingClientRect();
+    let x = rect.left + rect.width / 2 - cardRect.width / 2;
+    let y = rect.top - cardRect.height - 14;
+    x = Math.max(pad, Math.min(x, window.innerWidth - cardRect.width - pad));
+    y = Math.max(pad, y);
+    hoverCard.style.left = x + "px";
+    hoverCard.style.top = y + "px";
+  }
+
+  /* =========================
+     Text helpers
+  ========================= */
+  const normalizeKey = (s) =>
+    String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
+
+  const titleize = (name) => {
+    const base = String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim();
+    return base.replace(/\b\w/g, c => c.toUpperCase());
+  };
 
   const escapeHtml = (s) =>
     String(s ?? "")
@@ -287,74 +387,9 @@ or search from the bar above.`;
     updateBackForwardButtons();
   }
 
-  function rtfBundlesLoaded(){
-    return (typeof window.RTFJS !== "undefined") &&
-           (typeof window.WMFJS !== "undefined") &&
-           (typeof window.EMFJS !== "undefined");
-  }
-
-  function loadScript(src){
-    return new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = src;
-      s.async = false;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error("Failed to load: " + src));
-      document.head.appendChild(s);
-    });
-  }
-
-  async function ensureRtfVendorLoaded(){
-    if (rtfBundlesLoaded()){
-      APP.vendorReady = true;
-      return true;
-    }
-    if (APP.vendorLoadTried){
-      // already tried and failed
-      return false;
-    }
-    APP.vendorLoadTried = true;
-
-    const base = new URL(".", location.href).href;
-
-    const files = [
-      "vendor/WMFJS.bundle.js",
-      "vendor/EMFJS.bundle.js",
-      "vendor/RTFJS.bundle.js"
-    ];
-
-    try{
-      // Load in required order
-      await loadScript("./" + files[0]);
-      await loadScript("./" + files[1]);
-      await loadScript("./" + files[2]);
-
-      if (!rtfBundlesLoaded()){
-        throw new Error("Scripts loaded but globals not found (WMFJS/EMFJS/RTFJS).");
-      }
-
-      APP.vendorReady = true;
-      return true;
-    }catch(e){
-      docContent.innerHTML =
-        `<div class="welcomeMsg">
-RTF renderer not loaded.
-
-Make sure this folder exists NEXT TO index.html:
-<b>vendor</b>
-
-And inside it you have EXACTLY these 3 files:
-<b>WMFJS.bundle.js</b>
-<b>EMFJS.bundle.js</b>
-<b>RTFJS.bundle.js</b>
-
-Quick check (open these in your browser):
-${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
-</div>`;
-      return false;
-    }
-  }
-
+  /* =========================
+     Index loading (online)
+  ========================= */
   async function tryLoadOnlineIndexes(){
     try{
       const [idxRes, sRes] = await Promise.all([
@@ -380,6 +415,9 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
     }
   }
 
+  /* =========================
+     Offline scan -> same index format
+  ========================= */
   async function rtfToPlainTextFromFile(file){
     const raw = await file.text();
     let s = String(raw || "");
@@ -447,6 +485,9 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
     buildLookupsFromIndex();
   }
 
+  /* =========================
+     Lookups for links
+  ========================= */
   function buildLookupsFromIndex(){
     APP.pageByKey.clear();
     APP.folderByKey.clear();
@@ -502,6 +543,9 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
     return parts;
   }
 
+  /* =========================
+     Presentation doc rule
+  ========================= */
   function presentationDocPathForFolder(folderNode){
     if (!folderNode || folderNode.type !== "folder") return null;
     const want = (folderNode.name + ".rtf").toLowerCase();
@@ -512,22 +556,29 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
   function listSubfolders(folderNode){
     return (folderNode.children || []).filter(ch => ch.type === "folder");
   }
+
   function listExtraPages(folderNode){
     const pres = presentationDocPathForFolder(folderNode);
     return (folderNode.children || []).filter(ch => ch.type === "page" && ch.path !== pres);
   }
 
+  /* =========================
+     Rendering: crumbs + choices
+     Hidden-root: no root crumb
+  ========================= */
   function buildCrumbs(){
     crumbs.innerHTML = "";
     if (APP.menuOverlay) return;
 
-    // hidden-root: skip root crumb
     for (let i=1; i<APP.folderPath.length; i++){
       const folderNode = APP.folderPath[i];
       const b = document.createElement("button");
       b.className = "btn sel";
       b.textContent = folderNode.name.toUpperCase();
-      b.addEventListener("click", () => openFolderByPath(folderNode.path, true));
+      b.addEventListener("click", () => {
+        hideHoverCard();
+        openFolderByPath(folderNode.path, true);
+      });
       crumbs.appendChild(b);
     }
     crumbs.scrollLeft = crumbs.scrollWidth;
@@ -546,6 +597,7 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
         b.className = "btn";
         b.textContent = f.name.toUpperCase();
         b.addEventListener("click", () => {
+          hideHoverCard();
           APP.menuOverlay = false;
           setMenuActive(false);
           openFolderByPath(f.path, true);
@@ -558,6 +610,7 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
         b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
         b.textContent = p.title.toUpperCase();
         b.addEventListener("click", () => {
+          hideHoverCard();
           APP.menuOverlay = false;
           setMenuActive(false);
           openDocByPath(p.path, true);
@@ -575,7 +628,10 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = f.name.toUpperCase();
-      b.addEventListener("click", () => openFolderByPath(f.path, true));
+      b.addEventListener("click", () => {
+        hideHoverCard();
+        openFolderByPath(f.path, true);
+      });
       choicesRow.appendChild(b);
     }
 
@@ -583,58 +639,193 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
       const b = document.createElement("button");
       b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
       b.textContent = p.title.toUpperCase();
-      b.addEventListener("click", () => openDocByPath(p.path, true));
+      b.addEventListener("click", () => {
+        hideHoverCard();
+        openDocByPath(p.path, true);
+      });
       choicesRow.appendChild(b);
     }
   }
 
-function normalizeRtfArrayBuffer(ab){
-  let u8 = new Uint8Array(ab);
-  if (u8.length < 4) return ab;
+  /* =========================
+     Fix: UTF-16 / UTF-8 BOM normalization
+  ========================= */
+  function normalizeRtfArrayBuffer(ab){
+    let u8 = new Uint8Array(ab);
+    if (u8.length < 4) return ab;
 
-  // 1) Strip UTF-8 BOM (EF BB BF) if present
-  if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
-    u8 = u8.slice(3);
-  }
-
-  // 2) UTF-16 BOM handling
-  const b0 = u8[0], b1 = u8[1];
-  const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
-  const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
-  if (isLEBOM || isBEBOM){
-    const dec = new TextDecoder(isLEBOM ? "utf-16le" : "utf-16be");
-    const s = dec.decode(u8);
-    return new TextEncoder().encode(s).buffer;
-  }
-
-  // 3) UTF-16 without BOM heuristics
-  const looksLE = u8[0] === 0x7B && u8[1] === 0x00 && u8[2] === 0x5C && u8[3] === 0x00; // "{\"
-  const looksBE = u8[0] === 0x00 && u8[1] === 0x7B && u8[2] === 0x00 && u8[3] === 0x5C;
-  if (looksLE || looksBE){
-    const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
-    const s = dec.decode(u8);
-    return new TextEncoder().encode(s).buffer;
-  }
-
-  // 4) If it still doesn't start with "{", try to find the first "{"
-  // (some exporters add harmless bytes/newlines before the RTF header)
-  if (u8[0] !== 0x7B) {
-    const limit = Math.min(u8.length, 256);
-    let idx = -1;
-    for (let i = 0; i < limit; i++) {
-      if (u8[i] === 0x7B) { idx = i; break; }
+    // Strip UTF-8 BOM
+    if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
+      u8 = u8.slice(3);
     }
-    if (idx > 0) {
-      u8 = u8.slice(idx);
+
+    // UTF-16 BOM
+    const b0 = u8[0], b1 = u8[1];
+    const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
+    const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
+    if (isLEBOM || isBEBOM){
+      const dec = new TextDecoder(isLEBOM ? "utf-16le" : "utf-16be");
+      const s = dec.decode(u8);
+      return new TextEncoder().encode(s).buffer;
+    }
+
+    // UTF-16 without BOM heuristics
+    const looksLE = u8[0] === 0x7B && u8[1] === 0x00 && u8[2] === 0x5C && u8[3] === 0x00;
+    const looksBE = u8[0] === 0x00 && u8[1] === 0x7B && u8[2] === 0x00 && u8[3] === 0x5C;
+    if (looksLE || looksBE){
+      const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
+      const s = dec.decode(u8);
+      return new TextEncoder().encode(s).buffer;
+    }
+
+    // If it doesn't start with "{", try to find first "{"
+    if (u8[0] !== 0x7B) {
+      const limit = Math.min(u8.length, 256);
+      let idx = -1;
+      for (let i = 0; i < limit; i++) {
+        if (u8[i] === 0x7B) { idx = i; break; }
+      }
+      if (idx > 0) u8 = u8.slice(idx);
+    }
+
+    return u8.buffer;
+  }
+
+  /* =========================
+     Hyperlinks (restored): bold + ALL CAPS -> link to matching page/folder
+  ========================= */
+  function isAllCapsToken(token){
+    const t = String(token || "").trim();
+    if (t.length < 2) return false;
+    const letters = t.replace(/[^A-Za-z]/g,"");
+    if (letters.length < 2) return false;
+    return letters === letters.toUpperCase();
+  }
+
+  function elementIsBold(el){
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName?.toLowerCase();
+    if (tag === "b" || tag === "strong") return true;
+    const w = getComputedStyle(el).fontWeight;
+    const n = Number(w);
+    if (!Number.isNaN(n)) return n >= 600;
+    return w === "bold";
+  }
+
+  function hasBoldAncestor(node){
+    let cur = node.parentElement;
+    while (cur){
+      if (elementIsBold(cur)) return true;
+      cur = cur.parentElement;
+    }
+    return false;
+  }
+
+  function autolinkBoldAllCaps(rootEl){
+    hideHoverCard();
+
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        if (!hasBoldAncestor(n) && !elementIsBold(n.parentElement)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    for (const textNode of nodes){
+      const text = textNode.nodeValue;
+      if (!text) continue;
+
+      const parts = text.split(/(\s+)/);
+      let changed = false;
+
+      const frag = document.createDocumentFragment();
+      for (const part of parts){
+        if (/^\s+$/.test(part)){
+          frag.appendChild(document.createTextNode(part));
+          continue;
+        }
+
+        // allow punctuation around the token
+        const m = part.match(/^([("'“”‘’\[\{<]*)(.*?)([)",'.!?;:’”\]\}>]*)$/);
+        const lead = m ? m[1] : "";
+        const core = m ? m[2] : part;
+        const tail = m ? m[3] : "";
+
+        if (core && isAllCapsToken(core)){
+          const key = normalizeKey(core);
+          const target = APP.pageByKey.get(key) || APP.folderByKey.get(key);
+          if (target){
+            changed = true;
+            if (lead) frag.appendChild(document.createTextNode(lead));
+
+            const span = document.createElement("span");
+            span.className = "atlasLink";
+            span.textContent = core;
+
+            // Desktop hover preview
+            span.addEventListener("mouseenter", () => showHoverCard(span, `go to ${target.title}`));
+            span.addEventListener("mouseleave", () => hideHoverCard());
+
+            // Touch: first tap preview, second tap navigate
+            let touchArmed = false;
+            span.addEventListener("pointerdown", (ev) => {
+              if (ev.pointerType === "touch"){
+                ev.preventDefault();
+                if (!touchArmed){
+                  touchArmed = true;
+                  showHoverCard(span, `go to ${target.title}`);
+                  setTimeout(() => { touchArmed = false; }, 1200);
+                } else {
+                  touchArmed = false;
+                  hideHoverCard();
+                  navigateToPath(target.path, true);
+                }
+              }
+            });
+
+            // Mouse click navigates immediately and dismisses balloon
+            span.addEventListener("click", (ev) => {
+              ev.preventDefault();
+              hideHoverCard();
+              navigateToPath(target.path, true);
+            });
+
+            frag.appendChild(span);
+            if (tail) frag.appendChild(document.createTextNode(tail));
+            continue;
+          }
+        }
+
+        frag.appendChild(document.createTextNode(part));
+      }
+
+      if (changed){
+        textNode.parentNode.replaceChild(frag, textNode);
+      }
     }
   }
 
-  return u8.buffer;
-}
+  /* =========================
+     RTF rendering
+  ========================= */
+  function rtfBundlesLoaded(){
+    return (typeof window.RTFJS !== "undefined") &&
+           (typeof window.WMFJS !== "undefined") &&
+           (typeof window.EMFJS !== "undefined");
+  }
 
   async function renderRtfArrayBuffer(ab){
-    const ok = await ensureRtfVendorLoaded();
-    if (!ok) return;
+    docContent.innerHTML = "";
+
+    if (!rtfBundlesLoaded()){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">RTF renderer not loaded.</div>`;
+      return;
+    }
 
     try{
       window.RTFJS.loggingEnabled(false);
@@ -650,46 +841,19 @@ function normalizeRtfArrayBuffer(ab){
     const container = document.createElement("div");
     for (const el of fragments) container.appendChild(el);
     docContent.appendChild(container);
-  }
 
-  async function fetchArrayBufferWithRootCaseFallback(docPath){
-    // tries original, then root LOWER/UPPER/Title variants
-    const original = String(docPath || "");
-    const parts = original.split("/").filter(Boolean);
-    if (parts.length === 0) throw new Error("Empty path");
-
-    const root = parts[0];
-    const variants = [];
-    const lower = root.toLowerCase();
-    const upper = root.toUpperCase();
-    const title = root.charAt(0).toUpperCase() + root.slice(1).toLowerCase();
-
-    const roots = Array.from(new Set([root, lower, upper, title]));
-
-    for (const r of roots){
-      const p = [r, ...parts.slice(1)].join("/");
-      variants.push(p);
-    }
-
-    let lastErr = null;
-    for (const p of variants){
-      const url = encodeURI("./" + p);
-      try{
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return await res.arrayBuffer();
-      }catch(e){
-        lastErr = e;
-      }
-    }
-    throw lastErr || new Error("Fetch failed");
+    // restore hyperlinking after DOM insertion
+    autolinkBoldAllCaps(docContent);
   }
 
   async function loadDocArrayBuffer(docPath){
     if (!docPath) return null;
 
     if (APP.mode === "online"){
-      return await fetchArrayBufferWithRootCaseFallback(docPath);
+      const url = encodeURI("./" + docPath);
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("Fetch failed: " + docPath);
+      return await res.arrayBuffer();
     }
 
     if (APP.mode === "offline"){
@@ -703,34 +867,32 @@ function normalizeRtfArrayBuffer(ab){
   }
 
   async function openAndRenderDoc(docPath){
-  docContent.innerHTML = "";
-  if (!docPath) return;
+    docContent.innerHTML = "";
+    if (!docPath) return;
 
-  try{
-    const ab = await loadDocArrayBuffer(docPath);
-    await renderRtfArrayBuffer(ab);
-  }catch(e){
-    // Helpful debug: first bytes
-    let hex = "";
     try{
-      const u = new Uint8Array(await loadDocArrayBuffer(docPath));
-      hex = Array.from(u.slice(0, 16)).map(x => x.toString(16).padStart(2,"0")).join(" ");
-    }catch{}
-
-    docContent.innerHTML =
-      `<div class="welcomeMsg">Could not open document.<br/><br/>
-<b>Error:</b> ${escapeHtml(e?.message || String(e))}<br/>
-<b>First bytes:</b> ${escapeHtml(hex || "(n/a)")}</div>`;
+      const ab = await loadDocArrayBuffer(docPath);
+      await renderRtfArrayBuffer(ab);
+    }catch{
+      docContent.innerHTML = `<div class="welcomeMsg">Could not open document.</div>`;
+    }
   }
-}
 
+  /* =========================
+     History snapshots (back/forward)
+  ========================= */
   function snapshotNow(){
-    return { folderPath: APP.folderPath.map(n => n.path), currentDocPath: APP.currentDocPath };
+    return {
+      folderPath: APP.folderPath.map(n => n.path),
+      currentDocPath: APP.currentDocPath
+    };
   }
 
   function pushSnapshot(){
     const snap = snapshotNow();
-    if (APP.navIdx < APP.navStack.length - 1) APP.navStack = APP.navStack.slice(0, APP.navIdx + 1);
+    if (APP.navIdx < APP.navStack.length - 1){
+      APP.navStack = APP.navStack.slice(0, APP.navIdx + 1);
+    }
     APP.navStack.push(snap);
     APP.navIdx = APP.navStack.length - 1;
     updateBackForwardButtons();
@@ -752,16 +914,24 @@ function normalizeRtfArrayBuffer(ab){
 
     buildCrumbs();
     buildChoices();
+    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
+
     updateBackForwardButtons();
   }
 
   function updateBackForwardButtons(){
-    backBtn.classList.toggle("hidden", !(APP.navIdx > 0));
-    fwdBtn.classList.toggle("hidden", !(APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1));
+    const canBack = APP.navIdx > 0;
+    const canFwd  = APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1;
+    backBtn.classList.toggle("hidden", !canBack);
+    fwdBtn.classList.toggle("hidden", !canFwd);
   }
 
+  /* =========================
+     Navigation
+  ========================= */
   async function openFolderByPath(folderPath, pushHist){
+    hideHoverCard();
     const folderNode = findNodeByPath(folderPath);
     if (!folderNode || folderNode.type !== "folder") return;
 
@@ -775,12 +945,14 @@ function normalizeRtfArrayBuffer(ab){
 
     buildCrumbs();
     buildChoices();
+    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
 
     if (pushHist) pushSnapshot();
   }
 
   async function openDocByPath(docPath, pushHist){
+    hideHoverCard();
     const docNode = findNodeByPath(docPath);
     if (!docNode || docNode.type !== "page") return;
 
@@ -793,18 +965,33 @@ function normalizeRtfArrayBuffer(ab){
 
     buildCrumbs();
     buildChoices();
+    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
 
     if (pushHist) pushSnapshot();
   }
 
+  async function navigateToPath(targetPath, pushHist){
+    const node = findNodeByPath(targetPath);
+    if (!node) return;
+    if (node.type === "folder") return openFolderByPath(node.path, pushHist);
+    if (node.type === "page")   return openDocByPath(node.path, pushHist);
+  }
+
+  /* =========================
+     Search
+  ========================= */
   function renderSearchResults(items){
     resultsRow.innerHTML = "";
     for (const it of items){
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = (it.title || "").toUpperCase();
-      b.addEventListener("click", () => openDocByPath(it.path, true));
+      b.addEventListener("click", () => {
+        hideHoverCard();
+        openDocByPath(it.path, true);
+        searchInput.blur();
+      });
       resultsRow.appendChild(b);
     }
   }
@@ -823,6 +1010,24 @@ function normalizeRtfArrayBuffer(ab){
     renderSearchResults(hits);
   }
 
+  /* =========================
+     Menu behavior (hidden-root)
+  ========================= */
+  async function ensureIndexesAvailable(){
+    if (APP.index && APP.rootNode) return true;
+
+    const okOnline = await tryLoadOnlineIndexes();
+    if (okOnline) return true;
+
+    // Hosted site should not ask for a local folder if indexes are missing
+    const isWeb = location.protocol === "https:" || location.protocol === "http:";
+    const canPick = !!window.showDirectoryPicker;
+
+    if (isWeb && !canPick) return false;
+
+    return false;
+  }
+
   async function promptPickOfflineRoot(){
     if (!window.showDirectoryPicker) return false;
     try{
@@ -835,19 +1040,16 @@ function normalizeRtfArrayBuffer(ab){
     }
   }
 
-  async function ensureIndexesAvailable(){
-    if (APP.index && APP.rootNode) return true;
-
-    const okOnline = await tryLoadOnlineIndexes();
-    if (okOnline) return true;
-
-    // offline fallback
-    if (!window.showDirectoryPicker) return false;
-    return false;
-  }
-
   async function onMenuClick(){
+    hideHoverCard();
+
     let ready = await ensureIndexesAvailable();
+
+    if (!ready && (location.protocol === "https:" || location.protocol === "http:")){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">Online indexes not found.<br/>Make sure GitHub Actions deploys <b>${INDEX_FILENAME}</b> and <b>${SEARCH_INDEX_FILENAME}</b> next to <b>index.html</b>.</div>`;
+      return;
+    }
 
     if (!ready){
       const ok = await promptPickOfflineRoot();
@@ -855,31 +1057,46 @@ function normalizeRtfArrayBuffer(ab){
       ready = true;
     }
 
+    // toggle overlay
     APP.menuOverlay = !APP.menuOverlay;
     setMenuActive(APP.menuOverlay);
 
     if (APP.menuOverlay){
       crumbs.innerHTML = "";
+
+      // Show root presentation doc without history
       const rootPres = presentationDocPathForFolder(APP.rootNode);
       APP.currentDocPath = rootPres;
       await openAndRenderDoc(APP.currentDocPath);
+
       buildChoices();
+      resultsRow.innerHTML = "";
       updateBackForwardButtons();
       return;
     }
 
     buildCrumbs();
     buildChoices();
+    resultsRow.innerHTML = "";
     updateBackForwardButtons();
   }
 
+  /* =========================
+     Boot
+  ========================= */
   async function boot(){
     showWelcome();
+    await tryLoadOnlineIndexes();
 
-    headerTitle.addEventListener("click", () => showWelcome());
+    headerTitle.addEventListener("click", () => {
+      hideHoverCard();
+      showWelcome();
+    });
+
     menuBtn.addEventListener("click", onMenuClick);
 
     backBtn.addEventListener("click", async () => {
+      hideHoverCard();
       if (APP.navIdx > 0){
         APP.navIdx--;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
@@ -887,6 +1104,7 @@ function normalizeRtfArrayBuffer(ab){
     });
 
     fwdBtn.addEventListener("click", async () => {
+      hideHoverCard();
       if (APP.navIdx < APP.navStack.length - 1){
         APP.navIdx++;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
@@ -894,6 +1112,17 @@ function normalizeRtfArrayBuffer(ab){
     });
 
     searchInput.addEventListener("input", () => doSearch(searchInput.value));
+    searchInput.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape"){
+        searchInput.value = "";
+        resultsRow.innerHTML = "";
+        hideHoverCard();
+      }
+    });
+
+    // Ensure hover balloon never "sticks"
+    document.addEventListener("click", () => hideHoverCard());
+    document.addEventListener("scroll", () => hideHoverCard(), { passive: true });
   }
 
   boot();
