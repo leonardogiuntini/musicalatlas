@@ -1,0 +1,204 @@
+name: Build indexes and deploy Musical Atlas to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Optional: Jekyll build sanity-check (runs only if a Jekyll site is detected).
+  # This job does NOT deploy anything. It only fails if Jekyll is present but broken.
+  jekyll_check:
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('_config.yml') != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Jekyll (optional check)
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    needs: [jekyll_check]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate content-index.json and search-index.json
+        run: node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const INDEX_OUT = "content-index.json";
+          const SEARCH_OUT = "search-index.json";
+
+          // Optional config file (recommended):
+          // atlas-config.json: { "rootFolder": "MENU" }
+          // Lets you name the root folder anything you want.
+          function readConfigRoot() {
+            const cfgPath = "atlas-config.json";
+            if (!fs.existsSync(cfgPath)) return null;
+            try {
+              const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
+              if (cfg && typeof cfg.rootFolder === "string" && cfg.rootFolder.trim()) {
+                const p = cfg.rootFolder.trim();
+                if (fs.existsSync(p) && fs.statSync(p).isDirectory()) return p;
+              }
+            } catch {}
+            return null;
+          }
+
+          function titleize(name) {
+            const base = String(name || "")
+              .replace(/\.rtf$/i, "")
+              .replace(/[_\-]+/g, " ")
+              .trim();
+            return base.replace(/\b\w/g, c => c.toUpperCase());
+          }
+
+          function rtfToPlainText(rtf) {
+            let s = String(rtf || "");
+            // Rough but effective: remove common RTF control words and groups
+            s = s.replace(/\{\\\*[^{}]*\}/g, " ");
+            s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
+            s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
+            s = s.replace(/[{}]/g, " ");
+            s = s.replace(/\s+/g, " ").trim();
+            return s;
+          }
+
+          function isDir(p) {
+            return fs.existsSync(p) && fs.statSync(p).isDirectory();
+          }
+
+          // Find the first top-level directory (excluding .github/.git/etc.)
+          // that contains at least one .rtf somewhere inside.
+          function containsRtfSomewhere(dirAbs) {
+            const entries = fs.readdirSync(dirAbs, { withFileTypes: true });
+            for (const ent of entries) {
+              const abs = path.join(dirAbs, ent.name);
+              if (ent.isFile() && /\.rtf$/i.test(ent.name)) return true;
+              if (ent.isDirectory()) {
+                if (ent.name === ".git" || ent.name === ".github" || ent.name === "node_modules") continue;
+                if (containsRtfSomewhere(abs)) return true;
+              }
+            }
+            return false;
+          }
+
+          function autoDetectRoot() {
+            const top = fs.readdirSync(".", { withFileTypes: true })
+              .filter(e => e.isDirectory())
+              .map(e => e.name)
+              .filter(n => n !== ".git" && n !== ".github" && n !== "node_modules")
+              .sort((a,b) => a.localeCompare(b));
+
+            for (const d of top) {
+              const abs = path.join(".", d);
+              if (containsRtfSomewhere(abs)) return d;
+            }
+            return null;
+          }
+
+          const ROOT = readConfigRoot() || autoDetectRoot();
+          if (!ROOT || !isDir(ROOT)) {
+            console.error("❌ No root content folder found.");
+            console.error("Create a top-level folder containing .rtf files, OR add atlas-config.json like:");
+            console.error('{ "rootFolder": "YOUR_FOLDER_NAME" }');
+            process.exit(1);
+          }
+
+          function scanFolder(absDir, relParts, searchItems) {
+            // relParts are folders under ROOT. Root node uses ROOT as its name.
+            const nodeName = relParts.length ? relParts[relParts.length - 1] : ROOT;
+            const nodePath = relParts.length ? [ROOT, ...relParts].join("/") : ROOT;
+
+            const node = {
+              type: "folder",
+              name: nodeName,
+              title: titleize(nodeName),
+              path: nodePath,
+              children: []
+            };
+
+            const entries = fs.readdirSync(absDir, { withFileTypes: true });
+
+            for (const ent of entries) {
+              const abs = path.join(absDir, ent.name);
+
+              if (ent.isDirectory()) {
+                node.children.push(scanFolder(abs, [...relParts, ent.name], searchItems));
+                continue;
+              }
+
+              if (ent.isFile() && /\.rtf$/i.test(ent.name)) {
+                const pagePath = relParts.length
+                  ? [ROOT, ...relParts, ent.name].join("/")
+                  : [ROOT, ent.name].join("/");
+
+                const title = titleize(ent.name);
+                node.children.push({ type: "page", name: ent.name, title, path: pagePath });
+
+                try {
+                  // read as utf8 for text indexing
+                  const raw = fs.readFileSync(abs, "utf8");
+                  const text = rtfToPlainText(raw);
+                  searchItems.push({ path: pagePath, title, text });
+                } catch {
+                  // ignore unreadable files
+                }
+              }
+            }
+
+            // folders first, then pages, both alphabetically
+            node.children.sort((a,b) => {
+              if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+              return a.title.localeCompare(b.title);
+            });
+
+            return node;
+          }
+
+          const searchItems = [];
+          const tree = scanFolder(ROOT, [], searchItems);
+
+          const contentIndex = {
+            generatedAt: new Date().toISOString(),
+            root: ROOT,
+            tree
+          };
+
+          fs.writeFileSync(INDEX_OUT, JSON.stringify(contentIndex, null, 2));
+          fs.writeFileSync(SEARCH_OUT, JSON.stringify(searchItems, null, 2));
+
+          console.log("✅ Generated:", INDEX_OUT, "and", SEARCH_OUT);
+          console.log("✅ Root folder:", ROOT);
+        NODE
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          # Deploy everything in the repo root (index.html, your content folder, and the generated JSON files)
+          path: .
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
