@@ -588,30 +588,49 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
     }
   }
 
-  function normalizeRtfArrayBuffer(ab){
-    const u8 = new Uint8Array(ab);
-    if (u8.length < 4) return ab;
+function normalizeRtfArrayBuffer(ab){
+  let u8 = new Uint8Array(ab);
+  if (u8.length < 4) return ab;
 
-    const b0 = u8[0], b1 = u8[1];
-    const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
-    const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
-    if (isLEBOM || isBEBOM){
-      const dec = new TextDecoder(isLEBOM ? "utf-16le" : "utf-16be");
-      const s = dec.decode(u8);
-      return new TextEncoder().encode(s).buffer;
-    }
-
-    const looksLE = u8[0] === 0x7B && u8[1] === 0x00 && u8[2] === 0x5C && u8[3] === 0x00;
-    const looksBE = u8[0] === 0x00 && u8[1] === 0x7B && u8[2] === 0x00 && u8[3] === 0x5C;
-
-    if (looksLE || looksBE){
-      const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
-      const s = dec.decode(u8);
-      return new TextEncoder().encode(s).buffer;
-    }
-
-    return ab;
+  // 1) Strip UTF-8 BOM (EF BB BF) if present
+  if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
+    u8 = u8.slice(3);
   }
+
+  // 2) UTF-16 BOM handling
+  const b0 = u8[0], b1 = u8[1];
+  const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
+  const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
+  if (isLEBOM || isBEBOM){
+    const dec = new TextDecoder(isLEBOM ? "utf-16le" : "utf-16be");
+    const s = dec.decode(u8);
+    return new TextEncoder().encode(s).buffer;
+  }
+
+  // 3) UTF-16 without BOM heuristics
+  const looksLE = u8[0] === 0x7B && u8[1] === 0x00 && u8[2] === 0x5C && u8[3] === 0x00; // "{\"
+  const looksBE = u8[0] === 0x00 && u8[1] === 0x7B && u8[2] === 0x00 && u8[3] === 0x5C;
+  if (looksLE || looksBE){
+    const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
+    const s = dec.decode(u8);
+    return new TextEncoder().encode(s).buffer;
+  }
+
+  // 4) If it still doesn't start with "{", try to find the first "{"
+  // (some exporters add harmless bytes/newlines before the RTF header)
+  if (u8[0] !== 0x7B) {
+    const limit = Math.min(u8.length, 256);
+    let idx = -1;
+    for (let i = 0; i < limit; i++) {
+      if (u8[i] === 0x7B) { idx = i; break; }
+    }
+    if (idx > 0) {
+      u8 = u8.slice(idx);
+    }
+  }
+
+  return u8.buffer;
+}
 
   async function renderRtfArrayBuffer(ab){
     const ok = await ensureRtfVendorLoaded();
@@ -684,19 +703,26 @@ ${files.map(f => `<br/><b>${escapeHtml(base + f)}</b>`).join("")}
   }
 
   async function openAndRenderDoc(docPath){
-    docContent.innerHTML = "";
-    if (!docPath) return;
+  docContent.innerHTML = "";
+  if (!docPath) return;
 
+  try{
+    const ab = await loadDocArrayBuffer(docPath);
+    await renderRtfArrayBuffer(ab);
+  }catch(e){
+    // Helpful debug: first bytes
+    let hex = "";
     try{
-      const ab = await loadDocArrayBuffer(docPath);
-      await renderRtfArrayBuffer(ab);
-    }catch(e){
-      docContent.innerHTML =
-        `<div class="welcomeMsg">Could not open document.<br/><br/>
-If this is ONLINE, it’s often a folder-name mismatch (example: <b>MENU</b> vs <b>menu</b>).<br/>
-If this is OFFLINE, make sure you opened the correct <b>index.html</b> (the one that has the <b>vendor</b> folder next to it).</div>`;
-    }
+      const u = new Uint8Array(await loadDocArrayBuffer(docPath));
+      hex = Array.from(u.slice(0, 16)).map(x => x.toString(16).padStart(2,"0")).join(" ");
+    }catch{}
+
+    docContent.innerHTML =
+      `<div class="welcomeMsg">Could not open document.<br/><br/>
+<b>Error:</b> ${escapeHtml(e?.message || String(e))}<br/>
+<b>First bytes:</b> ${escapeHtml(hex || "(n/a)")}</div>`;
   }
+}
 
   function snapshotNow(){
     return { folderPath: APP.folderPath.map(n => n.path), currentDocPath: APP.currentDocPath };
