@@ -40,23 +40,13 @@ jobs:
             return base.replace(/\b\w/g, c => c.toUpperCase());
           }
 
-          // Very simple RTF -> text extraction (good enough for search)
+          // Simple RTF -> text extraction (for search)
           function rtfToPlainText(rtf) {
             let s = String(rtf || "");
-
-            // Remove groups like {\*\...}
             s = s.replace(/\{\\\*[^{}]*\}/g, " ");
-
-            // Replace escaped hex \'hh
             s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
-
-            // Remove control words like \par, \fs24, \b0 etc.
             s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
-
-            // Remove braces
             s = s.replace(/[{}]/g, " ");
-
-            // Collapse whitespace
             s = s.replace(/\s+/g, " ").trim();
             return s;
           }
@@ -90,14 +80,11 @@ jobs:
                   path: pagePath
                 });
 
-                // Build search entry
                 try {
                   const raw = fs.readFileSync(abs, "utf8");
                   const text = rtfToPlainText(raw);
                   searchItems.push({ path: pagePath, title, text });
-                } catch {
-                  // ignore
-                }
+                } catch {}
               }
             }
 
@@ -107,7 +94,6 @@ jobs:
             return node;
           }
 
-          // Countries = subfolders of /menu
           const items = [];
           const searchItems = [];
 
@@ -120,7 +106,7 @@ jobs:
           }
           items.sort((a,b) => a.title.localeCompare(b.title));
 
-          // flat map for quick linking by name (kept for compatibility)
+          // flat map kept for compatibility (not required by current UI)
           const flatPagesByKey = {};
           function normalizeName(s) {
             return String(s||"").trim().replace(/\.rtf$/i,"").toLowerCase();
@@ -130,20 +116,30 @@ jobs:
               if (ch.type === "page") {
                 const key = normalizeName(ch.title);
                 if (!flatPagesByKey[key]) flatPagesByKey[key] = { title: ch.title, path: ch.path };
-              } else if (ch.type === "folder") flatten(ch);
+              } else if (ch.type === "folder") {
+                flatten(ch);
+              }
             }
           }
           for (const it of items) flatten(it);
 
+          const generatedAt = new Date().toISOString();
+
           const index = {
-            generatedAt: new Date().toISOString(),
+            generatedAt,
             root: ROOT,
             items,
             flatPagesByKey
           };
 
+          const searchIndex = {
+            generatedAt,
+            root: ROOT,
+            items: searchItems
+          };
+
           fs.writeFileSync("content-index.json", JSON.stringify(index, null, 2), "utf8");
-          fs.writeFileSync("search-index.json", JSON.stringify({ generatedAt: index.generatedAt, root: ROOT, items: searchItems }, null, 2), "utf8");
+          fs.writeFileSync("search-index.json", JSON.stringify(searchIndex, null, 2), "utf8");
 
           console.log("Wrote content-index.json and search-index.json");
           NODE
