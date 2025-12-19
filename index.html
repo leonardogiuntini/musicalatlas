@@ -6,220 +6,265 @@
   <title>Musical Atlas</title>
 
   <style>
-    :root { --w: 860px; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #fff;
-      color: #000;
+    :root{
+      --col-max: 900px;
+      --col: min(var(--col-max), calc(100vw - 28px));
+      --ui-bg: #000;
+      --ui-fg: #fff;
+      --ui-border: #fff;
+
+      --doc-bg: #fff;
+      --doc-fg: #000;
+      --doc-border: #000;
     }
 
-    .wrap {
-      max-width: var(--w);
+    *{ box-sizing: border-box; }
+
+    body{
+      margin:0;
+      background: var(--ui-bg);
+      color: var(--ui-fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .col{
+      width: var(--col);
       margin: 0 auto;
-      padding: 22px 14px 64px;
+    }
+
+    .wrap{
+      padding: 18px 0 74px;
     }
 
     /* Header */
-    #headerTitle {
+    #headerTitle{
+      margin: 0;
+      padding: 6px 0 2px;
+      text-align: center;
       font-weight: 800;
       letter-spacing: 0.08em;
-      text-align: center;
       cursor: pointer;
       user-select: none;
-      margin: 0;
       font-size: 28px;
     }
 
     /* Search */
-    .searchRow {
-      display: flex;
-      justify-content: center;
-      margin: 10px 0 14px;
-    }
-    #searchInput {
+    .searchRow{ padding: 10px 0 12px; }
+    #searchInput{
+      width: 100%;
       padding: 10px 12px;
-      border: 2px solid #000;
-      border-radius: 10px;
+      border: 2px solid var(--ui-border);
+      border-radius: 12px;
+      background: #000;
+      color: #fff;
       font-size: 14px;
       outline: none;
-      width: 320px; /* will be resized to match header */
     }
+    #searchInput::placeholder{ color: rgba(255,255,255,0.65); }
 
-    /* Nav line */
-    .navLine {
+    /* Nav row: < > left, Menu center, crumbs scroll right */
+    .navRow{
       display: flex;
-      justify-content: center;
       align-items: center;
       gap: 10px;
-      margin: 10px 0 8px;
-      flex-wrap: wrap;
+      padding: 8px 0 6px;
+    }
+    .navLeft{
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .navMid{
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .navRight{
+      flex: 1 1 auto;
+      display: flex;
+      justify-content: flex-end;
+      min-width: 0;
     }
 
-    .btn {
-      border: 2px solid #000;
+    #crumbs{
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      max-width: 100%;
+      scrollbar-width: thin;
+    }
+
+    /* Buttons: inverted UI (default black/white; selected white/black) */
+    .btn{
+      border: 2px solid var(--ui-border);
       border-radius: 999px;
       padding: 7px 12px;
       font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
-      background: #fff;
-      color: #000;
+      background: #000;
+      color: #fff;
       user-select: none;
       white-space: nowrap;
     }
-    .btn.black {
-      background: #000;
-      color: #fff;
+    .btn.sel{
+      background: #fff;
+      color: #000;
+      border-color: #fff;
     }
-    .btn.hidden { display: none; }
+    .btn.hidden{ display:none; }
 
-    #crumbs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      max-width: min(92vw, var(--w));
-      padding-bottom: 2px;
-      scrollbar-width: thin;
-    }
-
-    /* Choices row + Search results row */
-    .choicesRow, .resultsRow {
+    /* Choices + results rows */
+    .choicesRow, .resultsRow{
       display: flex;
       justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
-      margin: 10px 0 12px;
+      padding: 10px 0 10px;
       min-height: 36px;
     }
 
-    /* Content */
-    .docFrame {
-      border: 2px solid #000;
+    /* Document "paper" stays white */
+    .docFrame{
+      border: 2px solid var(--doc-border);
       border-radius: 18px;
       padding: 16px 16px;
-      min-height: 320px;
-      max-width: var(--w);
-      margin: 0 auto;
+      background: var(--doc-bg);
+      color: var(--doc-fg);
     }
-    #docContent {
+    #docContent{
       line-height: 1.55;
       font-size: 15px;
       overflow-wrap: anywhere;
     }
 
-    .welcomeMsg {
+    .welcomeMsg{
       text-align: center;
       white-space: pre-line;
       font-size: 16px;
       margin: 18px 0;
+      color: var(--doc-fg);
     }
 
-    /* Link styling (no underline/no color change) */
-    .atlasLink {
+    /* Link styling (no underline/color change) */
+    .atlasLink{
       cursor: pointer;
       text-decoration: none !important;
       color: inherit !important;
     }
 
-    /* Hover balloon */
-    #hoverCard {
+    /* Hover balloon (inverted UI) */
+    #hoverCard{
       position: fixed;
       z-index: 9999;
       max-width: min(320px, 80vw);
-      background: #fff;
-      border: 2px solid #000;
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
       border-radius: 14px;
       padding: 8px 10px;
       font-size: 12px;
       display: none;
       pointer-events: none;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.35);
     }
-    #hoverCard::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: -7px;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 7px solid #fff;
+    #hoverCard::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-7px;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:7px solid transparent;
+      border-right:7px solid transparent;
+      border-top:7px solid #000;
     }
-    #hoverCard::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: -8px;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid #000;
+    #hoverCard::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-8px;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:8px solid transparent;
+      border-right:8px solid transparent;
+      border-top:8px solid #fff;
     }
 
-    /* Footer */
-    footer {
+    /* Footer (always visible, inverted UI) */
+    footer{
       position: fixed;
       left: 0; right: 0; bottom: 0;
-      background: #fff;
-      border-top: 2px solid #000;
-      padding: 8px 12px;
-      text-align: center;
-      font-size: 12px;
+      background: #000;
+      color: #fff;
+      border-top: 2px solid #fff;
+      padding: 8px 0;
       white-space: pre-line;
+      font-size: 12px;
+      text-align: center;
     }
   </style>
 
-  <!-- RTF.js (CDN). If you want *true offline* without internet, later you can download these files into your repo and change the src. -->
-  <script src="https://unpkg.com/rtf.js@3.0.9/dist/rtf.min.js"></script>
-  <script src="https://unpkg.com/rtf.js@3.0.9/dist/wmf.js"></script>
-  <script src="https://unpkg.com/rtf.js@3.0.9/dist/emf.js"></script>
+  <!-- Local vendor bundles (autonomous, no external CDN) -->
+  <script src="./vendor/WMFJS.bundle.js"></script>
+  <script src="./vendor/EMFJS.bundle.js"></script>
+  <script src="./vendor/RTFJS.bundle.js"></script>
 </head>
 
 <body>
   <div class="wrap">
-    <h1 id="headerTitle">MUSICAL ATLAS</h1>
+    <div class="col">
+      <h1 id="headerTitle">MUSICAL ATLAS</h1>
 
-    <div class="searchRow">
-      <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
-    </div>
+      <div class="searchRow">
+        <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
+      </div>
 
-    <div class="navLine" aria-label="Navigation">
-      <button id="backBtn" class="btn hidden" aria-label="Back">&lt;</button>
-      <button id="menuBtn" class="btn" aria-label="Menu">Menu</button>
-      <div id="crumbs" aria-label="Path"></div>
-      <button id="fwdBtn" class="btn hidden" aria-label="Forward">&gt;</button>
-    </div>
+      <div class="navRow" aria-label="Navigation">
+        <div class="navLeft">
+          <button id="backBtn" class="btn hidden" aria-label="Back">&lt;</button>
+          <button id="fwdBtn" class="btn hidden" aria-label="Forward">&gt;</button>
+        </div>
 
-    <div id="choicesRow" class="choicesRow" aria-label="Choices"></div>
-    <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
+        <div class="navMid">
+          <button id="menuBtn" class="btn" aria-label="Menu">Menu</button>
+        </div>
 
-    <div class="docFrame">
-      <div id="docContent"></div>
+        <div class="navRight">
+          <div id="crumbs" aria-label="Path"></div>
+        </div>
+      </div>
+
+      <div id="choicesRow" class="choicesRow" aria-label="Choices"></div>
+      <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
+
+      <div class="docFrame">
+        <div id="docContent"></div>
+      </div>
     </div>
   </div>
 
   <div id="hoverCard"></div>
 
-  <footer id="footerQuote">Music for the People.
-by Leo G.</footer>
+  <footer>
+    <div class="col">Music for the People.
+by Leo G.</div>
+  </footer>
 
 <script>
 (() => {
   "use strict";
 
   /* =========================
-     Config
+     Files
   ========================= */
   const INDEX_FILENAME = "content-index.json";
   const SEARCH_INDEX_FILENAME = "search-index.json";
+
   const WELCOME_TEXT = `Welcome!
 Click Menu to explore the Atlas
 or search from the bar above.`;
@@ -228,101 +273,62 @@ or search from the bar above.`;
      DOM
   ========================= */
   const $ = (sel) => document.querySelector(sel);
+
   const headerTitle = $("#headerTitle");
-  const searchInput = $("#searchInput");
-  const menuBtn = $("#menuBtn");
-  const backBtn = $("#backBtn");
-  const fwdBtn = $("#fwdBtn");
-  const crumbs = $("#crumbs");
-  const choicesRow = $("#choicesRow");
-  const resultsRow = $("#resultsRow");
-  const docContent = $("#docContent");
-  const hoverCard = $("#hoverCard");
+  const searchInput  = $("#searchInput");
+  const menuBtn      = $("#menuBtn");
+  const backBtn      = $("#backBtn");
+  const fwdBtn       = $("#fwdBtn");
+  const crumbs       = $("#crumbs");
+  const choicesRow   = $("#choicesRow");
+  const resultsRow   = $("#resultsRow");
+  const docContent   = $("#docContent");
+  const hoverCard    = $("#hoverCard");
 
   /* =========================
      State
   ========================= */
   const APP = {
-    mode: "unknown", // "online" | "offline" | "unknown"
-    index: null,     // { generatedAt, root, tree, flatPagesByKey? }
-    searchIndex: null, // [{path,title,text}]
-    rootNode: null,    // folder node (tree)
-    // offline handle + file handles
+    mode: "unknown",      // "online" | "offline" | "unknown"
+    index: null,
+    searchIndex: [],
+    rootNode: null,
+
+    // offline handles
     rootHandle: null,
     fileHandleByPath: new Map(), // path -> FileSystemFileHandle
 
-    // navigation
+    // navigation (2-line)
     menuOverlay: false,       // root menu view
-    folderPath: [],           // array of folder nodes (root..current)
-    currentDocPath: null,     // actual displayed doc path (can be presentation)
-    // history snapshots for UI back/forward
+    folderPath: [],           // nodes root..current
+    currentDocPath: null,     // actual displayed doc path (presentation or explicit)
+
+    // history snapshots (Change #2)
     navStack: [],
     navIdx: -1,
 
-    // lookup maps for linking/search open
-    pageByKey: new Map(),     // normalized title -> {title,path}
-    folderByKey: new Map(),   // normalized title -> {title,path}
+    // lookups for hyperlinks / search open
+    pageByKey: new Map(),
+    folderByKey: new Map(),
   };
 
   /* =========================
-     Helpers
+     UI helpers
   ========================= */
-  const normalizeKey = (s) =>
-    String(s || "")
-      .trim()
-      .replace(/\.rtf$/i, "")
-      .toLowerCase();
-
-  const titleize = (name) => {
-    const base = String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim();
-    return base.replace(/\b\w/g, c => c.toUpperCase());
-  };
-
-  const escapeHtml = (s) =>
-    String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-
-  function syncSearchWidthToHeader() {
-    // Match search width to rendered header width (within safe bounds)
-    const r = headerTitle.getBoundingClientRect();
-    const w = Math.max(240, Math.min(r.width, 560));
-    searchInput.style.width = w + "px";
+  function setMenuActive(active){
+    menuBtn.classList.toggle("sel", !!active);
   }
 
-  function clearDoc() {
-    docContent.innerHTML = "";
-  }
-
-  function showWelcome() {
-    APP.menuOverlay = false;
-    setMenuActive(false);
-    clearDoc();
-    crumbs.innerHTML = "";
-    choicesRow.innerHTML = "";
-    resultsRow.innerHTML = "";
-    docContent.innerHTML = `<div class="welcomeMsg">${escapeHtml(WELCOME_TEXT)}</div>`;
-    hideHoverCard();
-    updateBackForwardButtons();
-  }
-
-  function setMenuActive(active) {
-    menuBtn.classList.toggle("black", !!active);
-  }
-
-  function hideHoverCard() {
+  function hideHoverCard(){
     hoverCard.style.display = "none";
     hoverCard.textContent = "";
   }
 
-  function showHoverCard(anchorEl, text) {
+  function showHoverCard(anchorEl, text){
     const rect = anchorEl.getBoundingClientRect();
     hoverCard.textContent = text;
     hoverCard.style.display = "block";
-    // place above the word
+
     const pad = 10;
     const cardRect = hoverCard.getBoundingClientRect();
     let x = rect.left + rect.width / 2 - cardRect.width / 2;
@@ -333,11 +339,49 @@ or search from the bar above.`;
     hoverCard.style.top = y + "px";
   }
 
+  function clearDoc(){
+    docContent.innerHTML = "";
+  }
+
+  function showWelcome(){
+    APP.menuOverlay = false;
+    setMenuActive(false);
+    APP.folderPath = [];
+    APP.currentDocPath = null;
+
+    crumbs.innerHTML = "";
+    choicesRow.innerHTML = "";
+    resultsRow.innerHTML = "";
+    hideHoverCard();
+
+    docContent.innerHTML = `<div class="welcomeMsg">${escapeHtml(WELCOME_TEXT)}</div>`;
+    updateBackForwardButtons();
+  }
+
   /* =========================
-     Index loading
+     Text helpers
   ========================= */
-  async function tryLoadOnlineIndexes() {
-    try {
+  const normalizeKey = (s) =>
+    String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
+
+  const titleize = (name) => {
+    const base = String(name || "").replace(/\.rtf$/i,"").replace(/[_\-]+/g," ").trim();
+    return base.replace(/\b\w/g, c => c.toUpperCase());
+  };
+
+  const escapeHtml = (s) =>
+    String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+
+  /* =========================
+     Index loading (online)
+  ========================= */
+  async function tryLoadOnlineIndexes(){
+    try{
       const [idxRes, sRes] = await Promise.all([
         fetch("./" + INDEX_FILENAME, { cache: "no-store" }),
         fetch("./" + SEARCH_INDEX_FILENAME, { cache: "no-store" }),
@@ -356,7 +400,7 @@ or search from the bar above.`;
 
       buildLookupsFromIndex();
       return true;
-    } catch {
+    }catch{
       return false;
     }
   }
@@ -368,18 +412,16 @@ or search from the bar above.`;
   const IDB_STORE = "handles";
   const IDB_KEY = "rootHandle";
 
-  function idbOpen() {
+  function idbOpen(){
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(IDB_DB, 1);
-      req.onupgradeneeded = () => {
-        req.result.createObjectStore(IDB_STORE);
-      };
+      req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
     });
   }
 
-  async function idbSet(key, value) {
+  async function idbSet(key, value){
     const db = await idbOpen();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(IDB_STORE, "readwrite");
@@ -389,7 +431,7 @@ or search from the bar above.`;
     });
   }
 
-  async function idbGet(key) {
+  async function idbGet(key){
     const db = await idbOpen();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(IDB_STORE, "readonly");
@@ -400,9 +442,20 @@ or search from the bar above.`;
   }
 
   /* =========================
-     Offline scanning (build same index format)
+     Offline scan -> same index format
   ========================= */
-  async function scanOfflineRoot(handle) {
+  async function rtfToPlainTextFromFile(file){
+    const raw = await file.text();
+    let s = String(raw || "");
+    s = s.replace(/\{\\\*[^{}]*\}/g, " ");
+    s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
+    s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
+    s = s.replace(/[{}]/g, " ");
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+  }
+
+  async function scanOfflineRoot(handle){
     APP.fileHandleByPath.clear();
 
     const rootName = handle.name;
@@ -416,9 +469,9 @@ or search from the bar above.`;
 
     const searchItems = [];
 
-    async function scanFolder(folderHandle, relParts, folderNode) {
-      for await (const [name, entry] of folderHandle.entries()) {
-        if (entry.kind === "directory") {
+    async function scanFolder(folderHandle, relParts, folderNode){
+      for await (const [name, entry] of folderHandle.entries()){
+        if (entry.kind === "directory"){
           const childFolder = {
             type: "folder",
             name,
@@ -428,21 +481,20 @@ or search from the bar above.`;
           };
           folderNode.children.push(childFolder);
           await scanFolder(entry, [...relParts, name], childFolder);
-        } else if (entry.kind === "file" && /\.rtf$/i.test(name)) {
+        } else if (entry.kind === "file" && /\.rtf$/i.test(name)){
           const pagePath = [rootName, ...relParts, name].join("/");
-          const pageNode = { type: "page", name, title: titleize(name), path: pagePath };
+          const pageNode = { type:"page", name, title: titleize(name), path: pagePath };
           folderNode.children.push(pageNode);
           APP.fileHandleByPath.set(pagePath, entry);
 
-          try {
+          try{
             const f = await entry.getFile();
             const text = await rtfToPlainTextFromFile(f);
             searchItems.push({ path: pagePath, title: pageNode.title, text });
-          } catch {}
+          }catch{}
         }
       }
 
-      // sort children: folders first, then pages, by title
       folderNode.children.sort((a,b) => {
         if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
         return a.title.localeCompare(b.title);
@@ -459,70 +511,48 @@ or search from the bar above.`;
     buildLookupsFromIndex();
   }
 
-  async function rtfToPlainTextFromFile(file) {
-    // Simple extraction: strip common RTF controls; good enough for search
-    const raw = await file.text();
-    let s = String(raw || "");
-    s = s.replace(/\{\\\*[^{}]*\}/g, " ");
-    s = s.replace(/\\'[0-9a-fA-F]{2}/g, " ");
-    s = s.replace(/\\[a-zA-Z]+\d* ?/g, " ");
-    s = s.replace(/[{}]/g, " ");
-    s = s.replace(/\s+/g, " ").trim();
-    return s;
-  }
-
   /* =========================
-     Lookups (links + open by title)
+     Lookups for links
   ========================= */
-  function buildLookupsFromIndex() {
+  function buildLookupsFromIndex(){
     APP.pageByKey.clear();
     APP.folderByKey.clear();
 
-    function walk(node) {
+    function walk(node){
       if (!node) return;
-      if (node.type === "folder") {
+      if (node.type === "folder"){
         APP.folderByKey.set(normalizeKey(node.title), { title: node.title, path: node.path });
         for (const ch of (node.children || [])) walk(ch);
-      } else if (node.type === "page") {
+      } else if (node.type === "page"){
         APP.pageByKey.set(normalizeKey(node.title), { title: node.title, path: node.path });
       }
     }
     walk(APP.rootNode);
   }
 
-  function findNodeByPath(path) {
+  function findNodeByPath(path){
     if (!APP.rootNode) return null;
     const want = String(path || "");
     let found = null;
 
-    function walk(node) {
+    (function walk(node){
       if (!node || found) return;
-      if (node.path === want) { found = node; return; }
+      if (node.path === want){ found = node; return; }
       for (const ch of (node.children || [])) walk(ch);
-    }
-    walk(APP.rootNode);
+    })(APP.rootNode);
+
     return found;
   }
 
-  function getParentFolderPathOfDoc(docPath) {
-    const parts = String(docPath || "").split("/").filter(Boolean);
-    if (parts.length < 2) return []; // root? not expected
-    // drop last segment (file)
-    parts.pop();
-    // parts now: [root, ...folders]
-    return parts;
-  }
-
-  function getFolderPathNodesFromParts(folderParts) {
-    // folderParts like [root, A, B] -> nodes [rootNode, nodeA, nodeB]
+  function getFolderPathNodesFromParts(folderParts){
     if (!APP.rootNode) return [];
     const out = [];
     let cur = APP.rootNode;
     if (!folderParts.length) return out;
     if (folderParts[0] !== APP.rootNode.name) return out;
-    out.push(cur);
 
-    for (let i=1; i<folderParts.length; i++) {
+    out.push(cur);
+    for (let i=1;i<folderParts.length;i++){
       const seg = folderParts[i];
       const next = (cur.children || []).find(ch => ch.type==="folder" && ch.name===seg);
       if (!next) break;
@@ -532,36 +562,48 @@ or search from the bar above.`;
     return out;
   }
 
-  function presentationDocPathForFolder(folderNode) {
+  function getParentFolderPartsOfDoc(docPath){
+    const parts = String(docPath || "").split("/").filter(Boolean);
+    if (parts.length < 2) return [];
+    parts.pop();
+    return parts; // [root, ...folders]
+  }
+
+  /* =========================
+     Change #1 rule: presentation doc
+     (filename matches folder name)
+  ========================= */
+  function presentationDocPathForFolder(folderNode){
     if (!folderNode || folderNode.type !== "folder") return null;
-    const presName = folderNode.name + ".rtf";
-    const pres = (folderNode.children || []).find(ch => ch.type==="page" && ch.name.toLowerCase() === presName.toLowerCase());
+    const want = (folderNode.name + ".rtf").toLowerCase();
+    const pres = (folderNode.children || []).find(ch => ch.type==="page" && ch.name.toLowerCase() === want);
     return pres ? pres.path : null;
   }
 
-  function listSubfolders(folderNode) {
+  function listSubfolders(folderNode){
     return (folderNode.children || []).filter(ch => ch.type === "folder");
   }
 
-  function listPages(folderNode) {
-    return (folderNode.children || []).filter(ch => ch.type === "page");
-  }
-
-  function listExtraPages(folderNode) {
+  function listExtraPages(folderNode){
     const pres = presentationDocPathForFolder(folderNode);
-    return listPages(folderNode).filter(p => p.path !== pres);
+    return (folderNode.children || []).filter(ch => ch.type === "page" && ch.path !== pres);
   }
 
   /* =========================
      Rendering: crumbs + choices
+     Change #5: hidden-root (no generated root button)
   ========================= */
-  function buildCrumbs() {
+  function buildCrumbs(){
     crumbs.innerHTML = "";
     if (APP.menuOverlay) return;
-    for (let i=0; i<APP.folderPath.length; i++) {
+
+    // Show folders-only, but hide the root container chip:
+    // breadcrumbs start from the first real subfolder level
+    const startIdx = 1; // skip root node at [0]
+    for (let i=startIdx; i<APP.folderPath.length; i++){
       const folderNode = APP.folderPath[i];
       const b = document.createElement("button");
-      b.className = "btn black";
+      b.className = "btn sel";
       b.textContent = folderNode.name.toUpperCase();
       b.addEventListener("click", () => {
         hideHoverCard();
@@ -569,39 +611,55 @@ or search from the bar above.`;
       });
       crumbs.appendChild(b);
     }
-    // scroll to end
+
+    // pin scroll to the rightmost end
     crumbs.scrollLeft = crumbs.scrollWidth;
   }
 
-  function buildChoices() {
+  function buildChoices(){
     choicesRow.innerHTML = "";
+    if (!APP.rootNode) return;
 
-    // Root menu view: show the root folder as a white selectable button
-    if (APP.menuOverlay) {
-      if (!APP.rootNode) return;
-      const b = document.createElement("button");
-      b.className = "btn";
-      b.textContent = APP.rootNode.name.toUpperCase();
-      b.addEventListener("click", () => {
-        hideHoverCard();
-        APP.menuOverlay = false;
-        setMenuActive(false);
-        openFolderByPath(APP.rootNode.path, true); // this pushes history
-      });
-      choicesRow.appendChild(b);
+    // In root-menu view: show root subfolders directly (no root button)
+    if (APP.menuOverlay){
+      const subfolders = listSubfolders(APP.rootNode);
+      const extras = listExtraPages(APP.rootNode);
+
+      for (const f of subfolders){
+        const b = document.createElement("button");
+        b.className = "btn";
+        b.textContent = f.name.toUpperCase();
+        b.addEventListener("click", () => {
+          hideHoverCard();
+          APP.menuOverlay = false;
+          setMenuActive(false);
+          openFolderByPath(f.path, true);
+        });
+        choicesRow.appendChild(b);
+      }
+
+      // Also allow extra docs in root view (non-presentation)
+      for (const p of extras){
+        const b = document.createElement("button");
+        b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
+        b.textContent = p.title.toUpperCase();
+        b.addEventListener("click", () => {
+          hideHoverCard();
+          APP.menuOverlay = false;
+          setMenuActive(false);
+          openDocByPath(p.path, true);
+        });
+        choicesRow.appendChild(b);
+      }
       return;
     }
 
-    const currentFolder = APP.folderPath[APP.folderPath.length - 1] || null;
-    if (!currentFolder) return;
+    const currentFolder = APP.folderPath[APP.folderPath.length - 1] || APP.rootNode;
 
     const subfolders = listSubfolders(currentFolder);
     const extras = listExtraPages(currentFolder);
 
-    const hasSubfolders = subfolders.length > 0;
-
-    // Always show subfolders as white buttons
-    for (const f of subfolders) {
+    for (const f of subfolders){
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = f.name.toUpperCase();
@@ -612,13 +670,9 @@ or search from the bar above.`;
       choicesRow.appendChild(b);
     }
 
-    // If there are extra (non-presentation) docs:
-    // - show them in the white row (even if there are subfolders),
-    // - and highlight the selected one as black.
-    for (const p of extras) {
+    for (const p of extras){
       const b = document.createElement("button");
-      const isSelected = APP.currentDocPath === p.path;
-      b.className = "btn" + (isSelected ? " black" : "");
+      b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
       b.textContent = p.title.toUpperCase();
       b.addEventListener("click", () => {
         hideHoverCard();
@@ -629,13 +683,40 @@ or search from the bar above.`;
   }
 
   /* =========================
-     RTF rendering + autolinks
+     Fix1: UTF-16 BOM normalize
   ========================= */
-  async function renderRtfArrayBuffer(buf) {
+  function normalizeRtfArrayBuffer(ab){
+    const u8 = new Uint8Array(ab);
+    if (u8.length >= 2){
+      const b0 = u8[0], b1 = u8[1];
+      const isLE = (b0 === 0xFF && b1 === 0xFE);
+      const isBE = (b0 === 0xFE && b1 === 0xFF);
+      if (isLE || isBE){
+        const dec = new TextDecoder(isLE ? "utf-16le" : "utf-16be");
+        const s = dec.decode(u8);
+        return new TextEncoder().encode(s).buffer;
+      }
+    }
+    return ab;
+  }
+
+  /* =========================
+     RTF rendering (autonomous vendor bundles)
+  ========================= */
+  async function renderRtfArrayBuffer(ab){
     clearDoc();
-    // RTFJS will insert HTML into a container
-    const doc = new window.RTFJS.Document(buf);
+
+    try{
+      RTFJS.loggingEnabled(false);
+      WMFJS.loggingEnabled(false);
+      EMFJS.loggingEnabled(false);
+    }catch{}
+
+    const normalized = normalizeRtfArrayBuffer(ab);
+
+    const doc = new RTFJS.Document(normalized);
     const fragments = await doc.render();
+
     const container = document.createElement("div");
     for (const el of fragments) container.appendChild(el);
     docContent.appendChild(container);
@@ -643,16 +724,15 @@ or search from the bar above.`;
     autolinkBoldAllCaps(docContent);
   }
 
-  function isAllCapsToken(token) {
+  function isAllCapsToken(token){
     const t = String(token || "").trim();
     if (t.length < 2) return false;
-    // allow A-Z, digits, some punctuation like '-' '’'
-    const letters = t.replace(/[^A-Za-z]/g, "");
+    const letters = t.replace(/[^A-Za-z]/g,"");
     if (letters.length < 2) return false;
     return letters === letters.toUpperCase();
   }
 
-  function elementIsBold(el) {
+  function elementIsBold(el){
     if (!el || el.nodeType !== 1) return false;
     const tag = el.tagName?.toLowerCase();
     if (tag === "b" || tag === "strong") return true;
@@ -662,19 +742,19 @@ or search from the bar above.`;
     return w === "bold";
   }
 
-  function hasBoldAncestor(node) {
+  function hasBoldAncestor(node){
     let cur = node.parentElement;
-    while (cur) {
+    while (cur){
       if (elementIsBold(cur)) return true;
       cur = cur.parentElement;
     }
     return false;
   }
 
-  function autolinkBoldAllCaps(rootEl) {
+  // Hyperlink rule (current): bold + ALL CAPS token links to matching page OR folder by title (case-insensitive)
+  function autolinkBoldAllCaps(rootEl){
     hideHoverCard();
 
-    // Strategy: for every text node inside a bold element, wrap ALL-CAPS tokens.
     const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {
         if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
@@ -683,56 +763,50 @@ or search from the bar above.`;
       }
     });
 
-    const toProcess = [];
-    while (walker.nextNode()) toProcess.push(walker.currentNode);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
 
-    for (const textNode of toProcess) {
+    for (const textNode of nodes){
       const text = textNode.nodeValue;
       if (!text) continue;
 
-      const parts = text.split(/(\s+)/); // keep spaces
+      const parts = text.split(/(\s+)/);
       let changed = false;
 
       const frag = document.createDocumentFragment();
-      for (const part of parts) {
-        if (/^\s+$/.test(part)) {
+      for (const part of parts){
+        if (/^\s+$/.test(part)){
           frag.appendChild(document.createTextNode(part));
           continue;
         }
 
-        // Strip edge punctuation for matching but keep original rendering
         const m = part.match(/^([("'“”‘’\[\{<]*)(.*?)([)",'.!?;:’”\]\}>]*)$/);
         const lead = m ? m[1] : "";
         const core = m ? m[2] : part;
         const tail = m ? m[3] : "";
 
-        if (core && isAllCapsToken(core)) {
+        if (core && isAllCapsToken(core)){
           const key = normalizeKey(core);
           const target = APP.pageByKey.get(key) || APP.folderByKey.get(key);
-          if (target) {
+          if (target){
             changed = true;
-
             if (lead) frag.appendChild(document.createTextNode(lead));
 
             const span = document.createElement("span");
             span.className = "atlasLink";
             span.textContent = core;
-            span.dataset.targetPath = target.path;
-            span.dataset.targetTitle = target.title;
 
-            // Desktop hover
             span.addEventListener("mouseenter", () => showHoverCard(span, `go to ${target.title}`));
             span.addEventListener("mouseleave", () => hideHoverCard());
 
-            // Click / touch behavior: first tap shows; second tap navigates
+            // Touch: first tap preview, second tap navigate
             let touchArmed = false;
             span.addEventListener("pointerdown", (ev) => {
-              if (ev.pointerType === "touch") {
+              if (ev.pointerType === "touch"){
                 ev.preventDefault();
-                if (!touchArmed) {
+                if (!touchArmed){
                   touchArmed = true;
                   showHoverCard(span, `go to ${target.title}`);
-                  // disarm after a moment
                   setTimeout(() => { touchArmed = false; }, 1200);
                 } else {
                   touchArmed = false;
@@ -742,15 +816,14 @@ or search from the bar above.`;
               }
             });
 
+            // Mouse click navigates immediately and dismisses balloon
             span.addEventListener("click", (ev) => {
-              // For mouse clicks: navigate immediately, and ensure balloon disappears now
               ev.preventDefault();
               hideHoverCard();
               navigateToPath(target.path, true);
             });
 
             frag.appendChild(span);
-
             if (tail) frag.appendChild(document.createTextNode(tail));
             continue;
           }
@@ -759,63 +832,61 @@ or search from the bar above.`;
         frag.appendChild(document.createTextNode(part));
       }
 
-      if (changed) {
+      if (changed){
         textNode.parentNode.replaceChild(frag, textNode);
       }
     }
   }
 
   /* =========================
-     Loading documents
+     Load documents (online/offline)
   ========================= */
-  async function loadDocArrayBuffer(docPath) {
+  async function loadDocArrayBuffer(docPath){
     if (!docPath) return null;
 
-    if (APP.mode === "online") {
-      // fetch static file from GitHub Pages
+    if (APP.mode === "online"){
       const url = encodeURI("./" + docPath);
       const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch doc: " + docPath);
+      if (!res.ok) throw new Error("Fetch failed: " + docPath);
       return await res.arrayBuffer();
     }
 
-    if (APP.mode === "offline") {
+    if (APP.mode === "offline"){
       const handle = APP.fileHandleByPath.get(docPath);
-      if (!handle) throw new Error("Missing file handle: " + docPath);
+      if (!handle) throw new Error("Missing handle: " + docPath);
       const file = await handle.getFile();
       return await file.arrayBuffer();
     }
 
-    throw new Error("No mode/index loaded");
+    throw new Error("No mode ready");
   }
 
-  async function openAndRenderDoc(docPath) {
+  async function openAndRenderDoc(docPath){
     clearDoc();
     if (!docPath) return;
 
-    try {
-      const buf = await loadDocArrayBuffer(docPath);
-      await renderRtfArrayBuffer(buf);
-    } catch (e) {
+    try{
+      const ab = await loadDocArrayBuffer(docPath);
+      await renderRtfArrayBuffer(ab);
+    }catch{
       clearDoc();
       docContent.innerHTML = `<div class="welcomeMsg">Could not open document.</div>`;
     }
   }
 
   /* =========================
-     Navigation (folders/docs)
+     History snapshots (Change #2)
   ========================= */
-  function snapshotNow() {
+  function snapshotNow(){
     return {
       folderPath: APP.folderPath.map(n => n.path),
       currentDocPath: APP.currentDocPath
     };
   }
 
-  function pushSnapshot() {
+  function pushSnapshot(){
     const snap = snapshotNow();
-    // drop forward history
-    if (APP.navIdx < APP.navStack.length - 1) {
+    if (APP.navIdx < APP.navStack.length - 1){
       APP.navStack = APP.navStack.slice(0, APP.navIdx + 1);
     }
     APP.navStack.push(snap);
@@ -823,16 +894,17 @@ or search from the bar above.`;
     updateBackForwardButtons();
   }
 
-  async function restoreSnapshot(snap) {
+  async function restoreSnapshot(snap){
     if (!snap) return;
-    // folderPath stored as paths
+
     const nodes = [];
-    for (const p of (snap.folderPath || [])) {
+    for (const p of (snap.folderPath || [])){
       const n = findNodeByPath(p);
       if (n && n.type === "folder") nodes.push(n);
     }
     APP.folderPath = nodes;
     APP.currentDocPath = snap.currentDocPath || null;
+
     APP.menuOverlay = false;
     setMenuActive(false);
 
@@ -840,22 +912,30 @@ or search from the bar above.`;
     buildChoices();
     resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
+
     updateBackForwardButtons();
   }
 
-  async function openFolderByPath(folderPath, pushHist) {
+  function updateBackForwardButtons(){
+    const canBack = APP.navIdx > 0;
+    const canFwd  = APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1;
+    backBtn.classList.toggle("hidden", !canBack);
+    fwdBtn.classList.toggle("hidden", !canFwd);
+  }
+
+  /* =========================
+     Navigation
+  ========================= */
+  async function openFolderByPath(folderPath, pushHist){
     hideHoverCard();
     const folderNode = findNodeByPath(folderPath);
     if (!folderNode || folderNode.type !== "folder") return;
 
-    // build folder path nodes from root to this folder
     const parts = folderNode.path.split("/").filter(Boolean);
-    const nodes = getFolderPathNodesFromParts(parts);
-    APP.folderPath = nodes;
+    APP.folderPath = getFolderPathNodesFromParts(parts);
 
-    // auto-open presentation doc (file name matches folder name)
-    const pres = presentationDocPathForFolder(folderNode);
-    APP.currentDocPath = pres;
+    // auto-open presentation doc always
+    APP.currentDocPath = presentationDocPathForFolder(folderNode);
 
     APP.menuOverlay = false;
     setMenuActive(false);
@@ -868,15 +948,13 @@ or search from the bar above.`;
     if (pushHist) pushSnapshot();
   }
 
-  async function openDocByPath(docPath, pushHist) {
+  async function openDocByPath(docPath, pushHist){
     hideHoverCard();
     const docNode = findNodeByPath(docPath);
     if (!docNode || docNode.type !== "page") return;
 
-    // set folder path to parent folder of doc
-    const parentParts = getParentFolderPathOfDoc(docPath);
+    const parentParts = getParentFolderPartsOfDoc(docPath);
     APP.folderPath = getFolderPathNodesFromParts(parentParts);
-
     APP.currentDocPath = docPath;
 
     APP.menuOverlay = false;
@@ -890,34 +968,19 @@ or search from the bar above.`;
     if (pushHist) pushSnapshot();
   }
 
-  async function navigateToPath(targetPath, pushHist) {
+  async function navigateToPath(targetPath, pushHist){
     const node = findNodeByPath(targetPath);
     if (!node) return;
-
-    if (node.type === "folder") {
-      await openFolderByPath(node.path, pushHist);
-      return;
-    }
-
-    if (node.type === "page") {
-      await openDocByPath(node.path, pushHist);
-      return;
-    }
-  }
-
-  function updateBackForwardButtons() {
-    const canBack = APP.navIdx > 0;
-    const canFwd = APP.navIdx >= 0 && APP.navIdx < APP.navStack.length - 1;
-    backBtn.classList.toggle("hidden", !canBack);
-    fwdBtn.classList.toggle("hidden", !canFwd);
+    if (node.type === "folder") return openFolderByPath(node.path, pushHist);
+    if (node.type === "page")   return openDocByPath(node.path, pushHist);
   }
 
   /* =========================
      Search
   ========================= */
-  function renderSearchResults(items) {
+  function renderSearchResults(items){
     resultsRow.innerHTML = "";
-    for (const it of items) {
+    for (const it of items){
       const b = document.createElement("button");
       b.className = "btn";
       b.textContent = (it.title || "").toUpperCase();
@@ -930,14 +993,14 @@ or search from the bar above.`;
     }
   }
 
-  function doSearch(q) {
+  function doSearch(q){
     const query = String(q || "").trim().toLowerCase();
-    if (!query) { resultsRow.innerHTML = ""; return; }
-    if (!Array.isArray(APP.searchIndex)) { resultsRow.innerHTML = ""; return; }
+    if (!query){ resultsRow.innerHTML = ""; return; }
+    if (!Array.isArray(APP.searchIndex)){ resultsRow.innerHTML = ""; return; }
 
     const hits = [];
-    for (const it of APP.searchIndex) {
-      const hay = (it.title + " " + it.text).toLowerCase();
+    for (const it of APP.searchIndex){
+      const hay = ((it.title || "") + " " + (it.text || "")).toLowerCase();
       if (hay.includes(query)) hits.push(it);
       if (hits.length >= 18) break;
     }
@@ -945,110 +1008,117 @@ or search from the bar above.`;
   }
 
   /* =========================
-     Menu button behavior
+     Menu behavior (Change #5)
+     - no generated root button
+     - on open: show root subfolders and auto-show root presentation doc
+     - do not push history for toggling menu
   ========================= */
-  async function ensureIndexesAvailable() {
+  async function ensureIndexesAvailable(){
     if (APP.index && APP.rootNode) return true;
 
-    // First try online (if hosted)
     const okOnline = await tryLoadOnlineIndexes();
     if (okOnline) return true;
 
-    // If we're on https/http and online indexes are missing, do NOT pop folder picker.
-    // (Hosted site should not ask for your computer folders.)
+    // Hosted site should not ask for a local folder if indexes are missing
     const isWeb = location.protocol === "https:" || location.protocol === "http:";
     const canPick = !!window.showDirectoryPicker;
 
-    if (isWeb && !canPick) {
-      return false;
-    }
+    if (isWeb && !canPick) return false;
 
-    // Offline flow: try to re-use saved handle
-    if (canPick) {
-      try {
+    // Try saved offline handle silently
+    if (canPick){
+      try{
         const saved = await idbGet(IDB_KEY);
-        if (saved) {
-          // Request permission quietly
+        if (saved){
           const perm = await saved.queryPermission({ mode: "read" });
-          if (perm === "granted") {
+          if (perm === "granted"){
             APP.rootHandle = saved;
             await scanOfflineRoot(saved);
             return true;
           }
         }
-      } catch {}
+      }catch{}
     }
 
     return false;
   }
 
-  async function promptPickOfflineRoot() {
+  async function promptPickOfflineRoot(){
     if (!window.showDirectoryPicker) return false;
-    try {
+    try{
       const handle = await window.showDirectoryPicker();
       APP.rootHandle = handle;
       await idbSet(IDB_KEY, handle);
       await scanOfflineRoot(handle);
       return true;
-    } catch {
+    }catch{
       return false;
     }
   }
 
-  async function onMenuClick() {
+  async function onMenuClick(){
     hideHoverCard();
 
-    const ready = await ensureIndexesAvailable();
+    let ready = await ensureIndexesAvailable();
 
-    if (!ready && (location.protocol === "https:" || location.protocol === "http:")) {
-      // Hosted mode but no indexes found:
-      docContent.innerHTML = `<div class="welcomeMsg">Online indexes not found.<br/>Make sure GitHub Actions deploys <b>${INDEX_FILENAME}</b> and <b>${SEARCH_INDEX_FILENAME}</b> alongside <b>index.html</b>.</div>`;
+    if (!ready && (location.protocol === "https:" || location.protocol === "http:")){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">Online indexes not found.<br/>Make sure GitHub Actions deploys <b>${INDEX_FILENAME}</b> and <b>${SEARCH_INDEX_FILENAME}</b> next to <b>index.html</b>.</div>`;
       return;
     }
 
-    if (!ready) {
-      // likely offline/local server: ask to pick folder
+    if (!ready){
       const ok = await promptPickOfflineRoot();
       if (!ok) return;
+      ready = true;
     }
 
-    // Toggle overlay without pushing history (Change #2)
+    // toggle overlay
     APP.menuOverlay = !APP.menuOverlay;
     setMenuActive(APP.menuOverlay);
 
-    // Hide crumbs in overlay; keep current content visible
+    // In overlay: hide crumbs, show root subfolders, and auto-show root presentation doc
+    if (APP.menuOverlay){
+      crumbs.innerHTML = "";
+
+      // keep current content visible? You asked earlier yes, but now we also want root presentation shown:
+      // We will show root presentation automatically (without history).
+      const rootPres = presentationDocPathForFolder(APP.rootNode);
+      APP.currentDocPath = rootPres;
+      await openAndRenderDoc(APP.currentDocPath);
+
+      buildChoices();
+      resultsRow.innerHTML = "";
+      updateBackForwardButtons();
+      return;
+    }
+
+    // closing overlay: restore crumbs/choices for current folder/doc view (no history step)
     buildCrumbs();
     buildChoices();
     resultsRow.innerHTML = "";
+    updateBackForwardButtons();
   }
 
   /* =========================
      Boot
   ========================= */
-  async function boot() {
-    syncSearchWidthToHeader();
-    window.addEventListener("resize", syncSearchWidthToHeader);
-
+  async function boot(){
     showWelcome();
 
-    // Preload online indexes if available, but don't navigate yet.
+    // preload online indexes if available (no navigation yet)
     await tryLoadOnlineIndexes();
 
-    // Events
     headerTitle.addEventListener("click", () => {
-      // Reset to true home (Welcome), and do not add to nav history (per rules)
+      hideHoverCard();
       showWelcome();
-      APP.folderPath = [];
-      APP.currentDocPath = null;
-      APP.menuOverlay = false;
-      setMenuActive(false);
     });
 
     menuBtn.addEventListener("click", onMenuClick);
 
     backBtn.addEventListener("click", async () => {
       hideHoverCard();
-      if (APP.navIdx > 0) {
+      if (APP.navIdx > 0){
         APP.navIdx--;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
       }
@@ -1056,7 +1126,7 @@ or search from the bar above.`;
 
     fwdBtn.addEventListener("click", async () => {
       hideHoverCard();
-      if (APP.navIdx < APP.navStack.length - 1) {
+      if (APP.navIdx < APP.navStack.length - 1){
         APP.navIdx++;
         await restoreSnapshot(APP.navStack[APP.navIdx]);
       }
@@ -1064,14 +1134,14 @@ or search from the bar above.`;
 
     searchInput.addEventListener("input", () => doSearch(searchInput.value));
     searchInput.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape") {
+      if (ev.key === "Escape"){
         searchInput.value = "";
         resultsRow.innerHTML = "";
         hideHoverCard();
       }
     });
 
-    // Ensure hover card never "sticks" after navigation or leaving the page
+    // Ensure hover balloon never "sticks"
     document.addEventListener("click", () => hideHoverCard());
     document.addEventListener("scroll", () => hideHoverCard(), { passive: true });
   }
