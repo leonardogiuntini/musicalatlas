@@ -7,8 +7,10 @@
 
   <style>
     :root{
-      --col-max: 900px;
+      /* 75% of previous max width (900px -> 675px) */
+      --col-max: 675px;
       --col: min(var(--col-max), calc(100vw - 28px));
+
       --ui-bg: #000;
       --ui-fg: #fff;
       --ui-border: #fff;
@@ -32,11 +34,8 @@
       margin: 0 auto;
     }
 
-    .wrap{
-      padding: 18px 0 74px;
-    }
+    .wrap{ padding: 18px 0 74px; }
 
-    /* Header */
     #headerTitle{
       margin: 0;
       padding: 6px 0 2px;
@@ -48,8 +47,7 @@
       font-size: 28px;
     }
 
-    /* Search */
-    .searchRow{ padding: 10px 0 12px; }
+    .searchRow{ padding: 10px 0 6px; }
     #searchInput{
       width: 100%;
       padding: 10px 12px;
@@ -62,12 +60,21 @@
     }
     #searchInput::placeholder{ color: rgba(255,255,255,0.65); }
 
-    /* Nav row: < > left, Menu center, crumbs scroll right */
+    /* Results now sit directly under search bar */
+    .resultsRow{
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 8px 0 10px;
+      min-height: 36px;
+    }
+
     .navRow{
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 0 6px;
+      padding: 6px 0 6px;
     }
     .navLeft{
       display: flex;
@@ -97,7 +104,7 @@
       scrollbar-width: thin;
     }
 
-    /* Buttons: inverted UI (default black/white; selected white/black) */
+    /* Inverted UI buttons */
     .btn{
       border: 2px solid var(--ui-border);
       border-radius: 999px;
@@ -118,8 +125,7 @@
     }
     .btn.hidden{ display:none; }
 
-    /* Choices + results rows */
-    .choicesRow, .resultsRow{
+    .choicesRow{
       display: flex;
       justify-content: center;
       gap: 10px;
@@ -128,7 +134,7 @@
       min-height: 36px;
     }
 
-    /* Document "paper" stays white */
+    /* Document stays "paper-like" */
     .docFrame{
       border: 2px solid var(--doc-border);
       border-radius: 18px;
@@ -150,7 +156,6 @@
       color: var(--doc-fg);
     }
 
-    /* Link styling (no underline/color change) */
     .atlasLink{
       cursor: pointer;
       text-decoration: none !important;
@@ -195,7 +200,6 @@
       border-top:8px solid #fff;
     }
 
-    /* Footer (always visible, inverted UI) */
     footer{
       position: fixed;
       left: 0; right: 0; bottom: 0;
@@ -209,7 +213,7 @@
     }
   </style>
 
-  <!-- Local vendor bundles (autonomous, no external CDN) -->
+  <!-- Local vendor bundles (autonomous) -->
   <script src="./vendor/WMFJS.bundle.js"></script>
   <script src="./vendor/EMFJS.bundle.js"></script>
   <script src="./vendor/RTFJS.bundle.js"></script>
@@ -223,6 +227,9 @@
       <div class="searchRow">
         <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
       </div>
+
+      <!-- Search results: directly under the search bar -->
+      <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
 
       <div class="navRow" aria-label="Navigation">
         <div class="navLeft">
@@ -240,7 +247,6 @@
       </div>
 
       <div id="choicesRow" class="choicesRow" aria-label="Choices"></div>
-      <div id="resultsRow" class="resultsRow" aria-label="Search results"></div>
 
       <div class="docFrame">
         <div id="docContent"></div>
@@ -259,9 +265,6 @@ by Leo G.</div>
 (() => {
   "use strict";
 
-  /* =========================
-     Files
-  ========================= */
   const INDEX_FILENAME = "content-index.json";
   const SEARCH_INDEX_FILENAME = "search-index.json";
 
@@ -269,9 +272,6 @@ by Leo G.</div>
 Click Menu to explore the Atlas
 or search from the bar above.`;
 
-  /* =========================
-     DOM
-  ========================= */
   const $ = (sel) => document.querySelector(sel);
 
   const headerTitle = $("#headerTitle");
@@ -285,9 +285,6 @@ or search from the bar above.`;
   const docContent   = $("#docContent");
   const hoverCard    = $("#hoverCard");
 
-  /* =========================
-     State
-  ========================= */
   const APP = {
     mode: "unknown",      // "online" | "offline" | "unknown"
     index: null,
@@ -301,23 +298,18 @@ or search from the bar above.`;
     // navigation (2-line)
     menuOverlay: false,       // root menu view
     folderPath: [],           // nodes root..current
-    currentDocPath: null,     // actual displayed doc path (presentation or explicit)
+    currentDocPath: null,     // displayed doc path
 
-    // history snapshots (Change #2)
+    // history snapshots
     navStack: [],
     navIdx: -1,
 
-    // lookups for hyperlinks / search open
+    // link lookups
     pageByKey: new Map(),
     folderByKey: new Map(),
   };
 
-  /* =========================
-     UI helpers
-  ========================= */
-  function setMenuActive(active){
-    menuBtn.classList.toggle("sel", !!active);
-  }
+  function setMenuActive(active){ menuBtn.classList.toggle("sel", !!active); }
 
   function hideHoverCard(){
     hoverCard.style.display = "none";
@@ -339,28 +331,6 @@ or search from the bar above.`;
     hoverCard.style.top = y + "px";
   }
 
-  function clearDoc(){
-    docContent.innerHTML = "";
-  }
-
-  function showWelcome(){
-    APP.menuOverlay = false;
-    setMenuActive(false);
-    APP.folderPath = [];
-    APP.currentDocPath = null;
-
-    crumbs.innerHTML = "";
-    choicesRow.innerHTML = "";
-    resultsRow.innerHTML = "";
-    hideHoverCard();
-
-    docContent.innerHTML = `<div class="welcomeMsg">${escapeHtml(WELCOME_TEXT)}</div>`;
-    updateBackForwardButtons();
-  }
-
-  /* =========================
-     Text helpers
-  ========================= */
   const normalizeKey = (s) =>
     String(s || "").trim().replace(/\.rtf$/i, "").toLowerCase();
 
@@ -377,9 +347,21 @@ or search from the bar above.`;
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#39;");
 
-  /* =========================
-     Index loading (online)
-  ========================= */
+  function showWelcome(){
+    APP.menuOverlay = false;
+    setMenuActive(false);
+    APP.folderPath = [];
+    APP.currentDocPath = null;
+
+    crumbs.innerHTML = "";
+    choicesRow.innerHTML = "";
+    resultsRow.innerHTML = "";
+    hideHoverCard();
+
+    docContent.innerHTML = `<div class="welcomeMsg">${escapeHtml(WELCOME_TEXT)}</div>`;
+    updateBackForwardButtons();
+  }
+
   async function tryLoadOnlineIndexes(){
     try{
       const [idxRes, sRes] = await Promise.all([
@@ -405,9 +387,7 @@ or search from the bar above.`;
     }
   }
 
-  /* =========================
-     Offline persistence (IndexedDB)
-  ========================= */
+  /* IndexedDB (offline handle) */
   const IDB_DB = "musical-atlas";
   const IDB_STORE = "handles";
   const IDB_KEY = "rootHandle";
@@ -441,9 +421,6 @@ or search from the bar above.`;
     });
   }
 
-  /* =========================
-     Offline scan -> same index format
-  ========================= */
   async function rtfToPlainTextFromFile(file){
     const raw = await file.text();
     let s = String(raw || "");
@@ -511,9 +488,6 @@ or search from the bar above.`;
     buildLookupsFromIndex();
   }
 
-  /* =========================
-     Lookups for links
-  ========================= */
   function buildLookupsFromIndex(){
     APP.pageByKey.clear();
     APP.folderByKey.clear();
@@ -566,13 +540,9 @@ or search from the bar above.`;
     const parts = String(docPath || "").split("/").filter(Boolean);
     if (parts.length < 2) return [];
     parts.pop();
-    return parts; // [root, ...folders]
+    return parts;
   }
 
-  /* =========================
-     Change #1 rule: presentation doc
-     (filename matches folder name)
-  ========================= */
   function presentationDocPathForFolder(folderNode){
     if (!folderNode || folderNode.type !== "folder") return null;
     const want = (folderNode.name + ".rtf").toLowerCase();
@@ -589,18 +559,12 @@ or search from the bar above.`;
     return (folderNode.children || []).filter(ch => ch.type === "page" && ch.path !== pres);
   }
 
-  /* =========================
-     Rendering: crumbs + choices
-     Change #5: hidden-root (no generated root button)
-  ========================= */
   function buildCrumbs(){
     crumbs.innerHTML = "";
     if (APP.menuOverlay) return;
 
-    // Show folders-only, but hide the root container chip:
-    // breadcrumbs start from the first real subfolder level
-    const startIdx = 1; // skip root node at [0]
-    for (let i=startIdx; i<APP.folderPath.length; i++){
+    // hidden-root: skip root crumb
+    for (let i=1; i<APP.folderPath.length; i++){
       const folderNode = APP.folderPath[i];
       const b = document.createElement("button");
       b.className = "btn sel";
@@ -611,8 +575,6 @@ or search from the bar above.`;
       });
       crumbs.appendChild(b);
     }
-
-    // pin scroll to the rightmost end
     crumbs.scrollLeft = crumbs.scrollWidth;
   }
 
@@ -620,7 +582,6 @@ or search from the bar above.`;
     choicesRow.innerHTML = "";
     if (!APP.rootNode) return;
 
-    // In root-menu view: show root subfolders directly (no root button)
     if (APP.menuOverlay){
       const subfolders = listSubfolders(APP.rootNode);
       const extras = listExtraPages(APP.rootNode);
@@ -638,7 +599,6 @@ or search from the bar above.`;
         choicesRow.appendChild(b);
       }
 
-      // Also allow extra docs in root view (non-presentation)
       for (const p of extras){
         const b = document.createElement("button");
         b.className = "btn" + (APP.currentDocPath === p.path ? " sel" : "");
@@ -682,46 +642,45 @@ or search from the bar above.`;
     }
   }
 
-  /* =========================
-     Fix1: UTF-16 BOM normalize
-  ========================= */
-  function normalizeRtfArrayBuffer(ab){
-    const u8 = new Uint8Array(ab);
-    if (u8.length >= 2){
-      const b0 = u8[0], b1 = u8[1];
-      const isLE = (b0 === 0xFF && b1 === 0xFE);
-      const isBE = (b0 === 0xFE && b1 === 0xFF);
-      if (isLE || isBE){
-        const dec = new TextDecoder(isLE ? "utf-16le" : "utf-16be");
-        const s = dec.decode(u8);
-        return new TextEncoder().encode(s).buffer;
-      }
-    }
-    return ab;
+  /* RTF rendering fixes */
+
+  function rtfBundlesLoaded(){
+    return (typeof window.RTFJS !== "undefined") &&
+           (typeof window.WMFJS !== "undefined") &&
+           (typeof window.EMFJS !== "undefined");
   }
 
-  /* =========================
-     RTF rendering (autonomous vendor bundles)
-  ========================= */
-  async function renderRtfArrayBuffer(ab){
-    clearDoc();
+  function normalizeRtfArrayBuffer(ab){
+    const u8 = new Uint8Array(ab);
+    if (u8.length < 4) return ab;
 
-    try{
-      RTFJS.loggingEnabled(false);
-      WMFJS.loggingEnabled(false);
-      EMFJS.loggingEnabled(false);
-    }catch{}
+    // UTF-16 BOM
+    const b0 = u8[0], b1 = u8[1];
+    const isLEBOM = (b0 === 0xFF && b1 === 0xFE);
+    const isBEBOM = (b0 === 0xFE && b1 === 0xFF);
+    if (isLEBOM || isBEBOM){
+      const dec = new TextDecoder(isLEBOM ? "utf-16le" : "utf-16be");
+      const s = dec.decode(u8);
+      return new TextEncoder().encode(s).buffer;
+    }
 
-    const normalized = normalizeRtfArrayBuffer(ab);
+    // Heuristic: UTF-16LE WITHOUT BOM (common): "{\rtf" appears as 7B 00 5C 00 72 00...
+    const looksLE =
+      u8[0] === 0x7B && u8[1] === 0x00 &&
+      u8[2] === 0x5C && u8[3] === 0x00;
 
-    const doc = new RTFJS.Document(normalized);
-    const fragments = await doc.render();
+    // Heuristic: UTF-16BE WITHOUT BOM: 00 7B 00 5C 00 72...
+    const looksBE =
+      u8[0] === 0x00 && u8[1] === 0x7B &&
+      u8[2] === 0x00 && u8[3] === 0x5C;
 
-    const container = document.createElement("div");
-    for (const el of fragments) container.appendChild(el);
-    docContent.appendChild(container);
+    if (looksLE || looksBE){
+      const dec = new TextDecoder(looksLE ? "utf-16le" : "utf-16be");
+      const s = dec.decode(u8);
+      return new TextEncoder().encode(s).buffer;
+    }
 
-    autolinkBoldAllCaps(docContent);
+    return ab;
   }
 
   function isAllCapsToken(token){
@@ -751,7 +710,6 @@ or search from the bar above.`;
     return false;
   }
 
-  // Hyperlink rule (current): bold + ALL CAPS token links to matching page OR folder by title (case-insensitive)
   function autolinkBoldAllCaps(rootEl){
     hideHoverCard();
 
@@ -799,7 +757,6 @@ or search from the bar above.`;
             span.addEventListener("mouseenter", () => showHoverCard(span, `go to ${target.title}`));
             span.addEventListener("mouseleave", () => hideHoverCard());
 
-            // Touch: first tap preview, second tap navigate
             let touchArmed = false;
             span.addEventListener("pointerdown", (ev) => {
               if (ev.pointerType === "touch"){
@@ -816,7 +773,6 @@ or search from the bar above.`;
               }
             });
 
-            // Mouse click navigates immediately and dismisses balloon
             span.addEventListener("click", (ev) => {
               ev.preventDefault();
               hideHoverCard();
@@ -838,9 +794,35 @@ or search from the bar above.`;
     }
   }
 
-  /* =========================
-     Load documents (online/offline)
-  ========================= */
+  async function renderRtfArrayBuffer(ab){
+    if (!rtfBundlesLoaded()){
+      docContent.innerHTML =
+        `<div class="welcomeMsg">RTF renderer not loaded.<br/>
+Make sure these files exist next to index.html:<br/>
+<b>vendor/WMFJS.bundle.js</b><br/>
+<b>vendor/EMFJS.bundle.js</b><br/>
+<b>vendor/RTFJS.bundle.js</b></div>`;
+      return;
+    }
+
+    try{
+      window.RTFJS.loggingEnabled(false);
+      window.WMFJS.loggingEnabled(false);
+      window.EMFJS.loggingEnabled(false);
+    }catch{}
+
+    const normalized = normalizeRtfArrayBuffer(ab);
+
+    const doc = new window.RTFJS.Document(normalized);
+    const fragments = await doc.render();
+
+    const container = document.createElement("div");
+    for (const el of fragments) container.appendChild(el);
+    docContent.appendChild(container);
+
+    autolinkBoldAllCaps(docContent);
+  }
+
   async function loadDocArrayBuffer(docPath){
     if (!docPath) return null;
 
@@ -862,21 +844,17 @@ or search from the bar above.`;
   }
 
   async function openAndRenderDoc(docPath){
-    clearDoc();
+    docContent.innerHTML = "";
     if (!docPath) return;
 
     try{
       const ab = await loadDocArrayBuffer(docPath);
       await renderRtfArrayBuffer(ab);
     }catch{
-      clearDoc();
       docContent.innerHTML = `<div class="welcomeMsg">Could not open document.</div>`;
     }
   }
 
-  /* =========================
-     History snapshots (Change #2)
-  ========================= */
   function snapshotNow(){
     return {
       folderPath: APP.folderPath.map(n => n.path),
@@ -910,7 +888,6 @@ or search from the bar above.`;
 
     buildCrumbs();
     buildChoices();
-    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
 
     updateBackForwardButtons();
@@ -923,9 +900,6 @@ or search from the bar above.`;
     fwdBtn.classList.toggle("hidden", !canFwd);
   }
 
-  /* =========================
-     Navigation
-  ========================= */
   async function openFolderByPath(folderPath, pushHist){
     hideHoverCard();
     const folderNode = findNodeByPath(folderPath);
@@ -934,7 +908,6 @@ or search from the bar above.`;
     const parts = folderNode.path.split("/").filter(Boolean);
     APP.folderPath = getFolderPathNodesFromParts(parts);
 
-    // auto-open presentation doc always
     APP.currentDocPath = presentationDocPathForFolder(folderNode);
 
     APP.menuOverlay = false;
@@ -942,7 +915,6 @@ or search from the bar above.`;
 
     buildCrumbs();
     buildChoices();
-    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
 
     if (pushHist) pushSnapshot();
@@ -962,7 +934,6 @@ or search from the bar above.`;
 
     buildCrumbs();
     buildChoices();
-    resultsRow.innerHTML = "";
     await openAndRenderDoc(APP.currentDocPath);
 
     if (pushHist) pushSnapshot();
@@ -975,9 +946,6 @@ or search from the bar above.`;
     if (node.type === "page")   return openDocByPath(node.path, pushHist);
   }
 
-  /* =========================
-     Search
-  ========================= */
   function renderSearchResults(items){
     resultsRow.innerHTML = "";
     for (const it of items){
@@ -1007,25 +975,17 @@ or search from the bar above.`;
     renderSearchResults(hits);
   }
 
-  /* =========================
-     Menu behavior (Change #5)
-     - no generated root button
-     - on open: show root subfolders and auto-show root presentation doc
-     - do not push history for toggling menu
-  ========================= */
   async function ensureIndexesAvailable(){
     if (APP.index && APP.rootNode) return true;
 
     const okOnline = await tryLoadOnlineIndexes();
     if (okOnline) return true;
 
-    // Hosted site should not ask for a local folder if indexes are missing
     const isWeb = location.protocol === "https:" || location.protocol === "http:";
     const canPick = !!window.showDirectoryPicker;
 
     if (isWeb && !canPick) return false;
 
-    // Try saved offline handle silently
     if (canPick){
       try{
         const saved = await idbGet(IDB_KEY);
@@ -1073,40 +1033,28 @@ or search from the bar above.`;
       ready = true;
     }
 
-    // toggle overlay
     APP.menuOverlay = !APP.menuOverlay;
     setMenuActive(APP.menuOverlay);
 
-    // In overlay: hide crumbs, show root subfolders, and auto-show root presentation doc
     if (APP.menuOverlay){
       crumbs.innerHTML = "";
 
-      // keep current content visible? You asked earlier yes, but now we also want root presentation shown:
-      // We will show root presentation automatically (without history).
       const rootPres = presentationDocPathForFolder(APP.rootNode);
       APP.currentDocPath = rootPres;
       await openAndRenderDoc(APP.currentDocPath);
 
       buildChoices();
-      resultsRow.innerHTML = "";
       updateBackForwardButtons();
       return;
     }
 
-    // closing overlay: restore crumbs/choices for current folder/doc view (no history step)
     buildCrumbs();
     buildChoices();
-    resultsRow.innerHTML = "";
     updateBackForwardButtons();
   }
 
-  /* =========================
-     Boot
-  ========================= */
   async function boot(){
     showWelcome();
-
-    // preload online indexes if available (no navigation yet)
     await tryLoadOnlineIndexes();
 
     headerTitle.addEventListener("click", () => {
@@ -1141,7 +1089,6 @@ or search from the bar above.`;
       }
     });
 
-    // Ensure hover balloon never "sticks"
     document.addEventListener("click", () => hideHoverCard());
     document.addEventListener("scroll", () => hideHoverCard(), { passive: true });
   }
