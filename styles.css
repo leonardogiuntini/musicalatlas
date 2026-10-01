@@ -1,0 +1,293 @@
+:root{
+  --col-max: 675px;
+  --col: min(var(--col-max), calc(100vw - 28px));
+
+  --ui-bg: #000;
+  --ui-fg: #fff;
+  --ui-border: #fff;
+
+  --doc-bg: #fff;
+  --doc-fg: #000;
+  --doc-border: #000;
+
+  --gap: 12px; /* spazio nero sopra/sotto la pagina */
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin:0;
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.col{
+  width: var(--col);
+  margin: 0 auto;
+}
+
+.wrap{
+  padding: 18px 0 30px;
+}
+
+/* ---------- Titolo ---------- */
+#headerTitle{
+  margin: 0;
+  padding: 6px 0 2px;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  font-size: 28px;
+}
+
+/* ---------- Ricerca ---------- */
+.searchRow{ padding: 10px 0 6px; text-align: center; }
+#searchInput{
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--ui-border);
+  border-radius: 12px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+#searchInput::placeholder{ color: rgba(255,255,255,0.65); }
+
+.resultsRow{
+  padding: 8px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.resultItem{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: var(--col-max);
+  justify-content: center;
+}
+
+.resultItem .pathContainer{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #fff #000;
+}
+
+.pathArrow{
+  color: #fff;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.pathBtn{
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pathBtn.docBtn{
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+/* ---------- Percorso + interruttori ---------- */
+.navRow{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0 6px;
+  flex-wrap: wrap;
+}
+
+#crumbs{
+  flex: 1 1 auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+
+.specialToggles{
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* INSTRUMENTS (ciano) */
+.btn.toggle-instruments{
+  color: #00FFFF;
+  border-color: #00FFFF;
+  background: #000;
+}
+.btn.toggle-instruments.sel{
+  background: #00FFFF;
+  color: #000;
+  border-color: #00FFFF;
+}
+
+/* PEOPLES (giallo) */
+.btn.toggle-peoples{
+  color: #FFFF00;
+  border-color: #FFFF00;
+  background: #000;
+}
+.btn.toggle-peoples.sel{
+  background: #FFFF00;
+  color: #000;
+  border-color: #FFFF00;
+}
+
+/* ---------- Pulsanti ---------- */
+.btn{
+  border: 2px solid var(--ui-border);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: #000;
+  color: #fff;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+}
+.btn.sel{
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+/* Righe di pulsanti (sottocartelle/pagine e INSTRUMENTS/PEOPLES) */
+.choicesRow{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 0 10px;
+  min-height: 36px;
+}
+.choicesRow.collapsed{ display: none; }
+
+/* ---------- Pagina ---------- */
+.contentPad{
+  margin-top: var(--gap);
+}
+.docFrame{
+  border: 2px solid var(--doc-border);
+  border-radius: 18px;
+  padding: 16px 16px;
+  background: var(--doc-bg);
+  color: var(--doc-fg);
+}
+#docContent{
+  line-height: 1.55;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+/* Paragrafi uno sotto l'altro, senza spazio extra (come negli RTF) */
+#docContent p{ margin: 0; }
+/* Paragrafo vuoto <p></p> = una riga vuota */
+#docContent p:empty::before{ content: "\00a0"; }
+
+/* I 7 colori di evidenziazione delle pagine */
+#docContent mark{ color: inherit; padding: 0; }
+#docContent mark.yellow { background: #FFFF00; }
+#docContent mark.cyan   { background: #00FFFF; }
+#docContent mark.green  { background: #00FF00; }
+#docContent mark.red    { background: #FF0000; }
+#docContent mark.magenta{ background: #FF00FF; }
+#docContent mark.blue   { background: #0000FF; }
+#docContent mark.white  { background: #FFFFFF; }
+
+.welcomeMsg{
+  text-align: center;
+  white-space: pre-line;
+  font-size: 16px;
+  margin: 18px 0;
+  color: var(--doc-fg);
+}
+
+/* Parole cliccabili (regole di formattazione): aspetto invariato */
+.atlasLink{ cursor: pointer; }
+
+/* Parole trovate dalla ricerca */
+.searchHit{
+  background-color: #ff6b6b;
+  color: #000;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* ---------- Menu a comparsa ---------- */
+#hoverCard{
+  position: fixed;
+  z-index: 9999;
+  max-width: min(320px, 80vw);
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 14px;
+  padding: 8px 10px;
+  font-size: 12px;
+  display: none;
+  white-space: normal;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+}
+
+.hoverAction{
+  display: block;
+  margin: 6px 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+#hoverCard::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-7px;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:7px solid #000;
+}
+#hoverCard::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-8px;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:8px solid #fff;
+}
+
+/* ---------- Piede (non fisso: si vede scorrendo in fondo) ---------- */
+.footerPad{
+  margin-top: var(--gap);
+  padding: 8px 0 18px;
+  border-top: 2px solid #fff;
+  white-space: pre-line;
+  font-size: 12px;
+  text-align: center;
+  color: #fff;
+}
