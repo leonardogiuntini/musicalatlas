@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Musical Atlas</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="map/atlas-map.css">
 </head>
 
 <body>
@@ -13,28 +14,47 @@
       <h1 id="headerTitle">MUSICAL ATLAS</h1>
 
       <div class="searchRow">
-        <input id="searchInput" type="search" placeholder="Search the Musical Atlas..." autocomplete="off" />
+        <input id="searchInput" type="search" placeholder="Search" autocomplete="off" />
       </div>
 
       <!-- risultati della ricerca -->
       <div id="resultsRow" class="resultsRow" role="region" aria-label="Search results"></div>
 
-      <!-- percorso (WORLD > AFRICA > ...) a sinistra, interruttori INSTRUMENTS / PEOPLES a destra -->
-      <div class="navRow">
-        <div id="crumbs" role="navigation" aria-label="Path"></div>
-        <div id="specialToggles" class="specialToggles" role="toolbar" aria-label="Special toggles"></div>
+      <!-- MAP BOX: dove sei e dove puoi andare.
+           In alto il percorso (WORLD > AFRICA > ...) e il pulsante MAP; a mappa chiusa
+           sotto compaiono sottocartelle e pagine, a mappa aperta il mappamondo -->
+      <div id="mapBox" class="mapBox">
+        <div class="mapBar">
+          <div class="mapBarLeft">
+            <div id="crumbs" role="navigation" aria-label="Path"></div>
+          </div>
+          <div id="mapControls" class="mapControls"></div>
+          <!-- sottocartelle e pagine: solo a mappa chiusa e solo sulla pagina di una cartella -->
+          <div id="choicesRow" class="choicesRow" role="region" aria-label="Choices"></div>
+        </div>
       </div>
 
-      <!-- pulsanti di sottocartelle e pagine -->
-      <div id="choicesRow" class="choicesRow" role="region" aria-label="Choices"></div>
-
-      <!-- pulsanti dell'interruttore acceso (INSTRUMENTS / PEOPLES) -->
-      <div id="specialButtonsRow" class="choicesRow" role="region" aria-label="Special subfolders"></div>
-
-      <!-- pagina -->
-      <div class="contentPad">
-        <div class="docFrame">
-          <div id="docContent"></div>
+      <!-- INFO BOX: intestazione nera (titolo, interruttori PEOPLES / GENRES / INSTRUMENTS)
+           e testo della pagina, che si apre e si chiude cliccando il titolo -->
+      <div id="infoBox" class="infoBox">
+        <!-- riga del titolo: resta agganciata in cima mentre si scorre -->
+        <div class="infoBar">
+          <div id="infoTitle" class="infoTitle"></div>
+          <!-- interruttori PEOPLES / GENRES / INSTRUMENTS -->
+          <div id="specialToggles" class="specialToggles" role="toolbar" aria-label="Special toggles"></div>
+        </div>
+        <div class="infoRows">
+          <!-- pulsanti dell'interruttore acceso (PEOPLES / GENRES / INSTRUMENTS) -->
+          <div id="specialButtonsRow" class="choicesRow" role="region" aria-label="Special subfolders"></div>
+          <!-- INSTRUMENTS: sotto-rami del ramo scelto, una riga per livello -->
+          <div id="specialSubRows"></div>
+        </div>
+        <div class="infoBody">
+          <div class="docFrame">
+            <div id="docContent"></div>
+            <!-- catalogo degli strumenti: al posto del testo, con INSTRUMENTS acceso -->
+            <div id="catalog" class="catalog" hidden></div>
+          </div>
         </div>
       </div>
 
@@ -46,6 +66,19 @@ by Leo G.</div>
   <!-- menu a comparsa al clic su una parola -->
   <div id="hoverCard"></div>
 
+  <!-- scheda dello strumento: riquadro sopra la pagina (si chiude con la ×,
+       cliccando fuori, con Esc o col tasto indietro). Il contenuto lo scrive app.js -->
+  <div id="instrumentCard" class="cardOverlay" hidden>
+    <div class="cardPanel" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+      <div class="cardBar">
+        <div id="cardTitle" class="btn sel toggle-instruments cardTitle"></div>
+        <button id="cardClose" class="btn sel cardClose" type="button" aria-label="Close">×</button>
+      </div>
+      <div id="cardContent"></div>
+    </div>
+  </div>
+
+  <script src="map/atlas-map.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

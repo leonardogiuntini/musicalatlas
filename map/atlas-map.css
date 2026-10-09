@@ -1,0 +1,225 @@
+/* =====================================================================
+   MUSICAL ATLAS - map/atlas-map.css
+   Aspetto del mappamondo. I colori qui sotto li legge anche la mappa:
+   cambiandoli qui cambia anche il disegno del globo.
+   Durata e andamento delle transizioni sono in styles.css (--ui-time, --ui-ease).
+   ===================================================================== */
+:root{
+  --map-bg: #000;          /* sfondo e mare */
+  --map-line: #fff;        /* contorni, scritte */
+  --map-land: 0.06;        /* terre: intensita' del grigio (0 = nere, 1 = bianche) */
+  --map-people: #FFFF00;   /* popoli: nomi e aloni (come il giallo di PEOPLES) */
+  --map-genres: #00FF00;   /* generi sul globo (come GENRES) */
+  --map-instruments: #00FFFF;   /* strumenti sul globo (come INSTRUMENTS) */
+  --map-stars: #fff;       /* stelline */
+  /* nomi sul globo (paesi, zone, continenti): scala unica */
+  --map-label-on: #fff;          /* acceso: selezionato o col mouse sopra */
+  --map-label-off: #9a9a9a;      /* spento: c'e' nell'atlante, si puo' cliccare */
+  --map-label-other: #555555;    /* non ancora nell'atlante: serve solo a orientarsi */
+  --map-label-outline: #000;     /* contorno di tutti i nomi */
+  --map-font: 600 11px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --map-height: min(440px, 78vw, 70vh);
+}
+
+/* ---------- Riquadro ---------- */
+.mapBox{
+  position: relative;
+  margin: 6px 0 0;
+  border: 2px solid var(--map-line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--map-bg);
+  transition: box-shadow var(--ui-time, .45s) var(--ui-ease, ease);
+}
+/* globo aperto e bloccato: cornice piu' spessa e luminosa */
+.mapBox.open.frozen.loaded{
+  box-shadow: inset 0 0 0 1.5px var(--map-line), 0 0 16px rgba(255,255,255,0.3);
+}
+
+/* ---------- Barra: percorso / livello precedente a sinistra, MAP e +/- a destra ---------- */
+.mapBar{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+}
+.mapBox.ready .mapBar{
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  pointer-events: none;            /* sotto la barra si clicca il globo */
+}
+.mapBar .btn{ pointer-events: auto; }
+
+.mapBarLeft{
+  display: grid;                   /* percorso e livello precedente nello stesso posto */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mapBarLeft > *{
+  grid-area: 1 / 1;
+  transition: opacity var(--ui-time, .45s) var(--ui-ease, ease),
+              visibility var(--ui-time, .45s);
+}
+.mapBarLeft #crumbs{ padding: 0; }
+/* globo aperto: freccia (livello sopra) in alto a sinistra */
+.mapLevel{
+  justify-self: start;
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.mapLevel .btn[hidden]{ display: none; }
+/* freccia: nera ("spenta"); si accende di bianco solo mentre la premi */
+.btn.mapBack{ padding-top: 3px; }
+.btn.mapBack:active,
+.btn.mapBack.flash{ background: #fff; color: #000; border-color: var(--map-bg); }
+/* luogo attuale, in basso a sinistra: bianco ("acceso"); nero col globo fermo.
+   Clic = torna allo stato iniziale del luogo */
+.btn.mapHere{ white-space: normal; overflow-wrap: anywhere; text-align: left; max-width: 60%; }
+.mapCorner .btn[hidden]{ display: none; }
+
+/* chiuso: percorso completo.  aperto: la freccia (anche col globo fermo, in nero) */
+.mapLevel,
+.mapBox.open .mapBarLeft #crumbs{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.mapBox.open .mapLevel{ opacity: 1; visibility: visible; pointer-events: auto; }
+
+/* angoli in basso del globo: il luogo a sinistra, + e - a destra */
+.mapCorner, .mapZoomCorner{
+  position: absolute;
+  bottom: 10px;
+  z-index: 2;
+  transition: opacity var(--ui-time, .45s) var(--ui-ease, ease),
+              visibility var(--ui-time, .45s);
+}
+.mapCorner{ left: 10px; right: 60px; display: flex; }
+.mapZoomCorner{ right: 10px; }
+.mapBox:not(.open) .mapCorner,
+.mapBox:not(.open) .mapZoomCorner,
+.mapBox:not(.loaded) .mapCorner{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mapControls{
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+/* +/- in basso a destra.
+   Un pulsante solo diviso a meta': archetto in alto (+) e archetto in basso (-),
+   separati da una riga dritta. */
+.mapZoomBox{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: opacity var(--ui-time, .45s) var(--ui-ease, ease),
+              transform var(--ui-time, .45s) var(--ui-ease, ease),
+              visibility var(--ui-time, .45s);
+}
+.btn.mapZoom{
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn.mapZoom:disabled{ opacity: 0.35; cursor: default; }
+.mapZoomBox .btn.mapZoom{ height: 28px; }
+.mapZoomBox .btn.mapZoom:first-child{ border-radius: 15px 15px 0 0; }
+.mapZoomBox .btn.mapZoom:last-child{ border-radius: 0 0 15px 15px; border-top: 0; }
+/* spento: si attenua solo il segno, il contorno resta intero */
+.mapZoomBox .btn.mapZoom:disabled{ opacity: 1; color: rgba(255,255,255,0.3); }
+/* +/- solo a globo aperto e attivo */
+.mapBox:not(.open) .mapZoomBox,
+.mapBox.frozen .mapZoomBox,
+.mapBox:not(.loaded) .mapZoomBox{
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+/* ---------- Globo (si apre e si chiude come una tenda) ---------- */
+.mapBox.ready .mapStage{
+  position: relative;
+  height: var(--bar-h, 52px);
+  transition: height var(--ui-time, .45s) var(--ui-ease, ease);
+}
+.mapBox.ready.open .mapStage{ height: var(--map-height); }
+
+.mapCanvas{
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: block;
+  width: 100%;
+  height: var(--map-height);       /* fissa: la tenda la copre, il disegno non cambia */
+  cursor: pointer;
+  touch-action: none;              /* attivo: le dita muovono e zoomano il globo */
+  -webkit-user-select: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity var(--ui-time, .45s) var(--ui-ease, ease);
+}
+.mapBox.open .mapCanvas{ opacity: 1; }
+.mapBox.frozen .mapCanvas{ touch-action: pan-y pinch-zoom; }   /* bloccato: le dita scorrono la pagina */
+
+/* EXPLORE al centro del globo bloccato */
+.btn.mapExplore{
+  position: absolute;
+  left: 50%;
+  top: calc(var(--map-height) / 2);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  transition: opacity var(--ui-time, .45s) var(--ui-ease, ease),
+              visibility var(--ui-time, .45s);
+}
+.mapBox:not(.open) .mapExplore,
+.mapBox:not(.frozen) .mapExplore,
+.mapBox:not(.loaded) .mapExplore{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mapMsg{
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--map-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--map-line);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+.mapBox:not(.open) .mapMsg{ display: none; }
+
+/* ---------- Sotto il riquadro ---------- */
+.togglesRow{
+  display: flex;
+  justify-content: flex-end;
+}
+.togglesRow .specialToggles{ padding-top: 8px; }
+.togglesRow .specialToggles.collapsed{ display: none; }
+
+/* A mappa aperta si nascondono i pulsanti di cio' che la mappa mostra gia'
+   (continenti, zone, paesi). Se la riga resta vuota, sparisce. */
+body.mapOpen .choicesRow .onMap{ display: none; }
+body.mapOpen #choicesRow:not(:has(.btn:not(.onMap))){ display: none; }
+

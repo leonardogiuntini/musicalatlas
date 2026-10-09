@@ -11,6 +11,19 @@
   --doc-border: #000;
 
   --gap: 12px; /* spazio nero sopra/sotto la pagina */
+
+  /* TRANSIZIONI: valgono per tutti i box (mappa, risultati della ricerca, info box) */
+  --ui-time: 0.45s;                          /* durata */
+  --ui-ease: cubic-bezier(.4, 0, .2, 1);     /* andamento: parte deciso, arriva morbido */
+
+  /* TONI SCURI: un pulsante con la classe "dim" diventa una versione piu' scura del suo colore
+     (es. generi non nativi). 1 = uguale, 0 = nero. */
+  --dim: 0.55;
+}
+
+/* Chi ha chiesto al sistema "meno animazioni" le vede quasi istantanee */
+@media (prefers-reduced-motion: reduce){
+  :root{ --ui-time: 0.01s; }
 }
 
 *{ box-sizing: border-box; }
@@ -21,6 +34,8 @@ body{
   color: var(--ui-fg);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
+
+html{ scrollbar-gutter: stable; }
 
 .col{
   width: var(--col);
@@ -58,13 +73,25 @@ body{
 }
 #searchInput::placeholder{ color: rgba(255,255,255,0.65); }
 
+/* Lente d'ingrandimento a sinistra del campo di ricerca */
+#searchInput{
+  padding-left: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-opacity='.65' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5 21 21'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 13px center;
+  background-size: 16px 16px;
+}
+
 .resultsRow{
   padding: 8px 0 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  overflow: hidden;
+  transition: height var(--ui-time) var(--ui-ease);
 }
+.resultsRow:empty{ padding: 0; }
 
 .resultItem{
   display: flex;
@@ -137,7 +164,7 @@ body{
 .btn.toggle-instruments.sel{
   background: #00FFFF;
   color: #000;
-  border-color: #00FFFF;
+  border-color: transparent;       /* acceso: niente bordo, il riempimento arriva al bordo */
 }
 
 /* PEOPLES (giallo) */
@@ -149,14 +176,33 @@ body{
 .btn.toggle-peoples.sel{
   background: #FFFF00;
   color: #000;
-  border-color: #FFFF00;
+  border-color: transparent;       /* acceso: niente bordo, il riempimento arriva al bordo */
 }
+
+/* GENRES (verde, come gli evidenziati verdi dei testi) */
+.btn.toggle-genres{
+  color: #00FF00;
+  border-color: #00FF00;
+  background: #000;
+}
+.btn.toggle-genres.sel{
+  background: #00FF00;
+  color: #000;
+  border-color: transparent;       /* acceso: niente bordo, il riempimento arriva al bordo */
+}
+
+/* Regola generale dei pulsanti colorati:
+   spento = sfondo nero, testo e bordo colorati;  acceso (.sel) = sfondo colorato, testo nero,
+   bordo nero (sul fondo nero non si vede: resta solo il riempimento, e due pulsanti
+   accesi vicini restano separati senza linee in piu').
+   Tono scuro automatico (es. genere non nativo): stesso colore, piu' scuro (--dim). */
+.btn.dim{ filter: brightness(var(--dim)); }
 
 /* ---------- Pulsanti ---------- */
 .btn{
   border: 2px solid var(--ui-border);
   border-radius: 999px;
-  padding: 7px 12px;
+  padding: 5px 10px;               /* un po' piu' stretti (prima 7px 12px) */
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -170,7 +216,7 @@ body{
 .btn.sel{
   background: #fff;
   color: #000;
-  border-color: #fff;
+  border-color: transparent;       /* niente bordo: stessa misura dei pulsanti spenti */
 }
 
 /* Righe di pulsanti (sottocartelle/pagine e INSTRUMENTS/PEOPLES) */
@@ -184,16 +230,71 @@ body{
 }
 .choicesRow.collapsed{ display: none; }
 
-/* ---------- Pagina ---------- */
-.contentPad{
-  margin-top: var(--gap);
+/* Righe che si aprono "a tendina" (regola generale, vedi setRow in app.js):
+   chiuse non spariscono di colpo ma si riducono a zero con la transizione */
+.animRow{
+  overflow: hidden;
+  min-height: 0 !important;        /* la tendina parte davvero da zero */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  transition: height var(--ui-time) var(--ui-ease);
 }
-.docFrame{
-  border: 2px solid var(--doc-border);
+/* spazio sotto la riga aperta, dentro la tendina (cosi' si anima anche lui) */
+.animRow:not(.collapsed)::after{ content: ""; flex-basis: 100%; height: 0; }
+.choicesRow.animRow.collapsed{
+  display: flex;
+  height: 0;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ---------- Info box: intestazione nera + testo ----------
+   La riga del titolo resta agganciata in cima allo schermo mentre si scorre il testo.
+   Cliccando il titolo, il testo si chiude e resta solo l'intestazione. */
+.infoBox{
+  margin-top: var(--gap);
+  border: 2px solid var(--ui-border);
   border-radius: 18px;
+  background: var(--ui-bg);
+}
+.infoBar{
+  background: var(--ui-bg);
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;                 /* sul telefono gli interruttori vanno a capo */
+  gap: 8px;
+  padding: 10px;
+}
+.infoBar .specialToggles{ margin-left: auto; flex-wrap: wrap; }
+.infoRows{ padding: 0 10px; }
+.infoRows .choicesRow{ padding-top: 0; }
+.infoBox.closed .infoBar{ border-radius: 16px; }
+/* pagina di benvenuto: senza intestazione, resta solo il riquadro bianco */
+.infoBox.bare .infoBar{ display: none; }
+.infoBox.bare .docFrame{ border-radius: 16px; }
+/* Striscia della mappa chiusa: sotto il percorso, sottocartelle e pagine (a capo se servono).
+   A mappa aperta naviga il globo, e la riga sparisce. */
+#mapBox .mapBar{ flex-wrap: wrap; }
+#mapBox .mapBarLeft{ flex: 1 1 0; }        /* il percorso va a capo nel suo spazio, MAP resta a destra */
+.mapBar #choicesRow{ flex-basis: 100%; order: 3; padding: 2px 0 0; min-height: 0; }
+.mapBox.open #choicesRow{ display: none; }
+
+.infoBody{
+  overflow: hidden;
+  transition: height var(--ui-time) var(--ui-ease);   /* apertura e chiusura */
+}
+.infoBox.closed .infoBody{ height: 0; }
+
+.docFrame{
+  border-radius: 0 0 16px 16px;
   padding: 16px 16px;
   background: var(--doc-bg);
   color: var(--doc-fg);
+  overflow: hidden;
+  transition: height var(--ui-time) var(--ui-ease);   /* cambio di pagina morbido */
 }
 #docContent{
   line-height: 1.55;
@@ -224,6 +325,9 @@ body{
   color: var(--doc-fg);
 }
 
+/* I link non cambiano mai colore, ne' prima ne' dopo il clic */
+a, a:visited, a:hover, a:active{ color: inherit; }
+
 /* Parole cliccabili (regole di formattazione): aspetto invariato */
 .atlasLink{ cursor: pointer; }
 
@@ -250,6 +354,33 @@ body{
   white-space: normal;
   box-shadow: 0 10px 26px rgba(0,0,0,0.35);
 }
+
+/* fumetti del globo: sotto, lo sfondo scurito; un clic li chiude e basta */
+#popupShade{
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--ui-time) var(--ui-ease);
+}
+#popupShade.on{ opacity: 1; pointer-events: auto; }
+/* fumetto lungo: scorre al suo interno (lo decide app.js) */
+#hoverCard{ overscroll-behavior: contain; }
+/* fumetto sotto la parola: la punta va in alto */
+#hoverCard.below::after{ bottom: auto; top: -7px; border-top: 0; border-bottom: 7px solid #000; }
+#hoverCard.below::before{ bottom: auto; top: -8px; border-top: 0; border-bottom: 8px solid #fff; }
+
+/* fumetto del "+N" sul globo: le voci mancanti come piccoli pulsanti */
+.moreList{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+.moreList .btn{ font-size: 11px; padding: 4px 9px; }
 
 .hoverAction{
   display: block;
@@ -281,6 +412,169 @@ body{
   border-top:8px solid #fff;
 }
 
+/* ---------- Catalogo degli strumenti ----------
+   Griglia a mattoncini (colonne riempite da app.js), sullo sfondo bianco della pagina.
+   Ogni riquadro: immagine nelle sue proporzioni + nome; nome azzurro = nativo,
+   azzurro scuro = citato. Senza immagine: solo il nome. */
+#docContent[hidden], .catalog[hidden]{ display: none; }
+/* con il catalogo aperto la pagina diventa nera; riquadri neri col contorno bianco */
+.docFrame.catalogOn{ background: var(--ui-bg); }
+.catalogGrid{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.catalogCol{
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.catalogTile{
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 2px solid var(--ui-fg);
+  border-radius: 12px;
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+}
+.catalogTile img{
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #222;                 /* mentre l'immagine arriva */
+}
+.catalogName{
+  display: block;
+  padding: 6px 8px 7px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #00FFFF;
+  overflow-wrap: anywhere;
+}
+.catalogName.dim{ filter: brightness(var(--dim)); }
+.catalogTile.noImage .catalogName{ padding: 14px 8px; text-align: center; }
+.catalogTile:focus-visible{ outline: 3px solid #00FFFF; outline-offset: 2px; }
+.catalogEnd{ height: 1px; }
+.catalogEmpty{ margin: 18px 0; text-align: center; color: var(--ui-fg); }
+
+/* ---------- Scheda dello strumento ----------
+   Riquadro centrato sopra la pagina; la pagina sotto si scurisce e si sfoca.
+   Stessi materiali dell'info box: intestazione nera, testo su bianco.
+   Sul telefono occupa quasi tutto lo schermo. */
+.cardOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--ui-time) var(--ui-ease);
+}
+.cardOverlay[hidden]{ display: none; }
+.cardOverlay.open{ opacity: 1; }
+/* con la scheda aperta la pagina sotto non scorre */
+html.cardOpen, html.cardOpen body{ overflow: hidden; }
+
+.cardPanel{
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--ui-bg);
+  border: 2px solid var(--ui-border);
+  border-radius: 18px;
+  transform: translateY(10px) scale(0.98);
+  transition: transform var(--ui-time) var(--ui-ease);
+}
+.cardOverlay.open .cardPanel{ transform: none; }
+.cardPanel:focus{ outline: none; }
+
+/* intestazione: nome a sinistra, × a destra; resta in vista se la scheda scorre */
+.cardBar{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  background: var(--ui-bg);
+}
+.btn.cardTitle{
+  cursor: default;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* × tonda bianca, come quella del globo */
+.btn.cardClose{
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardImage{
+  background: var(--ui-bg);
+  display: flex;
+  justify-content: center;
+  padding: 0 10px 10px;
+}
+.cardImage img{
+  display: block;
+  max-width: 100%;
+  max-height: 55vh;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.cardText{
+  background: var(--doc-bg);
+  color: var(--doc-fg);
+  border-radius: 0 0 16px 16px;
+  padding: 16px;
+  line-height: 1.55;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.cardText p{ margin: 0; }
+.cardAka{ font-style: italic; margin-bottom: 8px !important; }
+.cardDesc p + p{ margin-top: 8px; }
+.cardRow{ margin-top: 12px !important; }
+.cardPath{ font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.cardLabel{ font-weight: 700; }
+.cardLink{ text-decoration: underline; cursor: pointer; }
+.cardSource{ margin-top: 12px !important; font-size: 12px; opacity: 0.7; }
+.cardWeb{ display: inline-block; margin-top: 12px; font-size: 12px; }
+.cardText > :first-child{ margin-top: 0 !important; }
+
+@media (max-width: 480px){
+  .cardOverlay{ padding: 8px; }
+  .cardPanel{ max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); }
+}
+
 /* ---------- Piede (non fisso: si vede scorrendo in fondo) ---------- */
 .footerPad{
   margin-top: var(--gap);
@@ -291,3 +585,35 @@ body{
   text-align: center;
   color: #fff;
 }
+/* ---------- PULSANTI UNITI (prova 4.5) ----------
+   Vale solo con JOINED_LABELS = true in app.js (classe "joinedLabels" sul body).
+   Righe "joined": percorso, pagine sotto il percorso, rami di INSTRUMENTS.
+   I pulsanti si toccano (bordi sovrapposti), le righe pure; gli archetti
+   (angoli arrotondati) solo dove il blocco finisce: classi jTL jTR jBL jBR
+   messe da app.js. Per tornare a prima: JOINED_LABELS = false. */
+body.joinedLabels .joined{
+  gap: 0 !important;
+  row-gap: 0 !important;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+body.joinedLabels .joined > .btn{
+  margin: -1px;                    /* bordi in comune: una riga sola tra due pulsanti */
+  border-radius: 0;
+}
+body.joinedLabels .joined > .btn.jTL{ border-top-left-radius: 15px; }
+body.joinedLabels .joined > .btn.jTR{ border-top-right-radius: 15px; }
+body.joinedLabels .joined > .btn.jBL{ border-bottom-left-radius: 15px; }
+body.joinedLabels .joined > .btn.jBR{ border-bottom-right-radius: 15px; }
+/* a capo deciso da app.js (righe equilibrate) */
+body.joinedLabels .joined > .rowBreak{ flex-basis: 100%; height: 0; }
+body.joinedLabels .joined > .btn{ position: relative; }
+body.joinedLabels .joined > .btn:hover{ z-index: 1; }
+/* due pulsanti accesi che si toccano: tra loro una riga nera (a fianco o sopra/sotto);
+   verso l'esterno il contorno del blocco resta continuo */
+body.joinedLabels .joined > .btn.sel + .btn.sel{ border-left-color: var(--ui-bg); }
+body.joinedLabels .joined > .btn.sel.jLitUp{ border-top-color: var(--ui-bg); }
+
+/* INSTRUMENTS: righe dei sotto-rami (LUTES, HARPS...), un po' staccate dalla riga sopra;
+   lo spazio sta dentro la tendina, cosi' si apre e si chiude insieme alla riga */
+#specialSubRows .choicesRow:not(.collapsed)::before{ content: ""; flex-basis: 100%; height: 8px; }

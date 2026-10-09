@@ -10,7 +10,7 @@ set PYTHONIOENCODING=utf-8
 cd /d "%~dp0"
 
 echo Creo l'indice...
-py build_index.py
+py _build_index.py
 if errorlevel 1 (
   echo.
   echo L'indice NON e' stato creato: leggi il messaggio qui sopra.
@@ -23,5 +23,5 @@ echo Anteprima attiva su http://localhost:8000/
 echo Chiudi questa finestra per fermarla.
 echo.
 start "" cmd /c "timeout /t 1 >nul & start http://localhost:8000/"
-py server.py
+py _server.py
 pause

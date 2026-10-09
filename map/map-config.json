@@ -1,0 +1,66 @@
+{
+  "_leggimi": [
+    "Impostazioni della mappa. Dopo una modifica, rilancia _anteprima.bat (rifa' l'indice).",
+    "I paesi si indicano col codice di 3 lettere usato in world.json (es. NGA = Nigeria).",
+    "",
+    "aliases:   nomi scritti nelle pagine che la mappa non riconosce da sola -> codice del paese.",
+    "           Maiuscole, accenti e apostrofi tipografici non contano.",
+    "continents: cartella del continente -> continenti di Natural Earth che la compongono",
+    "           (Africa, Asia, Europe, North America, South America, Oceania, Antarctica).",
+    "           Se la cartella ha lo stesso nome del continente non serve scriverla.",
+    "zones:     cartella della zona -> paesi che la compongono. I paesi che hanno una pagina",
+    "           dentro la cartella della zona vengono aggiunti da soli.",
+    "notCountries: pagine dentro una zona che NON sono paesi (es. \"Mali Empire\"):",
+    "           la mappa le ignora e _anteprima.bat non le segnala.",
+    "views:     inquadratura scritta a mano per un continente o una zona,",
+    "           center = [longitudine, latitudine], radius = gradi visibili attorno al centro.",
+    "labels:    scritte della mappa."
+  ],
+
+  "aliases": {
+    "Guinea Conakry": "GIN",
+    "Guinea Bissau": "GNB",
+    "Algerie": "DZA",
+    "Ivory Coast": "CIV",
+    "Cape Verde": "CPV",
+    "Equatorial Guinea": "GNQ",
+    "Central African Republic": "CAF",
+    "DR Congo": "COD",
+    "Congo Kinshasa": "COD",
+    "Congo Brazzaville": "COG",
+    "South Sudan": "SDS",
+    "Western Sahara": "SAH",
+    "Swaziland": "SWZ",
+    "U.S.A.": "USA",
+    "USA": "USA",
+    "UK": "GBR",
+    "England": "GBR"
+  },
+
+  "notCountries": [],
+
+  "continents": {
+    "America": ["North America", "South America"],
+    "Americas": ["North America", "South America"]
+  },
+
+  "zones": {
+    "West Africa":     ["BEN", "BFA", "CPV", "CIV", "GMB", "GHA", "GIN", "GNB", "LBR", "MLI", "MRT", "NER", "NGA", "SEN", "SLE", "TGO"],
+    "North Africa":    ["DZA", "EGY", "LBY", "MAR", "SAH", "SDN", "TUN"],
+    "Central Africa":  ["AGO", "CMR", "CAF", "TCD", "COG", "COD", "GNQ", "GAB", "STP"],
+    "East Africa":     ["BDI", "COM", "DJI", "ERI", "ETH", "KEN", "MDG", "MUS", "RWA", "SYC", "SOM", "SOL", "SDS", "TZA", "UGA"],
+    "Southern Africa": ["BWA", "LSO", "MWI", "MOZ", "NAM", "ZAF", "SWZ", "ZMB", "ZWE"]
+  },
+
+  "views": {
+    "Europe": { "center": [15, 52], "radius": 24 }
+  },
+
+  "labels": {
+    "map": "MAP",
+    "explore": "EXPLORE",
+    "showOnMap": "show on map",
+    "loading": "LOADING…",
+    "error": "Map not available."
+  }
+}

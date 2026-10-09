@@ -1,0 +1,75 @@
+MUSICAL ATLAS - REGOLE DI FORMATTAZIONE
+=======================================
+
+Ogni parola "speciale" nelle pagine si formatta in un solo modo.
+Lo script legge la formattazione e capisce da sola di che cosa si tratta.
+
+
+DUE DOMANDE PER OGNI PAROLA
+---------------------------
+
+1) E' un nome proprio o una categoria?
+     nome proprio  ->  scritto normale (Aa)      es. Sidiki Diabaté, Bamako
+     categoria     ->  scritto MAIUSCOLO (AA)    es. KORA, BAMBARA, HIGHLIFE
+
+2) Di che famiglia e'?  Lo dice lo stile:
+     sottolineato        = PERSONE   (chi fa la musica)
+     corsivo             = CULTURA   (cosa si suona, si crede, si crea)
+     solo grassetto      = LUOGHI    (dove succede)
+
+
+LA TABELLA
+----------
+
+  CATEGORIA     FORMATTAZIONE                                  NATIVO QUI
+  -----------   --------------------------------------------   ----------
+  ARTISTS       Aa  + grassetto + sottolineato                 -
+  PLACES        solo grassetto (Aa o AA, es. Bamako, U.S.A.)   -
+  TITLES        Aa  + corsivo                                  -
+  RELIGIONS     Aa  + grassetto + corsivo                      - (per ora)
+  LANGUAGES     Aa  + corsivo + sottolineato                   magenta
+  PEOPLES       AA  + grassetto + sottolineato                 giallo
+  GENRES        AA  + grassetto + corsivo                      verde
+  INSTRUMENTS   AA  + corsivo                                  azzurro
+
+Coppie a specchio (cambia solo il maiuscolo):
+  artista  <->  popolo       (individuo / gruppo)
+  religione <-> genere       (due "sistemi")
+  titolo   <->  strumento    (un'opera / un oggetto)
+
+
+L'EVIDENZIATORE
+---------------
+
+- Vuol dire solo "NATIVO QUI": questa pagina e' la sua patria.
+- Senza evidenziatore la parola resta nella sua categoria: e' "citata"
+  (nativa di un altro luogo). Non cambia mai categoria.
+- Ogni categoria ha il suo colore e solo quello.
+- ROSSO: riservato ai risultati della ricerca. Non usarlo.
+- BLU: libero ma sconsigliato (rende il testo illeggibile mentre scrivi).
+
+
+REGOLE FORTI
+------------
+
+1. Conta solo la corrispondenza ESATTA della tabella.
+2. Tutto cio' che ci assomiglia senza corrispondere finisce nel file di
+   controllo come "formattazione anomala" (es. uno strumento anche
+   sottolineato, un giallo su uno strumento).
+3. Doppia verifica: una parola entra in una categoria se la formattazione
+   lo dice E il nome e' nel dizionario di quella categoria
+   (es. INSTRUMENTS/_INSTRUMENTS.csv). Il file di controllo segnala i nomi
+   formattati ma assenti dal dizionario.
+4. Citazioni ed eccezioni vanno tra virgolette, non con la formattazione.
+5. Il grassetto da solo e' sempre un LUOGO: non usarlo per dare enfasi.
+
+
+DETTAGLI FINI: NEI CSV, NON NELLA FORMATTAZIONE
+-----------------------------------------------
+
+La formattazione dice solo due cose: la categoria e "nativo si'/no".
+Tutto il resto va nelle colonne di gerarchia del dizionario:
+  - lingue native, creole, franche, coloniali   -> _LANGUAGES.csv
+  - religioni e sincretismi                      -> _RELIGIONS.csv
+  - famiglie e sottofamiglie degli strumenti     -> INSTRUMENTS/_INSTRUMENTS.csv
+Cosi' il modo di scrivere resta fermo per sempre e il dettaglio cresce nei CSV.

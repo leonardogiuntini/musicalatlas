@@ -1,0 +1,69 @@
+MUSICAL ATLAS - IMMAGINI DEGLI STRUMENTI
+========================================
+
+  !!!  GLI ORIGINALI RESTANO SOLO SU QUESTO COMPUTER  !!!
+  Le foto che metti in questa cartella NON vanno su GitHub (le esclude
+  il file .gitignore: GitHub Desktop non te le propone nemmeno).
+  Online vanno solo le copie leggere che lo script crea in  web/ .
+  -> FAI UN BACKUP DI QUESTA CARTELLA (disco esterno, Google Drive...).
+     Se perdi gli originali il sito funziona ancora, ma non si possono
+     piu' rifare le copie (per esempio miniature piu' grandi).
+
+
+COME FUNZIONA
+-------------
+
+- Metti in questa cartella UNA immagine per strumento.
+- Lo script (lanciato da _anteprima.bat) crea da solo, dentro  web/ :
+    una miniatura per il catalogo  e  un'immagine per la scheda.
+  Se sostituisci un originale, le copie si rifanno da sole.
+- Non toccare la cartella  web/ : la gestisce lo script.
+- Le descrizioni stanno in  _INSTRUMENTS.csv  (stessa cartella).
+
+
+NOME DEL FILE
+-------------
+
+- Uguale alla colonna NAME del CSV:  KORA.jpg, BALAFON.png ...
+- Maiuscole/minuscole ed estensione non contano.
+
+
+FORMATO
+-------
+
+- Foto: JPG di buona qualita'.
+- PNG solo se l'immagine e' gia' cosi' (va bene comunque).
+- Colori: sRGB, quello normale delle foto (non CMYK, che e' per la stampa).
+- I metadati (GPS, macchina fotografica...) li toglie lo script.
+
+
+MISURE
+------
+
+- Lato lungo: minimo 800 px. Meglio 1600-2000 px.
+- Sopra i 3000 px non serve: lo script riduce comunque.
+- Proporzioni libere (verticale, orizzontale): il catalogo le rispetta,
+  senza tagliare e senza deformare.
+
+
+CHE FOTO SCEGLIERE
+------------------
+
+- Foto vere, meglio con una persona che suona lo strumento.
+- Strumento ben visibile e intero, se possibile.
+- NIENTE watermark, scritte sovrapposte, loghi.
+  (Togliere un watermark vuol dire cancellare le informazioni sui diritti:
+   e' vietato dalla legge sul diritto d'autore. Scegli foto che non ne hanno.)
+
+
+DIRITTI E FONTI
+---------------
+
+- Usa immagini con licenza aperta. Dove cercarle:
+    Wikimedia Commons   https://commons.wikimedia.org
+    Openverse           https://openverse.org
+    Flickr              (filtro "Creative Commons")
+- Licenze CC0 / Pubblico dominio: libere.
+  Licenze CC BY e CC BY-SA: vanno citati autore e licenza.
+- Scrivi SEMPRE la fonte nella colonna SOURCE del CSV
+  (es.  "Foto di Mario Rossi, CC BY-SA 4.0, Wikimedia Commons").

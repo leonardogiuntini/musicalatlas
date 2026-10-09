@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-02T00:39:11",
+ "generated": "2026-10-09T23:27:31",
  "tree": {
   "type": "folder",
   "name": "World",
@@ -74,38 +74,6 @@
       "title": "West Africa",
       "path": "World/Africa/West Africa",
       "children": [
-       {
-        "type": "folder",
-        "name": "INSTRUMENTS",
-        "title": "INSTRUMENTS",
-        "path": "World/Africa/West Africa/INSTRUMENTS",
-        "children": [
-         {
-          "type": "page",
-          "name": "CORDOPHONES.html",
-          "title": "CORDOPHONES",
-          "path": "World/Africa/West Africa/INSTRUMENTS/CORDOPHONES.html"
-         },
-         {
-          "type": "page",
-          "name": "IDIOPHONES.html",
-          "title": "IDIOPHONES",
-          "path": "World/Africa/West Africa/INSTRUMENTS/IDIOPHONES.html"
-         },
-         {
-          "type": "page",
-          "name": "MEMBRAPHONES.html",
-          "title": "MEMBRAPHONES",
-          "path": "World/Africa/West Africa/INSTRUMENTS/MEMBRAPHONES.html"
-         },
-         {
-          "type": "page",
-          "name": "WINDS.html",
-          "title": "WINDS",
-          "path": "World/Africa/West Africa/INSTRUMENTS/WINDS.html"
-         }
-        ]
-       },
        {
         "type": "folder",
         "name": "PEOPLES",
@@ -284,26 +252,6 @@
    "path": "World/Africa/Southern Africa/Southern Africa.html",
    "title": "Southern Africa",
    "text": "Southern Africa is south of West Africa"
-  },
-  {
-   "path": "World/Africa/West Africa/INSTRUMENTS/CORDOPHONES.html",
-   "title": "CORDOPHONES",
-   "text": "KORA ; SEPREWA ; XALAM ;"
-  },
-  {
-   "path": "World/Africa/West Africa/INSTRUMENTS/IDIOPHONES.html",
-   "title": "IDIOPHONES",
-   "text": "HONGAN ; BALAFON;"
-  },
-  {
-   "path": "World/Africa/West Africa/INSTRUMENTS/MEMBRAPHONES.html",
-   "title": "MEMBRAPHONES",
-   "text": "KAKAGBO ;"
-  },
-  {
-   "path": "World/Africa/West Africa/INSTRUMENTS/WINDS.html",
-   "title": "WINDS",
-   "text": "ATENTEBEN ;"
   },
   {
    "path": "World/Africa/West Africa/PEOPLES/000MULTI ETHNIC GROUPS.html",
@@ -602,6 +550,1966 @@
   "goumbeja": {
    "term": "GOUMBEJA",
    "path": "World/Africa/West Africa/Togo.html"
+  }
+ },
+ "peoples": {
+  "akan": {
+   "name": "AKAN",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "fante": {
+   "name": "FANTE",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "asante": {
+   "name": "ASANTE",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1
+   }
+  },
+  "baule": {
+   "name": "BAULE",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   }
+  },
+  "nzema": {
+   "name": "NZEMA",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1
+   }
+  },
+  "edo": {
+   "name": "EDO",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1
+   }
+  },
+  "ewe": {
+   "name": "EWE",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 2,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Togo.html": 1
+   }
+  },
+  "fon": {
+   "name": "FON",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "gun": {
+   "name": "GUN",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "anlo": {
+   "name": "ANLO",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1
+   }
+  },
+  "igbo": {
+   "name": "IGBO",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Cameroon",
+    "Gabon",
+    "Equatorial Guinea",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1
+   }
+  },
+  "yoruba": {
+   "name": "YORUBA",
+   "path": "World/Africa/West Africa/PEOPLES/GUINEA GULF.html",
+   "countries": [
+    "Benin",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/GUINEA GULF.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1
+   }
+  },
+  "fulɓe": {
+   "name": "FULƁE",
+   "path": "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html",
+   "countries": [
+    "Benin",
+    "Burkina Faso",
+    "Guinea Bissau",
+    "Guinea Conakry",
+    "Mali",
+    "Niger",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1
+   }
+  },
+  "hausa": {
+   "name": "HAUSA",
+   "path": "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html",
+   "countries": [
+    "Burkina Faso",
+    "Niger",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1
+   }
+  },
+  "kanuri": {
+   "name": "KANURI",
+   "path": "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html",
+   "countries": [
+    "Cameroon",
+    "Chad",
+    "Niger",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1
+   }
+  },
+  "songhai": {
+   "name": "SONGHAI",
+   "path": "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html",
+   "countries": [
+    "Benin",
+    "Burkina Faso",
+    "Mali",
+    "Niger",
+    "Nigeria"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "touareg": {
+   "name": "TOUAREG",
+   "path": "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html",
+   "countries": [
+    "Algerie",
+    "Burkina Faso",
+    "Libya",
+    "Mali",
+    "Niger"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1,
+    "World/Africa/West Africa/Mali.html": 1,
+    "World/Africa/West Africa/Niger.html": 1
+   }
+  },
+  "mande": {
+   "name": "MANDE",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Gambia.html": 1,
+    "World/Africa/West Africa/Guinea Conakry.html": 1
+   }
+  },
+  "soninke": {
+   "name": "SONINKE",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Gambia",
+    "Mali",
+    "Mauritania",
+    "Senegal"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1
+   }
+  },
+  "maninka": {
+   "name": "MANINKA",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Guinea Conakry.html": 1
+   }
+  },
+  "bambara": {
+   "name": "BAMBARA",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "mandinka": {
+   "name": "MANDINKA",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Gambia",
+    "Guinea Bissau",
+    "Guinea Conakry",
+    "Mali",
+    "Senegal"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1
+   }
+  },
+  "dyula": {
+   "name": "DYULA",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Burkina Faso",
+    "Côte d’Ivoire",
+    "Mali"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Burkina Faso.html": 1,
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   }
+  },
+  "kpelle": {
+   "name": "KPELLE",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Guinea Conakry",
+    "Liberia"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Guinea Conakry.html": 1,
+    "World/Africa/West Africa/Liberia.html": 1
+   }
+  },
+  "dan": {
+   "name": "DAN",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Côte d’Ivoire",
+    "Liberia"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   }
+  },
+  "susu": {
+   "name": "SUSU",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Guinea Conakry",
+    "Sierra Leone"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Guinea Conakry.html": 1
+   }
+  },
+  "mende": {
+   "name": "MENDE",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Sierra Leone"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1
+   }
+  },
+  "vai": {
+   "name": "VAI",
+   "path": "World/Africa/West Africa/PEOPLES/MANDE.html",
+   "countries": [
+    "Liberia",
+    "Sierra Leone"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Liberia.html": 1
+   }
+  },
+  "mossi": {
+   "name": "MOSSI",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Benin",
+    "Burkina Faso",
+    "Côte d’Ivoire",
+    "Mali",
+    "Nigeria",
+    "Togo"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1
+   }
+  },
+  "bariba": {
+   "name": "BARIBA",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Benin",
+    "Burkina Faso",
+    "Côte d’Ivoire",
+    "Mali",
+    "Nigeria",
+    "Togo"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1
+   }
+  },
+  "senufo": {
+   "name": "SENUFO",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Burkina Faso",
+    "Côte d’Ivoire",
+    "Mali"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "dogon": {
+   "name": "DOGON",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Burkina Faso",
+    "Mali"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1
+   }
+  },
+  "kasena": {
+   "name": "KASENA",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1
+   }
+  },
+  "dagbamba": {
+   "name": "DAGBAMBA",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Ghana",
+    "Togo"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "dagaaba": {
+   "name": "DAGAABA",
+   "path": "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html",
+   "countries": [
+    "Burkina Faso",
+    "Côte d’Ivoire",
+    "Ghana"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/VOLTAIC CLUSTER.html": 1
+   }
+  },
+  "wolof": {
+   "name": "WOLOF",
+   "path": "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html",
+   "countries": [
+    "Gambia",
+    "Mauritania",
+    "Senegal"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html": 1,
+    "World/Africa/West Africa/Senegal.html": 1
+   }
+  },
+  "temne": {
+   "name": "TEMNE",
+   "path": "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html",
+   "countries": [
+    "Sierra Leone"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html": 1
+   }
+  },
+  "gola": {
+   "name": "GOLA",
+   "path": "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html",
+   "countries": [
+    "Liberia",
+    "Sierra Leone"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html": 1
+   }
+  },
+  "balanta": {
+   "name": "BALANTA",
+   "path": "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html",
+   "countries": [
+    "Guinea Bissau"
+   ],
+   "pages": {
+    "World/Africa/West Africa/PEOPLES/WEST ATLANTIC.html": 1,
+    "World/Africa/West Africa/Guinea Bissau.html": 1
+   }
+  }
+ },
+ "genres": {
+  "gime": {
+   "term": "GIME",
+   "native": {
+    "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "jaliyaa": {
+   "term": "JALIYAA",
+   "native": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Guinea Conakry.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "jazz": {
+   "term": "JAZZ",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/PEOPLES/MANDE.html": 1,
+    "World/Africa/West Africa/Benin.html": 2,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "highlife": {
+   "term": "HIGHLIFE",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Liberia.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1,
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "_named": true
+  },
+  "afro-cuban": {
+   "term": "AFRO-CUBAN",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "congolese-rumba": {
+   "term": "CONGOLESE-RUMBA",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "soul": {
+   "term": "SOUL",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "chanson": {
+   "term": "CHANSON",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "tchinkoume": {
+   "term": "TCHINKOUME",
+   "native": {
+    "World/Africa/West Africa/Benin.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "tchink-system": {
+   "term": "TCHINK-SYSTEM",
+   "native": {
+    "World/Africa/West Africa/Benin.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "zinli": {
+   "term": "ZINLI",
+   "native": {
+    "World/Africa/West Africa/Benin.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "afro-beat": {
+   "term": "AFRO-BEAT",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Sierra Leone.html": 1,
+    "World/Africa/West Africa/Togo.html": 1
+   },
+   "_named": true
+  },
+  "soukous": {
+   "term": "SOUKOUS",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "funk": {
+   "term": "FUNK",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "afro-akpala-funk": {
+   "term": "AFRO-AKPALA-FUNK",
+   "native": {
+    "World/Africa/West Africa/Benin.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "agbadja": {
+   "term": "AGBADJA",
+   "native": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Togo.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "r&b": {
+   "term": "R&B",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1
+   }
+  },
+  "reggae": {
+   "term": "REGGAE",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Burkina Faso.html": 1,
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Togo.html": 2
+   }
+  },
+  "rap": {
+   "term": "RAP",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Burkina Faso.html": 1,
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Mali.html": 1,
+    "World/Africa/West Africa/Niger.html": 1,
+    "World/Africa/West Africa/Togo.html": 1
+   }
+  },
+  "hip-hop": {
+   "term": "HIP-HOP",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Benin.html": 1,
+    "World/Africa/West Africa/Burkina Faso.html": 1,
+    "World/Africa/West Africa/Togo.html": 1
+   }
+  },
+  "ska": {
+   "term": "SKA",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Burkina Faso.html": 1
+   }
+  },
+  "ge": {
+   "term": "GE",
+   "native": {
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "ziglibithy": {
+   "term": "ZIGLIBITHY",
+   "native": {
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "zoblazo": {
+   "term": "ZOBLAZO",
+   "native": {
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "zouglou": {
+   "term": "ZOUGLOU",
+   "native": {
+    "World/Africa/West Africa/Côte d’Ivoire.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Liberia.html": 1
+   },
+   "_named": true
+  },
+  "mbalax": {
+   "term": "MBALAX",
+   "native": {
+    "World/Africa/West Africa/Senegal.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Gambia.html": 1
+   },
+   "_named": true
+  },
+  "ragtime": {
+   "term": "RAGTIME",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "adaha": {
+   "term": "ADAHA",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "asiko": {
+   "term": "ASIKO",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1
+   }
+  },
+  "palm-wine": {
+   "term": "PALM-WINE",
+   "native": {
+    "World/Africa/West Africa/Liberia.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Nigeria.html": 1,
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "_named": true
+  },
+  "odonson": {
+   "term": "ODONSON",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "blues": {
+   "term": "BLUES",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Mali.html": 1
+   }
+  },
+  "concert-party": {
+   "term": "CONCERT-PARTY",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "vaudeville": {
+   "term": "VAUDEVILLE",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "music-hall": {
+   "term": "MUSIC-HALL",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "swing": {
+   "term": "SWING",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "calypso": {
+   "term": "CALYPSO",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1,
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   }
+  },
+  "pop": {
+   "term": "POP",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "kpanlogo": {
+   "term": "KPANLOGO",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "burger-highlife": {
+   "term": "BURGER-HIGHLIFE",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "gospel-highlife": {
+   "term": "GOSPEL-HIGHLIFE",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "indian-style/line": {
+   "term": "INDIAN-STYLE/LINE",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "bollywood": {
+   "term": "BOLLYWOOD",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Ghana.html": 1
+   }
+  },
+  "hip-life": {
+   "term": "HIP-LIFE",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "azonto": {
+   "term": "AZONTO",
+   "native": {
+    "World/Africa/West Africa/Ghana.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "kussunde": {
+   "term": "KUSSUNDE",
+   "native": {
+    "World/Africa/West Africa/Guinea Bissau.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "gumbe": {
+   "term": "GUMBE",
+   "native": {
+    "World/Africa/West Africa/Guinea Bissau.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "maringa": {
+   "term": "MARINGA",
+   "native": {
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Liberia.html": 1
+   },
+   "_named": true
+  },
+  "ndombolo": {
+   "term": "NDOMBOLO",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Liberia.html": 1
+   }
+  },
+  "desert-blues": {
+   "term": "DESERT-BLUES",
+   "native": {
+    "World/Africa/West Africa/Mali.html": 1,
+    "World/Africa/West Africa/Niger.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "ishumar": {
+   "term": "ISHUMAR",
+   "native": {
+    "World/Africa/West Africa/Mali.html": 1,
+    "World/Africa/West Africa/Niger.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "wassoulou": {
+   "term": "WASSOULOU",
+   "native": {
+    "World/Africa/West Africa/Mali.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "sumu": {
+   "term": "SUMU",
+   "native": {
+    "World/Africa/West Africa/Mali.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "balani-show": {
+   "term": "BALANI-SHOW",
+   "native": {
+    "World/Africa/West Africa/Mali.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "asoko": {
+   "term": "ASOKO",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "sakara": {
+   "term": "SAKARA",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "juju": {
+   "term": "JUJU",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "konkoma": {
+   "term": "KONKOMA",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "apala": {
+   "term": "APALA",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "fuji": {
+   "term": "FUJI",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "were": {
+   "term": "WERE",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "ajisari": {
+   "term": "AJISARI",
+   "native": {},
+   "cited": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   }
+  },
+  "waka": {
+   "term": "WAKA",
+   "native": {
+    "World/Africa/West Africa/Nigeria.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "gumbay": {
+   "term": "GUMBAY",
+   "native": {
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "cited": {
+    "World/Africa/West Africa/Togo.html": 1
+   },
+   "_named": true
+  },
+  "milo-jazz": {
+   "term": "MILO-JAZZ",
+   "native": {
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "soca-beat": {
+   "term": "SOCA-BEAT",
+   "native": {
+    "World/Africa/West Africa/Sierra Leone.html": 1
+   },
+   "cited": {},
+   "_named": true
+  },
+  "goumbeja": {
+   "term": "GOUMBEJA",
+   "native": {
+    "World/Africa/West Africa/Togo.html": 1
+   },
+   "cited": {},
+   "_named": true
+  }
+ },
+ "geoNames": {
+  "zimbabwe": "ZWE",
+  "republic of zimbabwe": "ZWE",
+  "zambia": "ZMB",
+  "zambie": "ZMB",
+  "republic of zambia": "ZMB",
+  "yemen": "YEM",
+  "republic of yemen": "YEM",
+  "vietnam": "VNM",
+  "viet nam": "VNM",
+  "socialist republic of vietnam": "VNM",
+  "venezuela": "VEN",
+  "bolivarian republic of venezuela": "VEN",
+  "vanuatu": "VUT",
+  "republic of vanuatu": "VUT",
+  "uzbekistan": "UZB",
+  "ouzbekistan": "UZB",
+  "republic of uzbekistan": "UZB",
+  "uruguay": "URY",
+  "oriental republic of uruguay": "URY",
+  "micronesia": "FSM",
+  "federated states of micronesia": "FSM",
+  "stati federati di micronesia": "FSM",
+  "etats federes de micronesie": "FSM",
+  "marshall is.": "MHL",
+  "marshall islands": "MHL",
+  "isole marshall": "MHL",
+  "iles marshall": "MHL",
+  "republic of the marshall islands": "MHL",
+  "n. mariana is.": "MNP",
+  "northern mariana islands": "MNP",
+  "isole marianne settentrionali": "MNP",
+  "iles mariannes du nord": "MNP",
+  "commonwealth of the northern mariana islands": "MNP",
+  "u.s. virgin is.": "VIR",
+  "united states virgin islands": "VIR",
+  "isole vergini americane": "VIR",
+  "iles vierges des etats-unis": "VIR",
+  "virgin islands of the united states": "VIR",
+  "guam": "GUM",
+  "territory of guam": "GUM",
+  "american samoa": "ASM",
+  "samoa americane": "ASM",
+  "samoa americaines": "ASM",
+  "puerto rico": "PRI",
+  "porto rico": "PRI",
+  "commonwealth of puerto rico": "PRI",
+  "united states of america": "USA",
+  "united states": "USA",
+  "stati uniti d'america": "USA",
+  "etats-unis": "USA",
+  "s. geo. and the is.": "SGS",
+  "south georgia and the islands": "SGS",
+  "south georgia and the south sandwich islands": "SGS",
+  "georgia del sud e isole sandwich meridionali": "SGS",
+  "georgie du sud-et-les iles sandwich du sud": "SGS",
+  "br. indian ocean ter.": "IOT",
+  "british indian ocean territory": "IOT",
+  "territorio britannico dell'oceano indiano": "IOT",
+  "territoire britannique de l'ocean indien": "IOT",
+  "saint helena": "SHN",
+  "sant'elena": "SHN",
+  "sainte-helene": "SHN",
+  "pitcairn is.": "PCN",
+  "pitcairn islands": "PCN",
+  "isole pitcairn": "PCN",
+  "iles pitcairn": "PCN",
+  "pitcairn, henderson, ducie and oeno islands": "PCN",
+  "falkland is.": "FLK",
+  "falkland islands / malvinas": "FLK",
+  "falkland islands": "FLK",
+  "isole falkland": "FLK",
+  "iles malouines": "FLK",
+  "islas malvinas": "FLK",
+  "cayman is.": "CYM",
+  "cayman islands": "CYM",
+  "isole cayman": "CYM",
+  "iles caimans": "CYM",
+  "bermuda": "BMU",
+  "bermudes": "BMU",
+  "the bermudas or somers isles": "BMU",
+  "turks and caicos is.": "TCA",
+  "turks and caicos islands": "TCA",
+  "turks e caicos": "TCA",
+  "iles turques-et-caiques": "TCA",
+  "montserrat": "MSR",
+  "jersey": "JEY",
+  "baliato di jersey": "JEY",
+  "bailiwick of jersey": "JEY",
+  "guernsey": "GGY",
+  "guernesey": "GGY",
+  "bailiwick of guernsey": "GGY",
+  "isle of man": "IMN",
+  "isola di man": "IMN",
+  "ile de man": "IMN",
+  "united kingdom": "GBR",
+  "regno unito": "GBR",
+  "royaume-uni": "GBR",
+  "united kingdom of great britain and northern ireland": "GBR",
+  "united arab emirates": "ARE",
+  "emirati arabi uniti": "ARE",
+  "emirats arabes unis": "ARE",
+  "ukraine": "UKR",
+  "ucraina": "UKR",
+  "uganda": "UGA",
+  "ouganda": "UGA",
+  "republic of uganda": "UGA",
+  "turkmenistan": "TKM",
+  "turkey": "TUR",
+  "turchia": "TUR",
+  "turquie": "TUR",
+  "republic of turkey": "TUR",
+  "tunisia": "TUN",
+  "tunisie": "TUN",
+  "republic of tunisia": "TUN",
+  "trinidad and tobago": "TTO",
+  "trinidad e tobago": "TTO",
+  "trinite-et-tobago": "TTO",
+  "republic of trinidad and tobago": "TTO",
+  "tonga": "TON",
+  "kingdom of tonga": "TON",
+  "togo": "TGO",
+  "togolese republic": "TGO",
+  "timor-leste": "TLS",
+  "east timor": "TLS",
+  "timor est": "TLS",
+  "timor oriental": "TLS",
+  "democratic republic of timor-leste": "TLS",
+  "thailand": "THA",
+  "thailandia": "THA",
+  "thailande": "THA",
+  "kingdom of thailand": "THA",
+  "tanzania": "TZA",
+  "united republic of tanzania": "TZA",
+  "tanzanie": "TZA",
+  "tajikistan": "TJK",
+  "tagikistan": "TJK",
+  "tadjikistan": "TJK",
+  "republic of tajikistan": "TJK",
+  "taiwan": "TWN",
+  "syria": "SYR",
+  "siria": "SYR",
+  "syrie": "SYR",
+  "syrian arab republic": "SYR",
+  "switzerland": "CHE",
+  "svizzera": "CHE",
+  "suisse": "CHE",
+  "swiss confederation": "CHE",
+  "sweden": "SWE",
+  "svezia": "SWE",
+  "suede": "SWE",
+  "kingdom of sweden": "SWE",
+  "eswatini": "SWZ",
+  "kingdom of eswatini": "SWZ",
+  "swaziland": "SWZ",
+  "suriname": "SUR",
+  "republic of suriname": "SUR",
+  "s. sudan": "SDS",
+  "south sudan": "SDS",
+  "sudan del sud": "SDS",
+  "soudan du sud": "SDS",
+  "republic of south sudan": "SDS",
+  "sudan": "SDN",
+  "soudan": "SDN",
+  "republic of the sudan": "SDN",
+  "sri lanka": "LKA",
+  "democratic socialist republic of sri lanka": "LKA",
+  "spain": "ESP",
+  "spagna": "ESP",
+  "espagne": "ESP",
+  "kingdom of spain": "ESP",
+  "south korea": "KOR",
+  "republic of korea": "KOR",
+  "corea del sud": "KOR",
+  "coree du sud": "KOR",
+  "south africa": "ZAF",
+  "sudafrica": "ZAF",
+  "afrique du sud": "ZAF",
+  "republic of south africa": "ZAF",
+  "somalia": "SOM",
+  "somalie": "SOM",
+  "federal republic of somalia": "SOM",
+  "somaliland": "SOL",
+  "republic of somaliland": "SOL",
+  "solomon is.": "SLB",
+  "solomon islands": "SLB",
+  "isole salomone": "SLB",
+  "iles salomon": "SLB",
+  "slovakia": "SVK",
+  "slovacchia": "SVK",
+  "slovaquie": "SVK",
+  "slovak republic": "SVK",
+  "slovenia": "SVN",
+  "slovenie": "SVN",
+  "republic of slovenia": "SVN",
+  "singapore": "SGP",
+  "singapour": "SGP",
+  "republic of singapore": "SGP",
+  "sierra leone": "SLE",
+  "republic of sierra leone": "SLE",
+  "seychelles": "SYC",
+  "republic of seychelles": "SYC",
+  "serbia": "SRB",
+  "republic of serbia": "SRB",
+  "serbie": "SRB",
+  "senegal": "SEN",
+  "republic of senegal": "SEN",
+  "saudi arabia": "SAU",
+  "arabia saudita": "SAU",
+  "arabie saoudite": "SAU",
+  "kingdom of saudi arabia": "SAU",
+  "sao tome and principe": "STP",
+  "sao tome e principe": "STP",
+  "sao tome-et-principe": "STP",
+  "democratic republic of sao tome and principe": "STP",
+  "san marino": "SMR",
+  "saint-marin": "SMR",
+  "republic of san marino": "SMR",
+  "samoa": "WSM",
+  "independent state of samoa": "WSM",
+  "st. vin. and gren.": "VCT",
+  "saint vincent and the grenadines": "VCT",
+  "saint vincent e grenadine": "VCT",
+  "saint-vincent-et-les-grenadines": "VCT",
+  "saint lucia": "LCA",
+  "sainte-lucie": "LCA",
+  "st. kitts and nevis": "KNA",
+  "saint kitts and nevis": "KNA",
+  "saint kitts e nevis": "KNA",
+  "saint-christophe-et-nieves": "KNA",
+  "federation of saint kitts and nevis": "KNA",
+  "rwanda": "RWA",
+  "ruanda": "RWA",
+  "republic of rwanda": "RWA",
+  "russia": "RUS",
+  "russian federation": "RUS",
+  "russie": "RUS",
+  "romania": "ROU",
+  "roumanie": "ROU",
+  "qatar": "QAT",
+  "state of qatar": "QAT",
+  "portugal": "PRT",
+  "portogallo": "PRT",
+  "portuguese republic": "PRT",
+  "poland": "POL",
+  "polonia": "POL",
+  "pologne": "POL",
+  "republic of poland": "POL",
+  "philippines": "PHL",
+  "filippine": "PHL",
+  "republic of the philippines": "PHL",
+  "peru": "PER",
+  "perou": "PER",
+  "republic of peru": "PER",
+  "paraguay": "PRY",
+  "republic of paraguay": "PRY",
+  "papua new guinea": "PNG",
+  "papua nuova guinea": "PNG",
+  "papouasie-nouvelle-guinee": "PNG",
+  "independent state of papua new guinea": "PNG",
+  "panama": "PAN",
+  "republic of panama": "PAN",
+  "palau": "PLW",
+  "palaos": "PLW",
+  "republic of palau": "PLW",
+  "pakistan": "PAK",
+  "islamic republic of pakistan": "PAK",
+  "oman": "OMN",
+  "sultanate of oman": "OMN",
+  "norway": "NOR",
+  "norvegia": "NOR",
+  "norvege": "NOR",
+  "kingdom of norway": "NOR",
+  "north korea": "PRK",
+  "dem. rep. korea": "PRK",
+  "corea del nord": "PRK",
+  "coree du nord": "PRK",
+  "democratic people's republic of korea": "PRK",
+  "nigeria": "NGA",
+  "federal republic of nigeria": "NGA",
+  "niger": "NER",
+  "republic of niger": "NER",
+  "nicaragua": "NIC",
+  "republic of nicaragua": "NIC",
+  "new zealand": "NZL",
+  "nuova zelanda": "NZL",
+  "nouvelle-zelande": "NZL",
+  "niue": "NIU",
+  "cook is.": "COK",
+  "cook islands": "COK",
+  "isole cook": "COK",
+  "iles cook": "COK",
+  "netherlands": "NLD",
+  "paesi bassi": "NLD",
+  "pays-bas": "NLD",
+  "kingdom of the netherlands": "NLD",
+  "aruba": "ABW",
+  "curacao": "CUW",
+  "nepal": "NPL",
+  "nauru": "NRU",
+  "republic of nauru": "NRU",
+  "namibia": "NAM",
+  "namibie": "NAM",
+  "republic of namibia": "NAM",
+  "mozambique": "MOZ",
+  "mozambico": "MOZ",
+  "republic of mozambique": "MOZ",
+  "morocco": "MAR",
+  "marocco": "MAR",
+  "maroc": "MAR",
+  "kingdom of morocco": "MAR",
+  "w. sahara": "SAH",
+  "western sahara": "SAH",
+  "sahara occidentale": "SAH",
+  "sahara occidental": "SAH",
+  "sahrawi arab democratic republic": "SAH",
+  "montenegro": "MNE",
+  "mongolia": "MNG",
+  "mongolie": "MNG",
+  "moldova": "MDA",
+  "moldavia": "MDA",
+  "moldavie": "MDA",
+  "republic of moldova": "MDA",
+  "mexico": "MEX",
+  "messico": "MEX",
+  "mexique": "MEX",
+  "united mexican states": "MEX",
+  "mauritius": "MUS",
+  "maurice": "MUS",
+  "republic of mauritius": "MUS",
+  "mauritania": "MRT",
+  "mauritanie": "MRT",
+  "islamic republic of mauritania": "MRT",
+  "malta": "MLT",
+  "malte": "MLT",
+  "republic of malta": "MLT",
+  "mali": "MLI",
+  "republic of mali": "MLI",
+  "malaysia": "MYS",
+  "malaisie": "MYS",
+  "malawi": "MWI",
+  "republic of malawi": "MWI",
+  "madagascar": "MDG",
+  "republic of madagascar": "MDG",
+  "north macedonia": "MKD",
+  "macedonia del nord": "MKD",
+  "macedoine du nord": "MKD",
+  "republic of north macedonia": "MKD",
+  "luxembourg": "LUX",
+  "lussemburgo": "LUX",
+  "grand duchy of luxembourg": "LUX",
+  "lithuania": "LTU",
+  "lituania": "LTU",
+  "lituanie": "LTU",
+  "republic of lithuania": "LTU",
+  "liechtenstein": "LIE",
+  "principality of liechtenstein": "LIE",
+  "libya": "LBY",
+  "libia": "LBY",
+  "libye": "LBY",
+  "liberia": "LBR",
+  "republic of liberia": "LBR",
+  "lesotho": "LSO",
+  "kingdom of lesotho": "LSO",
+  "lebanon": "LBN",
+  "libano": "LBN",
+  "liban": "LBN",
+  "lebanese republic": "LBN",
+  "latvia": "LVA",
+  "lettonia": "LVA",
+  "lettonie": "LVA",
+  "republic of latvia": "LVA",
+  "laos": "LAO",
+  "lao pdr": "LAO",
+  "lao people's democratic republic": "LAO",
+  "kyrgyzstan": "KGZ",
+  "kirghizistan": "KGZ",
+  "kyrgyz republic": "KGZ",
+  "kuwait": "KWT",
+  "koweit": "KWT",
+  "state of kuwait": "KWT",
+  "kosovo": "KOS",
+  "republic of kosovo": "KOS",
+  "kiribati": "KIR",
+  "republic of kiribati": "KIR",
+  "kenya": "KEN",
+  "republic of kenya": "KEN",
+  "kazakhstan": "KAZ",
+  "kazakistan": "KAZ",
+  "republic of kazakhstan": "KAZ",
+  "jordan": "JOR",
+  "giordania": "JOR",
+  "jordanie": "JOR",
+  "hashemite kingdom of jordan": "JOR",
+  "japan": "JPN",
+  "giappone": "JPN",
+  "japon": "JPN",
+  "jamaica": "JAM",
+  "giamaica": "JAM",
+  "jamaique": "JAM",
+  "italy": "ITA",
+  "italia": "ITA",
+  "italie": "ITA",
+  "italian republic": "ITA",
+  "israel": "ISR",
+  "israele": "ISR",
+  "state of israel": "ISR",
+  "palestine": "PSX",
+  "palestina": "PSX",
+  "west bank and gaza": "PSX",
+  "ireland": "IRL",
+  "irlanda": "IRL",
+  "irlande": "IRL",
+  "iraq": "IRQ",
+  "irak": "IRQ",
+  "republic of iraq": "IRQ",
+  "iran": "IRN",
+  "islamic republic of iran": "IRN",
+  "indonesia": "IDN",
+  "indonesie": "IDN",
+  "republic of indonesia": "IDN",
+  "india": "IND",
+  "inde": "IND",
+  "republic of india": "IND",
+  "iceland": "ISL",
+  "islanda": "ISL",
+  "islande": "ISL",
+  "republic of iceland": "ISL",
+  "hungary": "HUN",
+  "ungheria": "HUN",
+  "hongrie": "HUN",
+  "republic of hungary": "HUN",
+  "honduras": "HND",
+  "republic of honduras": "HND",
+  "haiti": "HTI",
+  "republic of haiti": "HTI",
+  "guyana": "GUY",
+  "co-operative republic of guyana": "GUY",
+  "guinea-bissau": "GNB",
+  "guinee-bissau": "GNB",
+  "republic of guinea-bissau": "GNB",
+  "guinea": "GIN",
+  "guinee": "GIN",
+  "republic of guinea": "GIN",
+  "guatemala": "GTM",
+  "republic of guatemala": "GTM",
+  "grenada": "GRD",
+  "grenade": "GRD",
+  "greece": "GRC",
+  "grecia": "GRC",
+  "grece": "GRC",
+  "hellenic republic": "GRC",
+  "ghana": "GHA",
+  "republic of ghana": "GHA",
+  "germany": "DEU",
+  "germania": "DEU",
+  "allemagne": "DEU",
+  "federal republic of germany": "DEU",
+  "georgia": "GEO",
+  "georgie": "GEO",
+  "gambia": "GMB",
+  "the gambia": "GMB",
+  "gambie": "GMB",
+  "republic of the gambia": "GMB",
+  "gabon": "GAB",
+  "gabonese republic": "GAB",
+  "france": "FRA",
+  "francia": "FRA",
+  "french republic": "FRA",
+  "st. pierre and miquelon": "SPM",
+  "saint pierre and miquelon": "SPM",
+  "saint-pierre e miquelon": "SPM",
+  "saint-pierre-et-miquelon": "SPM",
+  "wallis and futuna is.": "WLF",
+  "wallis and futuna islands": "WLF",
+  "wallis and futuna": "WLF",
+  "wallis e futuna": "WLF",
+  "wallis-et-futuna": "WLF",
+  "st-martin": "MAF",
+  "saint-martin": "MAF",
+  "saint martin": "MAF",
+  "saint-martin (french part)": "MAF",
+  "st-barthelemy": "BLM",
+  "saint-barthelemy": "BLM",
+  "saint barthelemy": "BLM",
+  "fr. polynesia": "PYF",
+  "french polynesia": "PYF",
+  "polinesia francese": "PYF",
+  "polynesie francaise": "PYF",
+  "new caledonia": "NCL",
+  "nuova caledonia": "NCL",
+  "nouvelle-caledonie": "NCL",
+  "fr. s. antarctic lands": "ATF",
+  "french southern and antarctic lands": "ATF",
+  "terre australi e antartiche francesi": "ATF",
+  "terres australes et antarctiques francaises": "ATF",
+  "territory of the french southern and antarctic lands": "ATF",
+  "fr. s. and antarctic lands": "ATF",
+  "aland": "ALD",
+  "aland islands": "ALD",
+  "isole aland": "ALD",
+  "finland": "FIN",
+  "finlandia": "FIN",
+  "finlande": "FIN",
+  "republic of finland": "FIN",
+  "fiji": "FJI",
+  "figi": "FJI",
+  "fidji": "FJI",
+  "republic of fiji": "FJI",
+  "ethiopia": "ETH",
+  "etiopia": "ETH",
+  "ethiopie": "ETH",
+  "federal democratic republic of ethiopia": "ETH",
+  "estonia": "EST",
+  "estonie": "EST",
+  "republic of estonia": "EST",
+  "eritrea": "ERI",
+  "erythree": "ERI",
+  "state of eritrea": "ERI",
+  "eq. guinea": "GNQ",
+  "equatorial guinea": "GNQ",
+  "guinea equatoriale": "GNQ",
+  "guinee equatoriale": "GNQ",
+  "republic of equatorial guinea": "GNQ",
+  "el salvador": "SLV",
+  "salvador": "SLV",
+  "republic of el salvador": "SLV",
+  "egypt": "EGY",
+  "egitto": "EGY",
+  "egypte": "EGY",
+  "arab republic of egypt": "EGY",
+  "ecuador": "ECU",
+  "equateur": "ECU",
+  "republic of ecuador": "ECU",
+  "dominican rep.": "DOM",
+  "dominican republic": "DOM",
+  "repubblica dominicana": "DOM",
+  "republique dominicaine": "DOM",
+  "dominica": "DMA",
+  "dominique": "DMA",
+  "commonwealth of dominica": "DMA",
+  "djibouti": "DJI",
+  "gibuti": "DJI",
+  "republic of djibouti": "DJI",
+  "greenland": "GRL",
+  "groenlandia": "GRL",
+  "groenland": "GRL",
+  "faeroe is.": "FRO",
+  "faeroe islands": "FRO",
+  "faroe islands": "FRO",
+  "fær øer": "FRO",
+  "iles feroe": "FRO",
+  "føroyar is. (faeroe is.)": "FRO",
+  "denmark": "DNK",
+  "danimarca": "DNK",
+  "danemark": "DNK",
+  "kingdom of denmark": "DNK",
+  "czechia": "CZE",
+  "czech republic": "CZE",
+  "repubblica ceca": "CZE",
+  "tchequie": "CZE",
+  "cesko": "CZE",
+  "n. cyprus": "CYN",
+  "northern cyprus": "CYN",
+  "turkish republic of northern cyprus": "CYN",
+  "cipro del nord": "CYN",
+  "chypre du nord": "CYN",
+  "cyprus": "CYP",
+  "cipro": "CYP",
+  "chypre": "CYP",
+  "republic of cyprus": "CYP",
+  "cuba": "CUB",
+  "republic of cuba": "CUB",
+  "croatia": "HRV",
+  "croazia": "HRV",
+  "croatie": "HRV",
+  "republic of croatia": "HRV",
+  "cote d'ivoire": "CIV",
+  "ivory coast": "CIV",
+  "costa d'avorio": "CIV",
+  "republic of ivory coast": "CIV",
+  "costa rica": "CRI",
+  "republic of costa rica": "CRI",
+  "dem. rep. congo": "COD",
+  "democratic republic of the congo": "COD",
+  "repubblica democratica del congo": "COD",
+  "republique democratique du congo": "COD",
+  "congo": "COG",
+  "republic of the congo": "COG",
+  "repubblica del congo": "COG",
+  "republique du congo": "COG",
+  "comoros": "COM",
+  "comore": "COM",
+  "comores": "COM",
+  "union of the comoros": "COM",
+  "colombia": "COL",
+  "colombie": "COL",
+  "republic of colombia": "COL",
+  "china": "CHN",
+  "people's republic of china": "CHN",
+  "cina": "CHN",
+  "republique populaire de chine": "CHN",
+  "hong kong": "HKG",
+  "hong kong s.a.r.": "HKG",
+  "hong kong special administrative region, prc": "HKG",
+  "chile": "CHL",
+  "cile": "CHL",
+  "chili": "CHL",
+  "republic of chile": "CHL",
+  "chad": "TCD",
+  "ciad": "TCD",
+  "tchad": "TCD",
+  "republic of chad": "TCD",
+  "central african rep.": "CAF",
+  "central african republic": "CAF",
+  "repubblica centrafricana": "CAF",
+  "republique centrafricaine": "CAF",
+  "cabo verde": "CPV",
+  "republic of cabo verde": "CPV",
+  "cape verde": "CPV",
+  "capo verde": "CPV",
+  "cap-vert": "CPV",
+  "canada": "CAN",
+  "cameroon": "CMR",
+  "camerun": "CMR",
+  "cameroun": "CMR",
+  "republic of cameroon": "CMR",
+  "cambodia": "KHM",
+  "cambogia": "KHM",
+  "cambodge": "KHM",
+  "kingdom of cambodia": "KHM",
+  "myanmar": "MMR",
+  "birmania": "MMR",
+  "birmanie": "MMR",
+  "republic of the union of myanmar": "MMR",
+  "burundi": "BDI",
+  "republic of burundi": "BDI",
+  "burkina faso": "BFA",
+  "bulgaria": "BGR",
+  "bulgarie": "BGR",
+  "republic of bulgaria": "BGR",
+  "brunei": "BRN",
+  "brunei darussalam": "BRN",
+  "negara brunei darussalam": "BRN",
+  "brazil": "BRA",
+  "brasile": "BRA",
+  "bresil": "BRA",
+  "federative republic of brazil": "BRA",
+  "botswana": "BWA",
+  "republic of botswana": "BWA",
+  "bosnia and herz.": "BIH",
+  "bosnia and herzegovina": "BIH",
+  "bosnia ed erzegovina": "BIH",
+  "bosnie-herzegovine": "BIH",
+  "bolivia": "BOL",
+  "bolivie": "BOL",
+  "plurinational state of bolivia": "BOL",
+  "bhutan": "BTN",
+  "bhoutan": "BTN",
+  "kingdom of bhutan": "BTN",
+  "benin": "BEN",
+  "republic of benin": "BEN",
+  "belize": "BLZ",
+  "belgium": "BEL",
+  "belgio": "BEL",
+  "belgique": "BEL",
+  "kingdom of belgium": "BEL",
+  "belarus": "BLR",
+  "bielorussia": "BLR",
+  "bielorussie": "BLR",
+  "republic of belarus": "BLR",
+  "barbados": "BRB",
+  "barbade": "BRB",
+  "bangladesh": "BGD",
+  "people's republic of bangladesh": "BGD",
+  "bahrain": "BHR",
+  "bahrein": "BHR",
+  "kingdom of bahrain": "BHR",
+  "bahamas": "BHS",
+  "the bahamas": "BHS",
+  "commonwealth of the bahamas": "BHS",
+  "azerbaijan": "AZE",
+  "azerbaigian": "AZE",
+  "azerbaidjan": "AZE",
+  "republic of azerbaijan": "AZE",
+  "austria": "AUT",
+  "autriche": "AUT",
+  "republic of austria": "AUT",
+  "australia": "AUS",
+  "australie": "AUS",
+  "commonwealth of australia": "AUS",
+  "indian ocean ter.": "IOA",
+  "indian ocean territories": "IOA",
+  "australian indian ocean territories": "IOA",
+  "territoires exterieurs australiens de l'ocean indien": "IOA",
+  "heard i. and mcdonald is.": "HMD",
+  "heard i. and mcdonald islands": "HMD",
+  "heard island and mcdonald islands": "HMD",
+  "isole heard e mcdonald": "HMD",
+  "iles heard-et-macdonald": "HMD",
+  "territory of heard island and mcdonald islands": "HMD",
+  "norfolk island": "NFK",
+  "isola norfolk": "NFK",
+  "ile norfolk": "NFK",
+  "territory of norfolk island": "NFK",
+  "armenia": "ARM",
+  "armenie": "ARM",
+  "republic of armenia": "ARM",
+  "argentina": "ARG",
+  "argentine": "ARG",
+  "argentine republic": "ARG",
+  "antigua and barb.": "ATG",
+  "antigua and barbuda": "ATG",
+  "antigua e barbuda": "ATG",
+  "antigua-et-barbuda": "ATG",
+  "angola": "AGO",
+  "people's republic of angola": "AGO",
+  "andorra": "AND",
+  "andorre": "AND",
+  "principality of andorra": "AND",
+  "algeria": "DZA",
+  "algerie": "DZA",
+  "people's democratic republic of algeria": "DZA",
+  "albania": "ALB",
+  "albanie": "ALB",
+  "republic of albania": "ALB",
+  "afghanistan": "AFG",
+  "islamic state of afghanistan": "AFG",
+  "siachen glacier": "KAS",
+  "ghiacciaio siachen": "KAS",
+  "glacier de siachen": "KAS",
+  "antarctica": "ATA",
+  "antartide": "ATA",
+  "antarctique": "ATA",
+  "sint maarten": "SXM",
+  "sint maarten (dutch part)": "SXM",
+  "guinea conakry": "GIN",
+  "guinea bissau": "GNB",
+  "dr congo": "COD",
+  "congo kinshasa": "COD",
+  "congo brazzaville": "COG",
+  "u.s.a.": "USA",
+  "usa": "USA",
+  "uk": "GBR",
+  "england": "GBR"
+ },
+ "map": {
+  "continents": [
+   "World/Africa"
+  ],
+  "zones": [
+   "World/Africa/Central Africa",
+   "World/Africa/East Africa",
+   "World/Africa/North Africa",
+   "World/Africa/Southern Africa",
+   "World/Africa/West Africa"
+  ],
+  "countryPages": {
+   "World/Africa/West Africa/Benin.html": "BEN",
+   "World/Africa/West Africa/Burkina Faso.html": "BFA",
+   "World/Africa/West Africa/Côte d’Ivoire.html": "CIV",
+   "World/Africa/West Africa/Gambia.html": "GMB",
+   "World/Africa/West Africa/Ghana.html": "GHA",
+   "World/Africa/West Africa/Guinea Bissau.html": "GNB",
+   "World/Africa/West Africa/Guinea Conakry.html": "GIN",
+   "World/Africa/West Africa/Liberia.html": "LBR",
+   "World/Africa/West Africa/Mali.html": "MLI",
+   "World/Africa/West Africa/Mauritania.html": "MRT",
+   "World/Africa/West Africa/Niger.html": "NER",
+   "World/Africa/West Africa/Nigeria.html": "NGA",
+   "World/Africa/West Africa/Senegal.html": "SEN",
+   "World/Africa/West Africa/Sierra Leone.html": "SLE",
+   "World/Africa/West Africa/Togo.html": "TGO"
+  }
+ },
+ "instruments": {
+  "file": "instruments.json",
+  "names": {
+   "akonting": "akonting",
+   "atenteben": "atenteben",
+   "balafon": "balafon",
+   "banjo": "banjo",
+   "classical-guitar": "classical-guitar",
+   "concertina": "concertina",
+   "guitar": "guitar",
+   "harmonica": "harmonica",
+   "hongan": "hongan",
+   "kakagbo": "kakagbo",
+   "kamale-ngoni": "kamale-ngoni",
+   "kontigi": "kontigi",
+   "kora": "kora",
+   "ngoni": "ngoni",
+   "seprewa": "seprewa",
+   "ukulele": "ukulele",
+   "xalam": "xalam",
+   "molo": "xalam",
+   "koliko": "xalam"
+  },
+  "mentions": {
+   "akonting": {
+    "name": "AKONTING",
+    "native": {
+     "World/Africa/West Africa/Senegal.html": 1
+    },
+    "cited": {}
+   },
+   "atenteben": {
+    "name": "ATENTEBEN",
+    "native": {
+     "World/Africa/West Africa/Ghana.html": 1
+    },
+    "cited": {}
+   },
+   "balafon": {
+    "name": "BALAFON",
+    "native": {
+     "World/Africa/West Africa/Burkina Faso.html": 1,
+     "World/Africa/West Africa/Mali.html": 1
+    },
+    "cited": {}
+   },
+   "banjo": {
+    "name": "BANJO",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Guinea Conakry.html": 1,
+     "World/Africa/West Africa/Nigeria.html": 1
+    }
+   },
+   "classical-guitar": {
+    "name": "CLASSICAL-GUITAR",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Ghana.html": 1
+    }
+   },
+   "concertina": {
+    "name": "CONCERTINA",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Ghana.html": 1
+    }
+   },
+   "guitar": {
+    "name": "GUITAR",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Burkina Faso.html": 1,
+     "World/Africa/West Africa/Ghana.html": 2,
+     "World/Africa/West Africa/Guinea Conakry.html": 1,
+     "World/Africa/West Africa/Mali.html": 1,
+     "World/Africa/West Africa/Nigeria.html": 1
+    }
+   },
+   "harmonica": {
+    "name": "HARMONICA",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Ghana.html": 1
+    }
+   },
+   "hongan": {
+    "name": "HONGAN",
+    "native": {
+     "World/Africa/West Africa/Benin.html": 1
+    },
+    "cited": {}
+   },
+   "kakagbo": {
+    "name": "KAKAGBO",
+    "native": {
+     "World/Africa/West Africa/Benin.html": 1
+    },
+    "cited": {}
+   },
+   "kamale-ngoni": {
+    "name": "KAMALE-NGONI",
+    "native": {
+     "World/Africa/West Africa/Mali.html": 1
+    },
+    "cited": {}
+   },
+   "kontigi": {
+    "name": "KONTIGI",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/PEOPLES/INLANDS AND DESERT.html": 1,
+     "World/Africa/West Africa/Nigeria.html": 1
+    }
+   },
+   "kora": {
+    "name": "KORA",
+    "native": {
+     "World/Africa/West Africa/Gambia.html": 1,
+     "World/Africa/West Africa/Guinea Conakry.html": 1,
+     "World/Africa/West Africa/Mali.html": 1
+    },
+    "cited": {
+     "World/Africa/West Africa/Ghana.html": 1
+    }
+   },
+   "ngoni": {
+    "name": "NGONI",
+    "native": {
+     "World/Africa/West Africa/Mali.html": 1
+    },
+    "cited": {}
+   },
+   "seprewa": {
+    "name": "SEPREWA",
+    "native": {
+     "World/Africa/West Africa/Ghana.html": 1
+    },
+    "cited": {}
+   },
+   "ukulele": {
+    "name": "UKULELE",
+    "native": {},
+    "cited": {
+     "World/Africa/West Africa/Nigeria.html": 1
+    }
+   },
+   "xalam": {
+    "name": "XALAM",
+    "native": {
+     "World/Africa/West Africa/Ghana.html": 1
+    },
+    "cited": {
+     "World/Africa/West Africa/Ghana.html": 2
+    }
+   }
   }
  }
 }

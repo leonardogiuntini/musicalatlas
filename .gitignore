@@ -1,0 +1,15 @@
+# MUSICAL ATLAS - file che GitHub Desktop deve ignorare
+#
+# Originali delle immagini degli strumenti: restano SOLO su questo computer
+# (fanne un backup). Online vanno solo le copie leggere in INSTRUMENTS/web/,
+# che non sono toccate da queste righe.
+INSTRUMENTS/*.jpg
+INSTRUMENTS/*.jpeg
+INSTRUMENTS/*.png
+INSTRUMENTS/*.webp
+INSTRUMENTS/*.gif
+INSTRUMENTS/*.tif
+INSTRUMENTS/*.tiff
+INSTRUMENTS/*.bmp
+INSTRUMENTS/*.heic
+INSTRUMENTS/*.avif

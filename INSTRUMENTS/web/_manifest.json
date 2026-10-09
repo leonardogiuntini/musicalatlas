@@ -1,0 +1,164 @@
+{
+ "settings": [
+  400,
+  1000,
+  75,
+  80
+ ],
+ "images": {
+  "akonting": {
+   "src": "AKONTING.webp",
+   "mtime": 1791499744,
+   "size": 16336,
+   "w": 400,
+   "h": 240,
+   "lw": 744,
+   "lh": 446,
+   "ow": 744,
+   "oh": 446
+  },
+  "atenteben": {
+   "src": "ATENTEBEN.webp",
+   "mtime": 1791499868,
+   "size": 8096,
+   "w": 375,
+   "h": 400,
+   "lw": 375,
+   "lh": 400,
+   "ow": 375,
+   "oh": 400
+  },
+  "balafon": {
+   "src": "BALAFON.webp",
+   "mtime": 1791499921,
+   "size": 69026,
+   "w": 400,
+   "h": 267,
+   "lw": 612,
+   "lh": 408,
+   "ow": 612,
+   "oh": 408
+  },
+  "banjo": {
+   "src": "BANJO.webp",
+   "mtime": 1791499980,
+   "size": 25014,
+   "w": 400,
+   "h": 266,
+   "lw": 612,
+   "lh": 407,
+   "ow": 612,
+   "oh": 407
+  },
+  "classical-guitar": {
+   "src": "CLASSICAL-GUITAR.webp",
+   "mtime": 1791500045,
+   "size": 34884,
+   "w": 400,
+   "h": 278,
+   "lw": 612,
+   "lh": 425,
+   "ow": 612,
+   "oh": 425
+  },
+  "concertina": {
+   "src": "CONCERTINA.webp",
+   "mtime": 1791500085,
+   "size": 49984,
+   "w": 400,
+   "h": 267,
+   "lw": 860,
+   "lh": 574,
+   "ow": 860,
+   "oh": 574
+  },
+  "guitar": {
+   "src": "GUITAR.webp",
+   "mtime": 1791500148,
+   "size": 43394,
+   "w": 400,
+   "h": 267,
+   "lw": 838,
+   "lh": 559,
+   "ow": 838,
+   "oh": 559
+  },
+  "harmonica": {
+   "src": "HARMONICA.webp",
+   "mtime": 1791500251,
+   "size": 22400,
+   "w": 400,
+   "h": 516,
+   "lw": 474,
+   "lh": 612,
+   "ow": 474,
+   "oh": 612
+  },
+  "kamale-ngoni": {
+   "src": "KAMALE-NGONI.jpg",
+   "mtime": 1791576825,
+   "size": 46310,
+   "w": 400,
+   "h": 533,
+   "lw": 480,
+   "lh": 640,
+   "ow": 480,
+   "oh": 640
+  },
+  "kora": {
+   "src": "KORA.jpg",
+   "mtime": 1791577349,
+   "size": 43478,
+   "w": 300,
+   "h": 445,
+   "lw": 300,
+   "lh": 445,
+   "ow": 300,
+   "oh": 445
+  },
+  "ngoni": {
+   "src": "NGONI.png",
+   "mtime": 1791577214,
+   "size": 279159,
+   "w": 400,
+   "h": 386,
+   "lw": 474,
+   "lh": 458,
+   "ow": 474,
+   "oh": 458
+  },
+  "seprewa": {
+   "src": "SEPREWA.jpg",
+   "mtime": 1791579230,
+   "size": 10847,
+   "w": 210,
+   "h": 240,
+   "lw": 210,
+   "lh": 240,
+   "ow": 210,
+   "oh": 240
+  },
+  "ukulele": {
+   "src": "UKULELE.webp",
+   "mtime": 1791577010,
+   "size": 42506,
+   "w": 400,
+   "h": 276,
+   "lw": 1000,
+   "lh": 689,
+   "ow": 1088,
+   "oh": 750
+  },
+  "xalam": {
+   "src": "XALAM.jpg",
+   "mtime": 1791576958,
+   "size": 44629,
+   "w": 265,
+   "h": 420,
+   "lw": 265,
+   "lh": 420,
+   "ow": 265,
+   "oh": 420
+  }
+ }
+}
