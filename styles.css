@@ -520,7 +520,7 @@ html.cardOpen, html.cardOpen body{ overflow: hidden; }
   white-space: normal;
   overflow-wrap: anywhere;
 }
-/* × tonda bianca, come quella del globo */
+/* × tonda nera, come quella del globo */
 .btn.cardClose{
   flex: 0 0 auto;
   width: 30px;

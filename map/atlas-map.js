@@ -41,7 +41,6 @@
 const WORLD_FILE  = "map/world.json";
 const CONFIG_FILE = "map/map-config.json";
 const SPECIAL_FOLDERS = ["INSTRUMENTS", "PEOPLES"];   // come in app.js
-const STORE_KEY = "musicalAtlas.mapOpen";              // ricorda se la mappa e' aperta
 const FROZEN_KEY = "musicalAtlas.mapFrozen";           // ricorda se il globo e' bloccato
 const FLY_MS = 1100;          // durata degli spostamenti
 const ZOOM_MS = 450;          // durata di uno scatto di zoom
@@ -2541,7 +2540,6 @@ async function openBox(fromText, byUser){
   if (STATE.open){ await loading; return; }
   STATE.open = true;
   if (byUser && !isWelcome()) STATE.frozen = false;   // premendo MAP il globo si apre gia' attivo (non sul benvenuto)
-  try { localStorage.setItem(STORE_KEY, "1"); } catch {}
   UI.box.classList.remove("broken");
   updateState();
   if (byUser) bringIntoView();
@@ -2569,18 +2567,15 @@ async function openBox(fromText, byUser){
 function closeBox(){
   STATE.open = false;
   STATE.anim = null;
-  try { localStorage.setItem(STORE_KEY, "0"); } catch {}
   updateState();
 }
 
 function boot(){
-  try { STATE.frozen = sessionStorage.getItem(FROZEN_KEY) !== "0"; } catch {}
+  try { STATE.frozen = sessionStorage.getItem(FROZEN_KEY) === "1"; } catch {}
   if (isWelcome()) STATE.frozen = true;          // apertura del sito: gira, si parte da EXPLORE
   if (!buildBox()) return;
   window.addEventListener("hashchange", () => syncFromAddress(STATE.open));
-  let wantOpen = false;
-  try { wantOpen = localStorage.getItem(STORE_KEY) === "1"; } catch {}
-  if (wantOpen) openBox(false, false);
+  openBox(false, false);
 }
 
 window.AtlasMap = {
