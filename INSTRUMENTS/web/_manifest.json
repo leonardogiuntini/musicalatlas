@@ -50,17 +50,6 @@
    "ow": 612,
    "oh": 407
   },
-  "classical-guitar": {
-   "src": "CLASSICAL-GUITAR.webp",
-   "mtime": 1791500045,
-   "size": 34884,
-   "w": 400,
-   "h": 278,
-   "lw": 612,
-   "lh": 425,
-   "ow": 612,
-   "oh": 425
-  },
   "concertina": {
    "src": "CONCERTINA.webp",
    "mtime": 1791500085,
@@ -74,14 +63,14 @@
   },
   "guitar": {
    "src": "GUITAR.webp",
-   "mtime": 1791500148,
-   "size": 43394,
+   "mtime": 1791500045,
+   "size": 34884,
    "w": 400,
-   "h": 267,
-   "lw": 838,
-   "lh": 559,
-   "ow": 838,
-   "oh": 559
+   "h": 278,
+   "lw": 612,
+   "lh": 425,
+   "ow": 612,
+   "oh": 425
   },
   "harmonica": {
    "src": "HARMONICA.webp",
@@ -159,6 +148,17 @@
    "lh": 420,
    "ow": 265,
    "oh": 420
+  },
+  "electric-guitar": {
+   "src": "ELECTRIC-GUITAR.webp",
+   "mtime": 1791500148,
+   "size": 43394,
+   "w": 400,
+   "h": 267,
+   "lw": 838,
+   "lh": 559,
+   "ow": 838,
+   "oh": 559
   }
  }
 }

@@ -6,7 +6,7 @@ IMMAGINE PICCOLA;AKONTING;AKONTING.webp;744x446 px: meglio almeno 800 px sul lat
 IMMAGINE PICCOLA;ATENTEBEN;ATENTEBEN.webp;375x400 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;BALAFON;BALAFON.webp;612x408 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;BANJO;BANJO.webp;612x407 px: meglio almeno 800 px sul lato lungo.
-IMMAGINE PICCOLA;CLASSICAL-GUITAR;CLASSICAL-GUITAR.webp;612x425 px: meglio almeno 800 px sul lato lungo.
+IMMAGINE PICCOLA;GUITAR;GUITAR.webp;612x425 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;HARMONICA;HARMONICA.webp;474x612 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;KAMALE-NGONI;KAMALE-NGONI.jpg;480x640 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;KORA;KORA.jpg;300x445 px: meglio almeno 800 px sul lato lungo.
@@ -14,9 +14,9 @@ IMMAGINE PICCOLA;NGONI;NGONI.png;474x458 px: meglio almeno 800 px sul lato lungo
 IMMAGINE PICCOLA;SEPREWA;SEPREWA.jpg;210x240 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;XALAM;XALAM.jpg;265x420 px: meglio almeno 800 px sul lato lungo.
 SENZA PATRIA;BANJO;"Guinea Conakry; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
-SENZA PATRIA;CLASSICAL-GUITAR;Ghana;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;CONCERTINA;Ghana;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
-SENZA PATRIA;GUITAR;"Burkina Faso; Ghana; Guinea Conakry; Mali; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
+SENZA PATRIA;ELECTRIC-GUITAR;"Burkina Faso; Ghana; Mali; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
+SENZA PATRIA;GUITAR;"Ghana; Guinea Conakry; Mali; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;HARMONICA;Ghana;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;KONTIGI;"INLANDS AND DESERT; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;UKULELE;Nigeria;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
@@ -24,16 +24,16 @@ IMMAGINE MANCANTE;HONGAN;;nessuna immagine con questo nome nella cartella.
 IMMAGINE MANCANTE;KAKAGBO;;nessuna immagine con questo nome nella cartella.
 IMMAGINE MANCANTE;KONTIGI;;nessuna immagine con questo nome nella cartella.
 VALORI GERARCHIA;AEROPHONES;3 strumenti;ATENTEBEN, CONCERTINA, HARMONICA
-VALORI GERARCHIA;CHORDOPHONES;10 strumenti;AKONTING, BANJO, CLASSICAL-GUITAR, GUITAR, KAMALE-NGONI, KORA, NGONI, SEPREWA, UKULELE, XALAM
+VALORI GERARCHIA;CHORDOPHONES;10 strumenti;AKONTING, BANJO, ELECTRIC-GUITAR, GUITAR, KAMALE-NGONI, KORA, NGONI, SEPREWA, UKULELE, XALAM
 VALORI GERARCHIA;IDIOPHONES;2 strumenti;BALAFON, HONGAN
 VALORI GERARCHIA;MEMBRANOPHONES;1 strumento;KAKAGBO
 PATRIE;AKONTING;Senegal;citato in: -
 PATRIE;ATENTEBEN;Ghana;citato in: -
 PATRIE;BALAFON;"Burkina Faso; Mali";citato in: -
 PATRIE;BANJO;-;"citato in: Guinea Conakry; Nigeria"
-PATRIE;CLASSICAL-GUITAR;-;citato in: Ghana
 PATRIE;CONCERTINA;-;citato in: Ghana
-PATRIE;GUITAR;-;"citato in: Burkina Faso; Ghana; Guinea Conakry; Mali; Nigeria"
+PATRIE;ELECTRIC-GUITAR;-;"citato in: Burkina Faso; Ghana; Mali; Nigeria"
+PATRIE;GUITAR;-;"citato in: Ghana; Guinea Conakry; Mali; Nigeria"
 PATRIE;HARMONICA;-;citato in: Ghana
 PATRIE;HONGAN;Benin;citato in: -
 PATRIE;KAKAGBO;Benin;citato in: -
@@ -43,5 +43,5 @@ PATRIE;KORA;"Gambia; Guinea Conakry; Mali";citato in: Ghana
 PATRIE;NGONI;Mali;citato in: -
 PATRIE;SEPREWA;Ghana;citato in: -
 PATRIE;UKULELE;-;citato in: Nigeria
-PATRIE;XALAM;Ghana;citato in: Ghana
+PATRIE;XALAM;Ghana;citato in: -
 PESO;;INSTRUMENTS/web;630.7 KB di immagini per il sito
