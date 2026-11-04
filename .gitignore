@@ -13,3 +13,4 @@ INSTRUMENTS/*.tiff
 INSTRUMENTS/*.bmp
 INSTRUMENTS/*.heic
 INSTRUMENTS/*.avif
+__pycache__/
