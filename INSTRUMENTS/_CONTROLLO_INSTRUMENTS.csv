@@ -1,7 +1,4 @@
 ﻿TIPO;STRUMENTO;PAGINA / FILE;DETTAGLIO
-FORMATTAZIONE ANOMALA;BALAFON;MANDE;scritto corsivo + sottolineato + senza colore: uno strumento e' solo corsivo + MAIUSCOLO (+ azzurro se nativo). Frase: …praise and historical songs with instruments like KORA and BALAFON. Long epic narratives, genealogies and praise songs…
-FORMATTAZIONE ANOMALA;KORA;MANDE;scritto corsivo + sottolineato + senza colore: uno strumento e' solo corsivo + MAIUSCOLO (+ azzurro se nativo). Frase: …lizing in praise and historical songs with instruments like KORA and BALAFON. Long epic narratives, genealogies and prai…
-FORMATTAZIONE ANOMALA;NGONI;MANDE;scritto corsivo + sottolineato + senza colore: uno strumento e' solo corsivo + MAIUSCOLO (+ azzurro se nativo). Frase: …Bamana jeli music, anchored in central Mali with slow pentatonic melodies, strong dance rhythms and NGONI accompaniment.
 IMMAGINE PICCOLA;AKONTING;AKONTING.webp;744x446 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;ATENTEBEN;ATENTEBEN.webp;375x400 px: meglio almeno 800 px sul lato lungo.
 IMMAGINE PICCOLA;BALAFON;BALAFON.webp;612x408 px: meglio almeno 800 px sul lato lungo.
@@ -18,7 +15,7 @@ SENZA PATRIA;CONCERTINA;Ghana;citato, ma mai in azzurro: in nessuna pagina risul
 SENZA PATRIA;ELECTRIC-GUITAR;"Burkina Faso; Ghana; Mali; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;GUITAR;"Ghana; Guinea Conakry; Mali; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;HARMONICA;Ghana;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
-SENZA PATRIA;KONTIGI;"INLANDS AND DESERT; Nigeria";citato, ma mai in azzurro: in nessuna pagina risulta nativo.
+SENZA PATRIA;KONTIGI;Nigeria;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 SENZA PATRIA;UKULELE;Nigeria;citato, ma mai in azzurro: in nessuna pagina risulta nativo.
 IMMAGINE MANCANTE;HONGAN;;nessuna immagine con questo nome nella cartella.
 IMMAGINE MANCANTE;KAKAGBO;;nessuna immagine con questo nome nella cartella.
@@ -38,7 +35,7 @@ PATRIE;HARMONICA;-;citato in: Ghana
 PATRIE;HONGAN;Benin;citato in: -
 PATRIE;KAKAGBO;Benin;citato in: -
 PATRIE;KAMALE-NGONI;Mali;citato in: -
-PATRIE;KONTIGI;-;"citato in: INLANDS AND DESERT; Nigeria"
+PATRIE;KONTIGI;-;citato in: Nigeria
 PATRIE;KORA;"Gambia; Guinea Conakry; Mali";citato in: Ghana
 PATRIE;NGONI;Mali;citato in: -
 PATRIE;SEPREWA;Ghana;citato in: -

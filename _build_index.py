@@ -6,7 +6,8 @@ Rilegge la cartella World e scrive  atlas-index.json  con queste parti:
   - "tree"        l'albero del menu (cartelle e pagine)
   - "search"      il testo semplice di ogni pagina, per la ricerca
   - "definitions" i termini definiti -> pagina che li definisce
-  - "peoples"     i popoli delle cartelle PEOPLES -> pagina e paesi
+  - "peoples"     i popoli: dizionario PEOPLES/_PEOPLES.csv + schede PEOPLES/NOME.html
+                  (li prepara _build_peoples.py)
   - "geoNames"    nomi e alias dei paesi -> codice (per la mappa)
   - "map"         continenti, zone e pagine dei paesi che compaiono sulla mappa
   - "instruments" nomi e pagine degli strumenti (il resto in instruments.json,
@@ -37,8 +38,12 @@ SITE_DIR = Path(__file__).resolve().parent
 # --- Mappa ---
 MAP_WORLD = "map/world.json"         # confini dei paesi (se manca, la mappa e' ignorata)
 MAP_CONFIG = "map/map-config.json"   # alias dei nomi e zone (modificabile a mano)
-PEOPLES_FOLDER = "PEOPLES"           # cartelle dove si leggono i popoli
 SPECIAL_FOLDERS = ("INSTRUMENTS", "PEOPLES")   # come in app.js: non sono zone
+
+# Vecchie cartelle PEOPLES dentro World (pagine di gruppo): non vanno piu' sul sito.
+# I popoli ora hanno le loro schede nella cartella PEOPLES accanto a World.
+OLD_PEOPLES_FOLDER = "PEOPLES"
+SKIPPED_FOLDERS = []                 # quelle trovate (le elenca il riassunto)
 
 
 # ------------------------------------------------------------
@@ -182,62 +187,6 @@ class PageReader(HTMLParser):
                 found.append((term, mark == "green"))
         return found
 
-    def people_marks(self):
-        """Popoli evidenziati in giallo in QUALSIASI pagina (grassetto + sottolineato
-        + MAIUSCOLO + giallo): dicono dove il popolo e' nativo. Restituisce [nome, ...]."""
-        found = []
-        for fmt, text in self.runs:
-            if fmt is None:
-                continue
-            bold, italic, underline, mark = fmt
-            t = text.strip().strip(",;:.()").strip()
-            if bold and underline and not italic and mark == "yellow" and is_all_caps(t):
-                found.append(t)
-        return found
-
-    def peoples(self):
-        """Regola POPOLO: giallo + grassetto + sottolineato + MAIUSCOLO.
-        Regola PAESI DEL POPOLO: un paragrafo fatto solo di nomi in grassetto
-        separati da ; o , (es.  Benin; Nigeria) appartiene ai popoli
-        del paragrafo con popoli piu' vicino sopra di lui.
-        Restituisce [(popolo, [paesi]), ...] (paesi vuoto se non ha elenco)."""
-        found = {}                 # popolo -> elenco paesi (ordine di lettura)
-        waiting = []               # popoli dell'ultimo paragrafo con popoli
-        for par in self.paragraphs():
-            names = []
-            for (bold, italic, underline, mark), text in par:
-                t = text.strip().strip(",;:.").strip()
-                if bold and underline and not italic and mark == "yellow" and is_all_caps(t):
-                    names.append(t)
-            if names:
-                for n in names:
-                    found.setdefault(n, [])
-                waiting = names
-                continue
-            countries = country_list(par)
-            if countries and waiting:
-                for n in waiting:
-                    for c in countries:
-                        if c not in found[n]:
-                            found[n].append(c)
-                waiting = []
-        return list(found.items())
-
-
-def country_list(par):
-    """Se il paragrafo e' solo un elenco di nomi in grassetto separati da ; o ,
-    restituisce i nomi, altrimenti []."""
-    names = []
-    for (bold, italic, underline, mark), text in par:
-        if bold and not italic and not underline and not mark:
-            for piece in re.split(r"[;,]", text):
-                piece = piece.strip()
-                if piece:
-                    names.append(piece)
-        elif text.strip(" \t\n ;,."):
-            return []                       # c'e' altro testo: non e' un elenco
-    return names
-
 
 def read_page(file_path):
     reader = PageReader()
@@ -259,6 +208,9 @@ def scan_folder(folder, rel_path, pages_in_order):
 
     children = []
     for sub in subfolders:
+        if sub.name.upper() == OLD_PEOPLES_FOLDER:
+            SKIPPED_FOLDERS.append(rel_path + "/" + sub.name)
+            continue
         node = scan_folder(sub, rel_path + "/" + sub.name, pages_in_order)
         if node:
             children.append(node)
@@ -358,7 +310,6 @@ def main():
     readers = []        # (pagina, lettore): servono anche agli strumenti
     definitions = {}
     genres = {}         # genere -> {"term", "native": {pagina: volte}, "cited": {pagina: volte}}
-    people_pages = {}   # popolo -> {pagina: volte in giallo}
     errors = []
     for node, file_path in pages:
         try:
@@ -375,35 +326,10 @@ def main():
             side[node["path"]] = side.get(node["path"], 0) + 1
             if native and not g.get("_named"):
                 g["term"] = term; g["_named"] = True      # il nome come scritto dove e' nativo
-        for name in reader.people_marks():
-            pp = people_pages.setdefault(normalize_key(name), {})
-            pp[node["path"]] = pp.get(node["path"], 0) + 1
         for term in reader.defined_terms():
             key = normalize_key(term)
             if key not in definitions:          # vale la prima nell'ordine del menu
                 definitions[key] = {"term": term, "path": node["path"]}
-
-    # --- Popoli (solo dalle pagine dentro le cartelle PEOPLES) ---
-    peoples = {}
-    for node, file_path in pages:
-        if PEOPLES_FOLDER.upper() not in [p.upper() for p in node["path"].split("/")[:-1]]:
-            continue
-        try:
-            found = read_page(file_path).peoples()
-        except Exception:
-            continue
-        for name, countries in found:
-            key = normalize_key(name)
-            if key not in peoples:
-                peoples[key] = {"name": name, "path": node["path"], "countries": countries}
-            else:
-                for c in countries:
-                    if c not in peoples[key]["countries"]:
-                        peoples[key]["countries"].append(c)
-
-    # pagine dove ogni popolo e' evidenziato in giallo (per la mappa: dove e' nativo)
-    for key, p in peoples.items():
-        p["pages"] = people_pages.get(key, {})
 
     # --- Nomi dei paesi per la mappa (nome o alias -> codice del paese) ---
     geo_names = {}
@@ -443,6 +369,36 @@ def main():
     except Exception as e:
         instruments_summary = [f"ATTENZIONE, strumenti non preparati per un errore: {e}"]
 
+    # --- Popoli (dizionario, schede, controllo): _build_peoples.py ---
+    peoples, peoples_summary = None, []
+    try:
+        import _build_peoples
+        peoples, peoples_summary = _build_peoples.build(
+            SITE_DIR, readers, normalize_key, is_all_caps, read_page,
+            geo_key, geo_names, (map_info or {}).get("countryPages", {}))
+    except ImportError as e:
+        peoples_summary = [f"ATTENZIONE: popoli saltati: {e}"]
+    except Exception as e:
+        peoples_summary = [f"ATTENZIONE, popoli non preparati per un errore: {e}"]
+
+    # Schede dei popoli: le loro definizioni e i loro generi valgono come quelli delle
+    # pagine (dopo le pagine: a parita' di termine vince la pagina). "go to" apre la scheda.
+    for it in ((peoples or {}).get("items") or {}).values():
+        if not it.get("page"):
+            continue
+        try:
+            reader = read_page(SITE_DIR / it["page"])
+        except Exception:
+            continue
+        for term, native in reader.genres():
+            g = genres.setdefault(normalize_key(term), {"term": term, "native": {}, "cited": {}})
+            side = g["native"] if native else g["cited"]
+            side[it["page"]] = side.get(it["page"], 0) + 1
+            if native and not g.get("_named"):
+                g["term"] = term; g["_named"] = True
+        for term in reader.defined_terms():
+            definitions.setdefault(normalize_key(term), {"term": term, "path": it["page"]})
+
     data = {
         "generated": datetime.now().isoformat(timespec="seconds"),
         "tree": tree,
@@ -463,19 +419,14 @@ def main():
         g.pop("_named", None)
     native_n = sum(1 for g in genres.values() if g["native"])
     print(f"Generi:              {len(genres)} ({native_n} nativi, {len(genres) - native_n} solo citati)")
-    with_countries = [p for p in peoples.values() if p["countries"]]
-    print(f"Popoli:              {len(peoples)} ({len(with_countries)} con elenco dei paesi)")
-    no_list = [p["name"] for p in peoples.values() if not p["countries"]]
-    if no_list:
-        print("  senza elenco dei paesi (sulla mappa non hanno alone): " + ", ".join(no_list))
-    if geo_names:
-        unknown = sorted({c for p in peoples.values() for c in p["countries"]
-                          if geo_key(c) not in geo_names})
-        if unknown:
-            print("  ATTENZIONE, paesi non riconosciuti dalla mappa "
-                  "(aggiungili agli alias di " + MAP_CONFIG + "): " + ", ".join(unknown))
-    for line in instruments_summary:
+    for line in instruments_summary + peoples_summary:
         print(line)
+    if SKIPPED_FOLDERS:
+        print("ATTENZIONE, vecchie cartelle PEOPLES dentro World: non vanno piu' sul sito")
+        print("(i popoli ora hanno le schede nella cartella PEOPLES accanto a World).")
+        print("Quando hai spostato i loro testi nelle schede, cancellale:")
+        for f in SKIPPED_FOLDERS:
+            print(f"  {f}")
     if unknown_pages:
         print("ATTENZIONE, pagine di paesi che la mappa non riconosce")
         print("(aggiungi un alias in " + MAP_CONFIG + ", oppure, se non e' un paese,")

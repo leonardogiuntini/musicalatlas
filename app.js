@@ -13,7 +13,7 @@
         6d. Catalogo degli strumenti (griglia di immagini)
      7. Apertura di una pagina
      8. Menu a comparsa (al clic su una parola)
-        8b. Scheda dello strumento
+        8b. Scheda (strumento o popolo)
      9. Ricerca
     10. Avvio
    ===================================================================== */
@@ -38,8 +38,9 @@ const WELCOME_TEXT = `Welcome!`;
 const SPECIAL_FOLDERS = ["INSTRUMENTS", "PEOPLES"];
 
 // Interruttori nell'intestazione dell'info box, in quest'ordine.
-// GENRES e INSTRUMENTS non sono cartelle: le loro liste nascono dai testi (vedi sezione 6b).
+// Non sono cartelle: le loro liste nascono dai testi del luogo aperto (vedi sezione 6b).
 const TOGGLE_ORDER = ["PEOPLES", "GENRES", "INSTRUMENTS"];
+const PEOPLES = "PEOPLES";
 const GENRES = "GENRES";
 const INSTRUMENTS = "INSTRUMENTS";
 
@@ -57,8 +58,8 @@ const INSTRUMENTS = "INSTRUMENTS";
                     (yellow, cyan, green, red, magenta, blue, white)
             maiuscolo: true = tutto MAIUSCOLO (almeno 2 lettere)
 
-   scheda:  (facoltativo) se restituisce uno strumento, il clic apre la sua
-            scheda invece del menu (vedi sezione 8b).
+   scheda:  (facoltativo) se restituisce uno strumento o un popolo, il clic
+            apre la sua scheda invece del menu (vedi sezione 8b).
 
    azioni:  cosa compare nel menu al clic. Riceve il testo e restituisce
             un elenco di voci. Voci disponibili:
@@ -105,17 +106,23 @@ const REGOLE = [
     }
   },
 
-  // 5. Giallo + grassetto + sottolineato + MAIUSCOLO -> e' un POPOLO: vai alla sua pagina + mostra sulla mappa
+  // 5. Grassetto + sottolineato + MAIUSCOLO + giallo -> POPOLO NATIVO: apre la sua scheda
+  //    (anche scritto con un nome alternativo; se non e' nel dizionario PEOPLES/_PEOPLES.csv
+  //    la scheda ha solo il nome e "search the web")
   {
     formato: { grassetto: true, corsivo: false, sottolineato: true, maiuscolo: true, colore: "yellow" },
-    azioni: (testo) => {
-      const pop = trovaPopolo(testo);
-      const pagina = pop ? APP.byPath.get(pop.path) : null;
-      return conMappa(pagina ? [ vaiA(pagina.title, pagina.path) ] : [], testo);
-    }
+    scheda: (testo) => trovaPopolo(testo),
+    azioni: (testo) => [ cercaSulWeb(testo) ]
   },
 
-  // 6. Corsivo + MAIUSCOLO + azzurro -> STRUMENTO NATIVO: apre la sua scheda
+  // 6. Grassetto + sottolineato + MAIUSCOLO senza colore -> POPOLO CITATO: apre la sua scheda
+  {
+    formato: { grassetto: true, corsivo: false, sottolineato: true, maiuscolo: true, colore: "nessuno" },
+    scheda: (testo) => trovaPopolo(testo),
+    azioni: (testo) => [ cercaSulWeb(testo) ]
+  },
+
+  // 7. Corsivo + MAIUSCOLO + azzurro -> STRUMENTO NATIVO: apre la sua scheda
   //    (se non e' nel dizionario _INSTRUMENTS.csv: menu con "search the web")
   {
     formato: { grassetto: false, corsivo: true, sottolineato: false, maiuscolo: true, colore: "cyan" },
@@ -123,7 +130,7 @@ const REGOLE = [
     azioni: (testo) => [ cercaSulWeb(testo) ]
   },
 
-  // 7. Corsivo + MAIUSCOLO senza colore -> STRUMENTO CITATO: apre la sua scheda
+  // 8. Corsivo + MAIUSCOLO senza colore -> STRUMENTO CITATO: apre la sua scheda
   {
     formato: { grassetto: false, corsivo: true, sottolineato: false, maiuscolo: true, colore: "nessuno" },
     scheda: (testo) => trovaStrumento(testo),
@@ -140,14 +147,26 @@ const REGOLE = [
 // Voce di menu "go to ..."
 // "go to" dei fumetti: si arriva sul luogo con INFO acceso (il suo testo), non col
 // pulsante ricordato; il globo si centra sul luogo come sempre
+// Regola generale: se il percorso e' una scheda (es. PEOPLES/FULƁE.html), "go to" la apre
 function vaiA(etichetta, percorso){
+  const popolo = APP.cardOfPath.get(percorso);
+  if (popolo) return { etichetta: "go to " + etichetta, inScheda: true, fai: () => apriPopolo(popolo) };
   return { etichetta: "go to " + etichetta, fai: () => { APP.memory = null; go(percorso, "doc"); } };
+}
+
+// Pagina o scheda di un percorso, come { title, path } (null se non c'e')
+function destinazione(percorso){
+  const node = APP.byPath.get(percorso);
+  if (node) return node;
+  const popolo = APP.cardOfPath.get(percorso);
+  return popolo ? { title: APP.index.peoples.items[popolo].name, path: percorso } : null;
 }
 
 // Voce di menu "search the web" (cerca il testo + il titolo della pagina aperta)
 function cercaSulWeb(testo){
   return {
     etichetta: "search the web",
+    inScheda: true,                    // si apre in un'altra scheda del browser: la scheda resta
     fai: () => {
       const q = `${testo} ${APP.docTitle}`.trim();
       window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank", "noopener");
@@ -162,10 +181,12 @@ function conMappa(voci, testo){
   return [ ...voci, { etichetta: mappa.label, fai: () => mappa.show(testo) } ];
 }
 
-// Popolo con quel nome, da atlas-index.json (null se non c'e')
+// Popolo con quel nome o nome alternativo, dal dizionario: { popolo: chiave, nome }.
+// Se non e' nel dizionario la chiave e' il nome stesso (la scheda avra' solo il nome).
 function trovaPopolo(testo){
-  const key = normalizeKey(testo.replace(/^[\s"'(\[‘“]+|[\s"'.,;:!?)\]’”]+$/g, ""));
-  return (APP.index.peoples || {})[key] || null;
+  const nome = testo.replace(/^[\s"'(\[‘“]+|[\s"'.,;:!?)\]’”]+$/g, "");
+  const names = (APP.index.peoples && APP.index.peoples.names) || {};
+  return { popolo: names[normalizeKey(nome)] || normalizeKey(nome), nome };
 }
 
 // Strumento con quel nome o nome alternativo, dal dizionario (null se non c'e')
@@ -269,7 +290,8 @@ function applicaRegole(root){
       span.addEventListener("click", (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        if (scheda) apriScheda(scheda);
+        if (scheda && scheda.popolo) apriPopolo(scheda.popolo, null, scheda.nome);
+        else if (scheda) apriScheda(scheda);
         else mostraMenu(span, azioni);
       });
     }
@@ -308,7 +330,8 @@ const APP = {
   byPath: new Map(),      // percorso -> cartella o pagina
   parentOf: new Map(),    // percorso -> cartella che lo contiene
   byName: new Map(),      // nome normalizzato -> cartella o pagina (regola 1)
-  openSpecial: null,      // interruttore acceso (cartella PEOPLES, oppure GENRES / INSTRUMENTS) o null
+  openSpecial: null,      // interruttore acceso (PEOPLES / GENRES / INSTRUMENTS) o null
+  cardOfPath: new Map(),  // scheda di un popolo (PEOPLES/NOME.html) -> chiave del popolo
   infoOpen: true,         // testo dell'info box aperto (si chiude cliccando il titolo)
   view: null,             // cosa si sta mostrando
   renderedPath: null,     // ultimo indirizzo disegnato
@@ -360,6 +383,12 @@ async function loadIndex(){
     if (presentationOf(APP.parentOf.get(node.path)) === node) continue;
     const key = normalizeKey(node.title);
     if (!APP.byName.has(key)) APP.byName.set(key, node);
+  }
+
+  // Schede dei popoli
+  APP.cardOfPath.clear();
+  for (const [key, p] of Object.entries((APP.index.peoples && APP.index.peoples.items) || {})){
+    if (p.page) APP.cardOfPath.set(p.page, key);
   }
 
   buildSearchMap();
@@ -708,23 +737,23 @@ function sullaMappa(node){
 // Interruttori nell'intestazione (PEOPLES / GENRES / INSTRUMENTS), uno alternativo all'altro
 function renderToggles(){
   if (!APP.view) { setRow(el.toggles, []); return; }
-  const folders = subfolders(APP.view.context).filter(isSpecial);
   const buttons = [];
   for (const name of TOGGLE_ORDER){
-    let key = null;
-    if (name === GENRES){ if (genresInScope().length) key = GENRES; }
-    else if (name === INSTRUMENTS){ if (instrumentsInScope().length) key = INSTRUMENTS; }
-    else key = folders.find(f => f.name.toUpperCase() === name) || null;
-    if (!key) continue;
-    const on = APP.openSpecial === key;
-    buttons.push(makeButton(typeof key === "string" ? key : key.name,
-      () => attivaScheda(on ? null : key),       // riclic sul pulsante acceso = torna INFO
-      toggleClass(key) + (on ? " sel" : "")));
+    if (!voceInScope(name).length) continue;     // il luogo non ne ha: niente pulsante
+    const on = APP.openSpecial === name;
+    buttons.push(makeButton(name,
+      () => attivaScheda(on ? null : name),      // riclic sul pulsante acceso = torna INFO
+      toggleClass(name) + (on ? " sel" : "")));
   }
   setRow(el.toggles, buttons);
 }
 
-// GENRES / INSTRUMENTS sono nomi (testo), PEOPLES e' una cartella
+// Voci di un interruttore nel luogo aperto
+function voceInScope(name){
+  return name === PEOPLES ? peoplesInScope() : name === GENRES ? genresInScope()
+    : name === INSTRUMENTS ? instrumentsInScope() : [];
+}
+
 /* ---------------------------------------------------------------------
    GRUPPO INFO / PEOPLES / GENRES / INSTRUMENTS: se ne accende uno solo.
      INFO (openSpecial = null): testo della pagina aperto.
@@ -738,7 +767,7 @@ function renderToggles(){
 function attivaScheda(key){
   hidePopup();
   APP.openSpecial = key;
-  APP.memory = key ? (typeof key === "string" ? key : key.name.toUpperCase()) : null;
+  APP.memory = key;
   renderToggles();
   renderSpecialRow();
   if (key === INSTRUMENTS) apriCatalogo();
@@ -750,9 +779,7 @@ function attivaScheda(key){
 function schedaRicordata(){
   const m = APP.memory;
   if (!m || !APP.view) return null;
-  if (m === GENRES) return genresInScope().length ? GENRES : null;
-  if (m === INSTRUMENTS) return instrumentsInScope().length ? INSTRUMENTS : null;
-  return subfolders(APP.view.context).find(f => isSpecial(f) && f.name.toUpperCase() === m) || null;
+  return voceInScope(m).length ? m : null;
 }
 
 // Torna allo stato iniziale del luogo (INFO acceso, nessun pulsante ricordato)
@@ -761,15 +788,14 @@ function statoIniziale(path){
   go(path);
 }
 
-function toggleClass(folder){
-  return "toggle-" + (typeof folder === "string" ? folder : folder.name).toLowerCase();
+function toggleClass(name){
+  return "toggle-" + name.toLowerCase();
 }
 
 // Livello mostrato dal globo: lo stesso interruttore dell'info box
 // (nessuno acceso = INFO, cioe' i luoghi)
 function livelloGlobo(){
-  const sp = APP.openSpecial;
-  return !sp ? "INFO" : typeof sp === "string" ? sp : sp.name.toUpperCase();
+  return APP.openSpecial || "INFO";
 }
 
 // Riga sotto: contenuto dell'interruttore acceso
@@ -779,26 +805,22 @@ function renderSpecialRow(){
   el.special.classList.toggle("joined", sp === INSTRUMENTS);   // uniti solo i rami di INSTRUMENTS
   renderSottoRami();
   if (!sp) { setRow(el.special, []); return; }
+  if (sp === PEOPLES) { setRow(el.special, peopleButtons()); return; }
   if (sp === GENRES) { setRow(el.special, genreButtons()); return; }
   if (sp === INSTRUMENTS) { setRow(el.special, catalogButtons()); return; }
-  const buttons = [];
-  for (const f of subfolders(sp)){
-    const sel = APP.view.selected === f.path;
-    buttons.push(makeButton(f.name, () => go(f.path), toggleClass(sp) + (sel ? " sel" : "")));
-  }
-  for (const p of extraPages(sp)){
-    const sel = APP.view.docPath === p.path;
-    buttons.push(makeButton(p.title, () => go(p.path), toggleClass(sp) + (sel ? " sel" : "")));
-  }
-  setRow(el.special, buttons);
+  setRow(el.special, []);
 }
 
 
 /* =====================================================================
-   6b. GENRES e INSTRUMENTS (dai testi, senza cartelle)
-   Stessa logica per entrambi (elencoInScope); cambia solo cosa fa il clic:
+   6b. PEOPLES, GENRES e INSTRUMENTS (dai testi, senza cartelle)
+   Stessa logica per tutti (elencoInScope); cambia solo cosa fa il clic:
+     PEOPLES     -> scheda del popolo (sezione 8b)
      GENRES      -> menu "go to" le pagine dove e' nativo + "search the web"
      INSTRUMENTS -> scheda dello strumento (sezione 8b)
+   Popolo = grassetto + sottolineato + MAIUSCOLO (lo raccoglie _build_peoples.py dal
+   dizionario PEOPLES/_PEOPLES.csv). NATIVO = pagine dei paesi della colonna COUNTRIES
+   (anche se il testo non lo cita); CITATO = le altre pagine dove compare.
    Strumento = corsivo + MAIUSCOLO (lo raccoglie _build_instruments.py dal dizionario
    INSTRUMENTS/_INSTRUMENTS.csv): azzurro = NATIVO, senza colore = CITATO.
 
@@ -847,6 +869,23 @@ function citazioniTotali(g){
   return n;
 }
 
+// PEOPLES: solo i popoli che vivono nel luogo (colonna COUNTRIES); i citati restano
+// cliccabili nel testo, ma non compaiono nella riga ne' sul globo
+function peoplesInScope(){
+  const pop = APP.index && APP.index.peoples;
+  return elencoInScope(pop && pop.items, (g) => g.name).filter(v => v.nativeN);
+}
+
+// Pulsanti di PEOPLES (solo nativi, gialli); clic = scheda
+// (il pulsante resta acceso finche' la scheda e' aperta)
+function peopleButtons(){
+  return peoplesInScope().map(({ key, g, nativeN }) => {
+    const b = makeButton(g.name, () => { hidePopup(); apriPopolo(key, b); },
+      "toggle-peoples" + (nativeN ? "" : " dim"));
+    return b;
+  });
+}
+
 function genresInScope(){
   return elencoInScope(APP.index && APP.index.genres, (g) => g.term);
 }
@@ -866,7 +905,7 @@ function genreButtons(){
 }
 
 function azioniGenere(g){
-  const pages = Object.keys(g.native).map(p => APP.byPath.get(p)).filter(Boolean)
+  const pages = Object.keys(g.native).map(destinazione).filter(Boolean)
     .sort((a, b) => a.title.localeCompare(b.title));
   return conRicerca(pages.map(p => vaiA(p.title, p.path)), g.term);
 }
@@ -1262,7 +1301,9 @@ function mostraMenu(anchor, azioni){
     item.addEventListener("click", (ev) => {
       ev.stopPropagation();
       hidePopup();
-      a.fai();
+      // dentro una scheda: le voci che portano altrove prima la chiudono
+      if (APP.cardOpen && !a.inScheda) chiudiScheda(a.fai);
+      else a.fai();
     });
     el.popup.appendChild(item);
   }
@@ -1308,13 +1349,22 @@ function ombraGlobo(){
 
 
 /* =====================================================================
-   8b. SCHEDA DELLO STRUMENTO
-   Si apre cliccando uno strumento nel testo o un pulsante di INSTRUMENTS.
+   8b. SCHEDA (STRUMENTO O POPOLO)
+   Si apre cliccando uno strumento o un popolo nel testo, un pulsante di
+   INSTRUMENTS / PEOPLES o una voce del globo.
    Riquadro sopra la pagina (che si scurisce e si sfoca). Si chiude con la ×,
    cliccando fuori, con Esc o col tasto "indietro" del browser / telefono.
-   Contenuto: immagine, nome, nomi alternativi, descrizione, classificazione,
-   pagine dove e' nativo (tranne quella aperta), fonte, "search the web".
-   I dati completi stanno in instruments.json: si caricano al primo clic.
+   Stessa forma per tutti e due:
+     nome (colore della categoria), "Also known as" (nomi alternativi nel formato
+     della categoria, non cliccabili),
+     "Living in" (popoli) / "Traditional in" (strumenti): paesi in grassetto,
+     cliccabili se hanno una pagina, grigi se non ce l'hanno ancora; la pagina
+     aperta non si ripete e allora l'etichetta diventa "Also ...",
+     solo popoli: "Part of MANDE peoples" / "Includes SONINKE, ..." (cliccabili),
+     testo, rami del CSV (quelli che non sono popoli), fonte, "search the web".
+   STRUMENTO: dati in instruments.json (si caricano al primo clic); testo = DESCRIPTION.
+   POPOLO: dati in atlas-index.json; testo = la sua pagina PEOPLES/NOME.html, con le
+     regole di formattazione (generi, strumenti, luoghi, altri popoli cliccabili).
    ===================================================================== */
 let datiStrumenti = null;          // promessa del caricamento di instruments.json
 
@@ -1348,14 +1398,59 @@ async function apriScheda(key, owner){
     it = { name: m ? m.name : key.toUpperCase(), aliases: [], description: "", source: "",
            paths: [], native: m ? m.native : {}, cited: {}, image: null };
   }
-  disegnaScheda(it);
+  // dove e' nativo: le pagine dove e' scritto in azzurro
+  const luoghi = Object.keys(it.native || {}).map(p => APP.byPath.get(p)).filter(Boolean)
+    .map(p => ({ nome: p.title, path: p.path }));
+  disegnaScheda(it, INSTRUMENTS, luoghi, null);
   mostraScheda(owner);
 }
 
-function disegnaScheda(it){
+// Scheda di un popolo. nome = come e' scritto nel testo (serve se non e' nel dizionario)
+async function apriPopolo(key, owner, nome){
+  hidePopup();
+  const pop = (APP.index.peoples && APP.index.peoples.items) || {};
+  const it = pop[key] || { name: nome || key.toUpperCase(), aliases: [], countries: [],
+                           paths: [], page: null, source: "" };
+  let html = "";
+  if (it.page){
+    try {
+      const res = await fetch("./" + encodePath(it.page), { cache: "no-cache" });
+      if (res.ok) html = await res.text();
+    } catch {}
+  }
+  // dove e' nativo: i paesi della colonna COUNTRIES (path null = paese senza pagina)
+  const luoghi = (it.countries || []).map(c => {
+    const page = c.page && APP.byPath.get(c.page);
+    return page ? { nome: page.title, path: page.path } : { nome: c.name, path: null };
+  });
+  disegnaScheda(it, PEOPLES, luoghi, html);
+  mostraScheda(owner);
+}
+
+// Nome alternativo nel formato della sua categoria (popolo: grassetto + sottolineato;
+// strumento: corsivo), non cliccabile
+function aliasFormattato(nome, tipo){
+  const fuori = crea(tipo === PEOPLES ? "b" : "i");
+  const dentro = tipo === PEOPLES ? fuori.appendChild(crea("u")) : fuori;
+  dentro.textContent = nome;
+  return fuori;
+}
+
+// Nome di un popolo come nel testo (grassetto + sottolineato), cliccabile: apre la sua scheda
+function popoloCliccabile(key, nome){
+  const b = crea("b", "atlasLink");
+  b.appendChild(crea("u", null, nome));
+  b.addEventListener("click", (ev) => { ev.stopPropagation(); apriPopolo(key); });
+  return b;
+}
+
+// tipo: PEOPLES o INSTRUMENTS;  luoghi: [{ nome, path }];  html: testo del popolo
+function disegnaScheda(it, tipo, luoghi, html){
   const box = el.cardBody;
   box.innerHTML = "";
-  el.card.querySelector(".cardTitle").textContent = it.name;
+  const title = el.card.querySelector(".cardTitle");
+  title.className = "btn sel cardTitle " + toggleClass(tipo);
+  title.textContent = it.name;
 
   if (it.image){
     const fig = crea("div", "cardImage");
@@ -1370,10 +1465,72 @@ function disegnaScheda(it){
   }
 
   const text = crea("div", "cardText");
+  // Righe in cima, prima del testo (senza i due punti: si leggono come una frase)
+  const head = crea("div", "cardHead");
   if (it.aliases && it.aliases.length){
-    text.appendChild(crea("p", "cardAka", "also known as: " + it.aliases.join(", ")));
+    const aka = crea("p", "cardAka", "Also known as ");
+    it.aliases.forEach((a, i) => {
+      if (i) aka.appendChild(document.createTextNode(", "));
+      aka.appendChild(aliasFormattato(a, tipo));
+    });
+    head.appendChild(aka);
   }
-  if (it.description){
+
+  // Dove e' nativo, tranne la pagina aperta (subito sotto i nomi alternativi):
+  //   nessun altro paese        -> la riga non compare
+  //   la pagina aperta e' tolta -> "Also living in" / "Also traditional in"
+  //   altrimenti                -> "Living in" / "Traditional in"
+  const here = APP.view && APP.view.docPath;
+  const ordinati = [...luoghi].sort((a, b) => a.nome.localeCompare(b.nome));
+  const others = ordinati.filter(l => !l.path || l.path !== here);
+  if (others.length){
+    const row = crea("p", "cardNative");
+    const etichetta = tipo === PEOPLES ? "living in " : "traditional in ";
+    row.appendChild(crea("span", "cardLabel",
+      others.length < ordinati.length ? "Also " + etichetta : etichetta[0].toUpperCase() + etichetta.slice(1)));
+    others.forEach((l, i) => {
+      if (i) row.appendChild(document.createTextNode(" · "));
+      if (!l.path){
+        row.appendChild(crea("b", "cardPlace cardMissing", l.nome));   // paese senza pagina
+        return;
+      }
+      const a = crea("a", "cardPlace", l.nome);
+      a.href = "#" + encodePath(l.path);
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        chiudiScheda(() => statoIniziale(l.path));   // INFO acceso; la pagina resta ferma, si muovono globo e testo
+      });
+      row.appendChild(a);
+    });
+    head.appendChild(row);
+  }
+
+  // Gruppi di popoli: "Part of MANDE peoples" (sotto-popolo), "Includes ..." (gruppo)
+  if (tipo === PEOPLES){
+    const pop = (APP.index.peoples && APP.index.peoples.items) || {};
+    const rigaPopoli = (prima, chiavi, dopo) => {
+      const keys = (chiavi || []).filter(k => pop[k]);
+      if (!keys.length) return;
+      const row = crea("p", "cardGroup", prima);
+      keys.forEach((k, i) => {
+        if (i) row.appendChild(document.createTextNode(i === keys.length - 1 && dopo ? " and " : ", "));
+        row.appendChild(popoloCliccabile(k, pop[k].name));
+      });
+      if (dopo) row.appendChild(document.createTextNode(dopo));
+      head.appendChild(row);
+    };
+    rigaPopoli("Part of ", it.partOf, " peoples");
+    rigaPopoli("Includes ", it.includes, "");
+  }
+  if (head.children.length) text.appendChild(head);
+
+  if (html){
+    // testo del popolo: come una pagina, con le regole di formattazione
+    const doc = crea("div", "cardDoc");
+    doc.innerHTML = html;
+    applicaRegole(doc);
+    text.appendChild(doc);
+  } else if (it.description){
     const desc = crea("div", "cardDesc");
     for (const par of it.description.split(/\n+/)) desc.appendChild(crea("p", null, par));
     text.appendChild(desc);
@@ -1384,32 +1541,12 @@ function disegnaScheda(it){
     text.appendChild(row);
   }
 
-  // Pagine dove e' nativo, tranne quella aperta
-  const here = APP.view && APP.view.docPath;
-  const pages = Object.keys(it.native || {}).map(p => APP.byPath.get(p)).filter(Boolean)
-    .sort((a, b) => a.title.localeCompare(b.title));
-  const others = pages.filter(p => p.path !== here);
-  if (others.length){
-    const row = crea("p", "cardRow cardNative");
-    row.appendChild(crea("span", "cardLabel",
-      (others.length < pages.length ? "Also native to: " : "Native to: ")));
-    others.forEach((p, i) => {
-      if (i) row.appendChild(document.createTextNode(" · "));
-      const a = crea("a", "cardLink", p.title);
-      a.href = "#" + encodePath(p.path);
-      a.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        chiudiScheda(() => statoIniziale(p.path));   // INFO acceso; la pagina resta ferma, si muovono globo e testo
-      });
-      row.appendChild(a);
-    });
-    text.appendChild(row);
-  }
-
   if (it.image && it.source) text.appendChild(crea("p", "cardSource", "Image: " + it.source));
+  else if (tipo === PEOPLES && it.source) text.appendChild(crea("p", "cardSource", "Source: " + it.source));
 
   const web = crea("a", "cardLink cardWeb", "search the web");
-  web.href = "https://www.google.com/search?q=" + encodeURIComponent(it.name + " musical instrument");
+  const cosa = tipo === PEOPLES ? " people" : " musical instrument";
+  web.href = "https://www.google.com/search?q=" + encodeURIComponent(it.name + cosa);
   web.target = "_blank";
   web.rel = "noopener";
   text.appendChild(web);
@@ -1471,9 +1608,8 @@ function azioneVoce(layer, key, rect, litId){
     window.AtlasMap.setLit(litId);
   } else if (layer === INSTRUMENTS){
     apriScheda(key);
-  } else if (layer === "PEOPLES"){
-    const p = (APP.index.peoples || {})[key];
-    if (p) go(p.path);
+  } else if (layer === PEOPLES){
+    apriPopolo(key);
   }
 }
 
@@ -1649,12 +1785,14 @@ async function boot(){
     window.AtlasMap.onStart = () => go(APP.root.path);
   }
 
-  // scheda dello strumento: la × e il clic fuori dal riquadro la chiudono
+  // scheda (strumento o popolo): la × e il clic fuori dal riquadro la chiudono
   el.cardClose.addEventListener("click", (ev) => { ev.stopPropagation(); chiudiScheda(); });
   el.card.addEventListener("click", (ev) => {
     ev.stopPropagation();
+    hidePopup();                                  // un menu aperto dentro la scheda si chiude
     if (ev.target === el.card) chiudiScheda();
   });
+  el.card.querySelector(".cardPanel").addEventListener("scroll", hidePopup, { passive: true });
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "Escape" && APP.cardOpen) chiudiScheda();
   });

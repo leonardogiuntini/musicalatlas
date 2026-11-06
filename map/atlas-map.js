@@ -101,8 +101,8 @@ const SITE = {
   pageCode: new Map(),        // percorso pagina del paese -> codice del paese
   codePage: new Map(),        // codice del paese -> pagina
   onMap: new Set(),           // percorsi di continenti, zone e paesi presenti sulla mappa
-  peoples: new Map(),         // normalizeKey(nome) -> popolo {name, path, countries}
-  groups: new Map(),          // percorso pagina PEOPLES -> [chiavi popoli]
+  peoples: new Map(),         // chiave -> popolo {name, aliases, codes, native, cited, page}
+  cardCodes: new Map(),       // scheda di un popolo (PEOPLES/NOME.html) -> paesi del popolo
   names: new Map(),           // geoKey -> cosa mostrare
 };
 let resolveIndex;
@@ -136,7 +136,7 @@ function setIndex(index){
   SITE.index = index;
   SITE.root = index.tree;
   SITE.byPath.clear(); SITE.parentOf.clear(); SITE.countryPages.clear();
-  SITE.peoples.clear(); SITE.groups.clear(); SITE.names.clear();
+  SITE.peoples.clear(); SITE.cardCodes.clear(); SITE.names.clear();
 
   (function walk(node, parent){
     SITE.byPath.set(node.path, node);
@@ -164,17 +164,19 @@ function setIndex(index){
   }
   SITE.onMap = new Set([...(info.continents || []), ...(info.zones || []), ...SITE.pageCode.keys()]);
 
-  for (const [key, p] of Object.entries(index.peoples || {})){
+  // Popoli: dizionario PEOPLES/_PEOPLES.csv (lo prepara _build_peoples.py)
+  for (const [key, p] of Object.entries((index.peoples && index.peoples.items) || {})){
     SITE.peoples.set(key, p);
-    if (!SITE.groups.has(p.path)) SITE.groups.set(p.path, []);
-    SITE.groups.get(p.path).push(key);
+    if (p.page) SITE.cardCodes.set(p.page, new Set(p.codes || []));
   }
 
   // Nomi riconosciuti, dal meno al piu' importante (l'ultimo vince)
   const names = SITE.names;
   for (const [k, code] of Object.entries(index.geoNames || {})) names.set(k, { kind: "country", code });
   for (const [k, page] of SITE.countryPages) names.set(k, { kind: "country", page });
-  for (const [key, p] of SITE.peoples) names.set(geoKey(p.name), { kind: "people", key });
+  for (const [key, p] of SITE.peoples){
+    for (const n of [p.name, ...(p.aliases || [])]) names.set(geoKey(n), { kind: "people", key });
+  }
   for (const z of SITE.zones){
     if (SITE.onMap.has(z.path)) names.set(geoKey(z.title), { kind: "zone", node: z });
   }
@@ -635,7 +637,7 @@ function buildGeoFromSite(){
   // aloni dei popoli: centro medio dei paesi (pesato per superficie)
   const placed = [];
   for (const [key, p] of SITE.peoples){
-    const codes = (p.countries || []).map(codeOfName).filter(c => c && GEO.byCode.has(c));
+    const codes = (p.codes || []).filter(c => GEO.byCode.has(c));
     if (!codes.length) continue;
     let s = [0, 0, 0], area = 0;
     for (const code of codes){
@@ -655,7 +657,7 @@ function buildGeoFromSite(){
       v = vec(lon * DEG, lat * DEG);
     }
     const radius = Math.min(12, Math.max(1.1, Math.sqrt(area) * 0.45)) * DEG;
-    const item = { key, name: p.name, path: p.path, codes, vec: v, lon, lat, lon0, lat0, radius };
+    const item = { key, name: p.name, codes, vec: v, lon, lat, lon0, lat0, radius };
     placed.push(item);
     GEO.peoples.set(key, item);
   }
@@ -1047,23 +1049,6 @@ function draw(){
     strokeLines(zone.outline, vv);
   }
 
-  // aloni dei popoli: solo con PEOPLES acceso (niente piu' puntini: il nome e' un pulsante)
-  ctx.globalCompositeOperation = "screen";
-  if (STATE.layer === "PEOPLES"){
-    for (const it of currentItems()){
-      if (!it.native) continue;
-      const hov = hover && hover.kind === "people" && hover.key === it.key;
-      const hl = STATE.hlPeoples.has(it.key);
-      drawGlow({ vec: it.anchor, radius: it.radius }, hl ? 0.7 : hov ? 0.5 : (STATE.hlPeoples.size ? 0.05 : 0.09), true);
-    }
-  } else if (lv === "zone" || lv === "free"){
-    // popoli chiesti apposta (pagina di un gruppo, "show on map"): l'alone resta
-    for (const key of STATE.hlPeoples){
-      const p = GEO.peoples.get(key);
-      if (p) drawGlow(p, 0.7, true);
-    }
-  }
-  ctx.globalCompositeOperation = "source-over";
   ctx.restore();
 
   // bordo del globo
@@ -1222,7 +1207,7 @@ function queueOutsideLabels(lv, cont, zone){
    Le voci sono quelle che l'info box elenca per il luogo aperto.
 
    UNITA' di riferimento: a WORLD i continenti, in un continente le zone,
-   in una zona i paesi. Una pagina di gruppo (es. MANDE) occupa i paesi dei suoi popoli.
+   in una zona i paesi. La scheda di un popolo occupa i paesi del popolo.
 
    Ogni voce compare UNA volta:
      NATIVA  (ha una patria tra le unita' del livello): dentro la patria;
@@ -1239,6 +1224,10 @@ const ITEM_FONT_PX = 8;           // grandezza base del testo delle voci (una ci
 const ITEM_STEP_N = 20;           // fino a quante citazioni si cresce dell'1% ciascuna
 const ITEM_MAX_PCT = 25;          // il piu' citato dell'atlante
 const ITEM_FADE_MS = 220;         // comparsa di una voce
+// PEOPLES: linee sottili tra un gruppo (es. MANDE) e i suoi sotto-popoli
+const GROUP_LINE_ALPHA = 0.25;    // sempre (0 = nascoste)
+const GROUP_LINE_LIT = 0.9;       // col mouse sopra il gruppo o un sotto-popolo
+const GROUP_LINE_WIDTH = 1;       // spessore in pixel
 const HOVER_GROW = 1.1;           // col mouse sopra una voce si ingrandisce un poco
 const HOOKS = { onItem: null, onMore: null, onHere: null, onStart: null };
 const ITEMS = { sig: null, list: [] };
@@ -1276,18 +1265,15 @@ function inCodes(v, codes){
   return false;
 }
 
-// Paesi occupati da una pagina: paese -> se stesso; pagina di un gruppo -> paesi
-// dei suoi popoli; pagina di presentazione di una zona o di un continente -> i suoi paesi
+// Paesi occupati da una pagina: paese -> se stesso; scheda di un popolo -> paesi
+// del popolo; pagina di presentazione di una zona o di un continente -> i suoi paesi
 function footprint(path){
   if (FOOT.has(path)) return FOOT.get(path);
   const out = new Set();
   const code = SITE.pageCode.get(path);
   if (code) out.add(code);
-  else if (SITE.groups.has(path)){
-    for (const key of SITE.groups.get(path)){
-      const p = SITE.peoples.get(key);
-      for (const n of (p && p.countries) || []){ const c = codeOfName(n); if (c) out.add(c); }
-    }
+  else if (SITE.cardCodes.has(path)){
+    for (const c of SITE.cardCodes.get(path)) out.add(c);
   } else {
     const parent = SITE.parentOf.get(path), node = SITE.byPath.get(path);
     if (parent && node && presentationOf(parent) === node){
@@ -1331,6 +1317,7 @@ function unitsOfLevel(){
     inside.clear(); inside.add(STATE.country);
   }
   return {
+    countries: !STATE.country,                 // livello dei paesi di una zona (non la pagina di un paese)
     of: (code) => (lv === "free" || inside.has(code)) && GEO.byCode.has(code) ? code : null,
     center: (u) => GEO.byCode.get(u).label,
     codes: (u) => [u],
@@ -1346,7 +1333,6 @@ function spaceOfPlace(){
   if (node.type === "page"){
     const code = SITE.pageCode.get(node.path);
     if (code) return new Set([code]);
-    if (SITE.groups.has(node.path)){ const f = footprint(node.path); return f.size ? f : null; }
   }
   let folder = node.type === "folder" ? node : SITE.parentOf.get(node.path);
   if (folder && isSpecial(folder)) folder = SITE.parentOf.get(folder.path);
@@ -1398,11 +1384,10 @@ function buildItems(layer){
                  total: sum(g.native) + sum(g.cited) });
     }
   } else if (layer === "PEOPLES"){
+    // nativo = paesi della colonna COUNTRIES (anche senza pagina); citato = le altre pagine
     for (const [key, p] of SITE.peoples){
-      const pages = Object.keys(p.pages || {}).filter(x => SITE.pageCode.has(x));   // giallo nei paesi
-      const codes = new Set((p.countries || []).map(codeOfName).filter(Boolean));
-      for (const c of footOf(pages)) codes.add(c);
-      raw.push({ key, name: p.name, path: p.path, codes, cited: [], total: Math.max(1, sum(p.pages)) });
+      raw.push({ key, name: p.name, native: Object.keys(p.native || {}), cited: Object.keys(p.cited || {}),
+                 codes: new Set(p.codes || []), total: sum(p.native) + sum(p.cited) });
     }
   }
   const max = raw.reduce((m, r) => Math.max(m, r.total), 0);
@@ -1413,27 +1398,22 @@ function buildItems(layer){
   };
 
   // nel luogo aperto?
-  const scopeCodes = layer === "PEOPLES"
-    ? footOf([...SITE.byPath.keys()].filter(p => SITE.byPath.get(p).type === "page" && inScope(p)))
-    : null;
   const U = unitsOfLevel();
-  const space = layer === "PEOPLES" ? null : spaceOfPlace();
+  const space = spaceOfPlace();
   const spaceCenter = space ? centerOfCodes(space) : null;
   const list = [];
   for (const r of raw){
-    let nativeCodes, citedCodes;
-    if (layer === "PEOPLES"){
-      const here = [...r.codes].some(c => scopeCodes.has(c)) || inScope(r.path);
-      if (!here) continue;
-      nativeCodes = r.codes; citedCodes = new Set();
-    } else {
-      if (!r.native.some(inScope) && !r.cited.some(inScope)) continue;
-      nativeCodes = footOf(r.native);
-      citedCodes = footOf(r.cited.filter(inScope));
-    }
+    if (!r.native.some(inScope) && (layer === "PEOPLES" || !r.cited.some(inScope))) continue;   // popoli: solo i nativi
+    const nativeCodes = r.codes || footOf(r.native);      // popoli: i paesi del CSV
+    const citedCodes = footOf(r.cited.filter(inScope));
     if (layer === "INSTRUMENTS" && STATE.only && !STATE.only.has(r.key)) continue;   // ramo scelto nel catalogo
-    const it = { key: r.key, name: r.name, path: r.path, total: r.total, pct: pctOf(r.total) };
-    const nUnits = [...new Set([...nativeCodes].map(U.of).filter(Boolean))];
+    const it = { key: r.key, name: r.name, total: r.total, pct: pctOf(r.total) };
+    let nUnits = [...new Set([...nativeCodes].map(U.of).filter(Boolean))];
+    // POPOLI, livello dei paesi di una zona: contano TUTTI i paesi del popolo, anche
+    // fuori dalla zona o senza pagina (il nome va verso il centro vero del popolo)
+    if (layer === "PEOPLES" && U.countries && nUnits.length){
+      nUnits = [...nativeCodes].filter(c => GEO.byCode.has(c));
+    }
     if (nUnits.length){
       it.native = true;
       it.anchor = (nUnits.length === 1) ? U.center(nUnits[0]) : nearAll(nUnits, U);
@@ -1634,6 +1614,7 @@ function drawItems(){
   let fading = false;
   const seen = new Set();
   const top = UI.bar ? UI.bar.offsetHeight * 0.6 : 0;
+  if (layer === "PEOPLES") drawGroupLines(color, vv);
   for (const p of LAYOUT.placed){
     if (dot(p.geo, vv) < 0.15) continue;
     const q = projectVec(p.geo);
@@ -1647,8 +1628,7 @@ function drawItems(){
     const ps = hov ? { font: p.s.font * HOVER_GROW, w: p.s.w * HOVER_GROW, h: p.s.h * HOVER_GROW } : p.s;
     drawPill(p.text, q.x, q.y, ps, p.it.native ? color : dimColor, STATE.lit === key, al);
     const b = [q.x - p.s.w / 2 - 2, q.y - p.s.h / 2 - 2, q.x + p.s.w / 2 + 2, q.y + p.s.h / 2 + 2];
-    const hit = layer === "PEOPLES" ? { kind: "people", key, path: p.it.path }
-      : { kind: "item", layer, key, rect: canvasRect(b) };
+    const hit = { kind: "item", layer, key, rect: canvasRect(b) };
     if (b[1] >= top) LABEL_HITS.push({ box: b, hit });
   }
   for (const k of [...ITEM_ALPHA.keys()]) if (!seen.has(k)) ITEM_ALPHA.delete(k);
@@ -1665,6 +1645,32 @@ function drawItems(){
   if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
   ctx.font = COLORS.font;
   if (fading) requestDraw(); else itemsT = 0;
+}
+
+// PEOPLES: da ogni sotto-popolo una linea verso il suo gruppo (es. BAMBARA -> MANDE),
+// se tutti e due sono sul globo. Disegnate prima dei nomi, che le coprono alle estremita'.
+// Col mouse sopra il gruppo si accendono tutte le sue linee, sopra un sotto-popolo la sua.
+function drawGroupLines(color, vv){
+  const at = new Map();
+  for (const p of LAYOUT.placed){
+    if (dot(p.geo, vv) >= 0.15) at.set(p.it.key, projectVec(p.geo));
+  }
+  const hov = STATE.hover && STATE.hover.kind === "item" ? STATE.hover.key : null;
+  ctx.lineWidth = GROUP_LINE_WIDTH;
+  ctx.strokeStyle = color;
+  for (const [key, a] of at){
+    const pop = SITE.peoples.get(key);
+    for (const g of (pop && pop.partOf) || []){
+      const b = at.get(g);
+      if (!b) continue;
+      const lit = hov === key || hov === g;
+      const alpha = Math.min(ITEM_ALPHA.get(key) || 0, ITEM_ALPHA.get(g) || 0);
+      ctx.globalAlpha = (lit ? GROUP_LINE_LIT : GROUP_LINE_ALPHA) * alpha;
+      if (!ctx.globalAlpha) continue;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
 }
 
 // Dove va ogni voce (si rifa' da fermo, o al massimo ogni LAYOUT_MS mentre il globo si muove)
@@ -1988,14 +1994,13 @@ function display(t, highlights, animate){
 function targetFromAddress(){
   const { node, continent, zone } = placeOf(currentPath());
   if (!node || !continent || !GEO.continents.has(continent.path)) return { level: "world" };
-  const countries = [], peoples = [];
+  const countries = [];
   if (node.type === "page"){
     const code = SITE.pageCode.get(node.path);
     if (code) countries.push(code);
-    for (const key of (SITE.groups.get(node.path) || [])) peoples.push(key);
   }
   const country = node.type === "page" ? SITE.pageCode.get(node.path) || null : null;
-  if (zone && GEO.zones.has(zone.path)) return { level: "zone", continent, zone, countries, peoples, country };
+  if (zone && GEO.zones.has(zone.path)) return { level: "zone", continent, zone, countries, country };
   return { level: "continent", continent };
 }
 
@@ -2132,9 +2137,14 @@ async function show(text){
     const { continent } = placeOf(t.node.path);
     target = { level: "zone", continent, zone: t.node };
   } else if (t.kind === "people"){
-    const p = SITE.peoples.get(t.key), g = GEO.peoples.get(t.key);
-    const { continent, zone } = placeOf(p.path);
-    const keys = g ? [t.key] : (SITE.groups.get(p.path) || []);
+    const g = GEO.peoples.get(t.key);
+    if (!g) return;
+    const keys = [t.key];
+    // la zona che contiene piu' paesi del popolo
+    const conta = new Map();
+    for (const c of g.codes){ const z = GEO.zoneOfCode.get(c); if (z) conta.set(z, (conta.get(z) || 0) + 1); }
+    const zone = [...conta.keys()].sort((a, b) => conta.get(b) - conta.get(a))[0] || null;
+    const continent = zone ? placeOf(zone.path).continent : null;
     if (zone && GEO.zones.has(zone.path)){
       const z = GEO.zones.get(zone.path);
       // se l'alone esce dalla zona, allarga l'inquadratura
@@ -2234,7 +2244,6 @@ function onClick(sx, sy, touch){
   }
   STATE.preview = null;
   if (hit.kind === "continent" || hit.kind === "zone") return go(hit.node.path);
-  if (hit.kind === "people") return go(hit.path);
   if (hit.kind === "item") return HOOKS.onItem && HOOKS.onItem(hit.layer, hit.key, hit.rect);
   if (hit.kind === "more") return HOOKS.onMore ? HOOKS.onMore(hit.layer, hit.keys, hit.rect, hit.id) : zoomBy(+1, sx, sy);
   if (hit.kind === "country") return go(hit.page.path);

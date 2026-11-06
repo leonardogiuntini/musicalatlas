@@ -252,6 +252,11 @@ def read_mentions(page_readers, items, names, normalize_key, is_all_caps, report
             full = "".join(t for _, t in par)
             for (bold, italic, underline, mark), text in par:
                 if italic and not bold:
+                    caps = [t for t in split_names(text) if is_all_caps(t)]
+                    if len(caps) > 1:
+                        report("FORMATTAZIONE ANOMALA", " ; ".join(caps), title,
+                               "piu' nomi nella stessa formattazione: sul sito diventano una sola parola "
+                               "cliccabile. Lascia ; , / fuori dalla formattazione. Frase: " + around(full, caps[0]))
                     for token in split_names(text):
                         if not is_all_caps(token):
                             continue

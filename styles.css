@@ -302,20 +302,21 @@ html{ scrollbar-gutter: stable; }
   overflow-wrap: anywhere;
 }
 
-/* Paragrafi uno sotto l'altro, senza spazio extra (come negli RTF) */
-#docContent p{ margin: 0; }
+/* Paragrafi uno sotto l'altro, senza spazio extra (come negli RTF).
+   Valgono per le pagine (#docContent) e per i testi delle schede dei popoli (.cardDoc) */
+#docContent p, .cardDoc p{ margin: 0; }
 /* Paragrafo vuoto <p></p> = una riga vuota */
-#docContent p:empty::before{ content: "\00a0"; }
+#docContent p:empty::before, .cardDoc p:empty::before{ content: "\00a0"; }
 
 /* I 7 colori di evidenziazione delle pagine */
-#docContent mark{ color: inherit; padding: 0; }
-#docContent mark.yellow { background: #FFFF00; }
-#docContent mark.cyan   { background: #00FFFF; }
-#docContent mark.green  { background: #00FF00; }
-#docContent mark.red    { background: #FF0000; }
-#docContent mark.magenta{ background: #FF00FF; }
-#docContent mark.blue   { background: #0000FF; }
-#docContent mark.white  { background: #FFFFFF; }
+#docContent mark, .cardDoc mark{ color: inherit; padding: 0; }
+:is(#docContent, .cardDoc) mark.yellow { background: #FFFF00; }
+:is(#docContent, .cardDoc) mark.cyan   { background: #00FFFF; }
+:is(#docContent, .cardDoc) mark.green  { background: #00FF00; }
+:is(#docContent, .cardDoc) mark.red    { background: #FF0000; }
+:is(#docContent, .cardDoc) mark.magenta{ background: #FF00FF; }
+:is(#docContent, .cardDoc) mark.blue   { background: #0000FF; }
+:is(#docContent, .cardDoc) mark.white  { background: #FFFFFF; }
 
 .welcomeMsg{
   text-align: center;
@@ -342,7 +343,7 @@ a, a:visited, a:hover, a:active{ color: inherit; }
 /* ---------- Menu a comparsa ---------- */
 #hoverCard{
   position: fixed;
-  z-index: 9999;
+  z-index: 10001;                  /* sopra anche la scheda (parole cliccabili nelle schede) */
   max-width: min(320px, 80vw);
   background: #000;
   color: #fff;
@@ -465,7 +466,7 @@ a, a:visited, a:hover, a:active{ color: inherit; }
 .catalogEnd{ height: 1px; }
 .catalogEmpty{ margin: 18px 0; text-align: center; color: var(--ui-fg); }
 
-/* ---------- Scheda dello strumento ----------
+/* ---------- Scheda (strumento o popolo) ----------
    Riquadro centrato sopra la pagina; la pagina sotto si scurisce e si sfoca.
    Stessi materiali dell'info box: intestazione nera, testo su bianco.
    Sul telefono occupa quasi tutto lo schermo. */
@@ -494,6 +495,7 @@ html.cardOpen, html.cardOpen body{ overflow: hidden; }
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none;
   background: var(--ui-bg);
   border: 2px solid var(--ui-border);
   border-radius: 18px;
@@ -501,13 +503,11 @@ html.cardOpen, html.cardOpen body{ overflow: hidden; }
   transition: transform var(--ui-time) var(--ui-ease);
 }
 .cardOverlay.open .cardPanel{ transform: none; }
+.cardPanel::-webkit-scrollbar{ display: none; }
 .cardPanel:focus{ outline: none; }
 
-/* intestazione: nome a sinistra, × a destra; resta in vista se la scheda scorre */
+/* intestazione: nome a sinistra, × a destra */
 .cardBar{
-  position: sticky;
-  top: 0;
-  z-index: 1;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -560,11 +560,17 @@ html.cardOpen, html.cardOpen body{ overflow: hidden; }
   overflow-wrap: anywhere;
 }
 .cardText p{ margin: 0; }
-.cardAka{ font-style: italic; margin-bottom: 8px !important; }
+/* righe in cima (nomi alternativi, paesi, gruppi): un po' di spazio tra loro e prima del testo */
+.cardHead{ margin-bottom: 12px; }
+.cardHead p + p{ margin-top: 8px !important; }
 .cardDesc p + p{ margin-top: 8px; }
 .cardRow{ margin-top: 12px !important; }
 .cardPath{ font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-.cardLabel{ font-weight: 700; }
+.cardLabel{ font-weight: 400; }
+/* Paesi in fondo alla scheda: grassetto come i luoghi nel testo, senza sottolineato.
+   Grigio = paese che non ha ancora una pagina (non cliccabile) */
+.cardPlace{ font-weight: 700; text-decoration: none; cursor: pointer; }
+.cardMissing{ cursor: default; opacity: 0.4; }
 .cardLink{ text-decoration: underline; cursor: pointer; }
 .cardSource{ margin-top: 12px !important; font-size: 12px; opacity: 0.7; }
 .cardWeb{ display: inline-block; margin-top: 12px; font-size: 12px; }

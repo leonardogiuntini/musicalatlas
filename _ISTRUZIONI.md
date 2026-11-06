@@ -10,11 +10,14 @@ _anteprima.bat              lancia l'anteprima (prima si chiamava anteprima.bat)
 _build_index.py             crea l'indice (prima build_index.py)
 _build_instruments.py       strumenti: dizionario, pagine, immagini, file di controllo
                             (lo richiama _build_index.py: non va lanciato a mano)
+_build_peoples.py           popoli: dizionario, schede, file di controllo
+                            (lo richiama _build_index.py: non va lanciato a mano)
 _server.py                  mini-server dell'anteprima (prima server.py)
 _ISTRUZIONI.md              questo file
 _REGOLE_FORMATTAZIONE.txt   come formattare le pagine
 INSTRUMENTS/                immagini e dizionario degli strumenti (vedi
                             INSTRUMENTS/_ISTRUZIONI_IMMAGINI.txt)
+PEOPLES/                    schede dei popoli (NOME.html) e dizionario _PEOPLES.csv
 ```
 
 Dove sotto si legge `anteprima.bat` o `build_index.py`, oggi sono `_anteprima.bat`
@@ -29,7 +32,60 @@ atlas-index.json                     indice del sito
 instruments.json                     dati completi degli strumenti
 INSTRUMENTS/web/                     copie leggere delle immagini
 INSTRUMENTS/_CONTROLLO_INSTRUMENTS.csv   segnalazioni (filtra per la colonna TIPO)
+PEOPLES/_CONTROLLO_PEOPLES.csv           segnalazioni sui popoli (filtra per la colonna TIPO)
 ```
+
+## PEOPLES: schede dei popoli (versione 4.9)
+
+I popoli funzionano come gli strumenti: un dizionario, una scheda per popolo, un file
+di controllo. Le vecchie cartelle PEOPLES dentro World (pagine di gruppo) non vanno
+piu' sul sito: `_anteprima.bat` le elenca finche' ci sono.
+
+- Cartella `PEOPLES/` accanto a `World/` e `INSTRUMENTS/`:
+  - `_PEOPLES.csv`: NAME; ALIASES; COUNTRIES; SOURCE; _NOTE; LEVEL 1 (e altri livelli).
+    Alias e paesi separati da " / ". Le colonne si riconoscono dal nome.
+  - `NOME.html` (es. `FULƁE.html`): il testo della scheda, nello stesso formato delle
+    pagine (si scrive con `_editor.html`). Nome del file = NAME.
+  - `_CONTROLLO_PEOPLES.csv`: lo crea `_anteprima.bat` (SENZA SCHEDA, SENZA PAGINA,
+    PAESE SCONOSCIUTO, GIALLO FUORI PATRIA, FORMATTAZIONE ANOMALA, PATRIE...).
+    FORMATTAZIONE ANOMALA segnala anche piu' nomi nella stessa formattazione
+    (es. FANTE; ASANTE tutto in grassetto + sottolineato): sul sito sarebbero una sola
+    parola cliccabile. Vale anche per gli strumenti (KORA; XALAM tutto in corsivo).
+- Nativo = i paesi della colonna COUNTRIES (anche se il testo non lo cita).
+  Citato = le altre pagine dove compare. Il giallo nei testi resta: il controllo
+  segnala un popolo giallo in un paese che non e' nella sua lista.
+- Regole: popolo = grassetto + sottolineato + MAIUSCOLO; giallo (regola 5) o senza
+  colore (regola 6): il clic apre la scheda. Vale anche il nome alternativo
+  (FULANI apre FULƁE). Un popolo che non e' nel CSV apre una scheda con il solo nome
+  e "search the web". Gli strumenti sono ora le regole 7 e 8.
+- Scheda (uguale per strumenti e popoli), etichette senza due punti: nome;
+  "Also known as" con i nomi alternativi nel formato della categoria (popoli
+  grassetto + sottolineato, strumenti corsivo), non cliccabili; i paesi in grassetto
+  (cliccabili; grigi se il paese non ha ancora una pagina): popoli "Living in",
+  strumenti "Traditional in"; solo popoli: "Part of MANDE peoples" / "Includes ...";
+  poi il testo (popoli: con le parole cliccabili); rami del CSV che non sono popoli
+  (riga piccola); "search the web".
+  La pagina aperta non si ripete nei paesi: se era fra loro l'etichetta diventa
+  "Also living in" / "Also traditional in"; se era l'unico, la riga non compare.
+- Gruppi di popoli (es. MANDE): un ramo della gerarchia che ha lo stesso nome di un
+  popolo del CSV E' quel popolo, come la pagina di presentazione di una cartella.
+  I sotto-popoli hanno il gruppo nel percorso (LEVEL 1 = MANDE); la riga MANDE dice
+  dove sta MANDE (LEVEL vuoto = da nessuna parte). Scheda del sotto-popolo:
+  "Part of MANDE peoples"; scheda del gruppo: "Includes SONINKE, MANINKA ..."
+  (nell'ordine del CSV), nomi cliccabili. COUNTRIES vuota nel gruppo = unione dei
+  paesi dei sotto-popoli (nel controllo, PATRIE dice "dai sotto-popoli").
+  Sul globo, con PEOPLES acceso, linee gialle sottili uniscono il gruppo ai suoi
+  sotto-popoli; col mouse sopra il gruppo (o un sotto-popolo) le sue linee si
+  accendono. Regolazioni in cima a map/atlas-map.js: GROUP_LINE_ALPHA (sempre;
+  0 = nascoste), GROUP_LINE_LIT (col mouse sopra), GROUP_LINE_WIDTH (spessore).
+- Dentro una scheda i menu si aprono sopra la scheda; "go to" e "show on map" prima
+  la chiudono.
+- Definizioni e generi scritti in una scheda valgono come quelli delle pagine:
+  "go to" apre la scheda.
+- Interruttore PEOPLES: solo i popoli che vivono nel luogo (colonna COUNTRIES), sia
+  nella riga sia sul globo; i popoli citati restano cliccabili nel testo. Clic = scheda. Sul globo: alone e nome sui paesi del popolo;
+  clic = scheda. Al livello di una zona il nome va al centro di TUTTI i paesi del
+  popolo, anche fuori dalla zona o senza pagina (es. TOUAREG verso l'Algeria).
 
 ## Percorso, pagine e INFO (dalla versione 4.3)
 
